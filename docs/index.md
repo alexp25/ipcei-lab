@@ -38,16 +38,16 @@ layout: default
 
 | Lecție | Periferică | Ziua | Durată |
 |---|---|---|---|
-| [L0 — Setup Toolchain & Prima Aplicație](l0-setup-toolchain.md) | `Toolchain · Build System · Debug` | Ziua 0 — Pre-school (asincron) | ~3h asincron |
-| [L1 — GPIO — Control Digital & Butoane](l1-gpio.md) | `PORT · GPIO · FGPIO` | Ziua 1, 22 iunie — dimineață | 2h (09:00–11:00) |
-| [L2 — LPUART — Comunicație Serială](l2-lpuart.md) | `LPUART0 · VCOM · FRO_HF_DIV` | Ziua 1, 22 iunie — după-amiază | 2h (13:00–15:00) |
-| [L3 — Întreruperi Externe & NVIC](l3-intreruperi.md) | `GPIO IRQ · NVIC · SysTick` | Ziua 2, 23 iunie — dimineață | 2h (09:00–11:00) |
-| [L4 — Timer & PWM — SCTimer și CTIMER](l4-timer-pwm.md) | `SCTimer/PWM · CTIMER0 · FRO_HF` | Ziua 2, 23 iunie — după-amiază | 2h (13:00–15:00) |
-| [L5 — LPADC — Conversie Analogică 12 biți](l5-lpadc.md) | `LPADC0 · Command Queue · VREFH 3.3V` | Ziua 3, 24 iunie — dimineață | 2h (09:00–11:00) |
-| [L6 — LPSPI — Comunicație SPI & Device Extern](l6-lpspi.md) | `LPSPI0 · Arduino Header · FIFO` | Ziua 3, 24 iunie — după-amiază | 2h (13:00–15:00) |
-| [L7 — LPI2C — Senzorul P3T1755 On-Board](l7-lpi2c-p3t1755.md) | `LPI2C0 · P3T1755DPJ · 400 kHz Fast Mode` | Ziua 4, 25 iunie — dimineață | 2h (09:00–11:00) |
-| [L8 — Integrare — Sistem Complet cu FSM](l8-integrare.md) | `Toate perifericele · FSM · Super-loop` | Ziua 4, 25 iunie — după-amiază + Ziua 5 | 3h (13:00–16:00) |
-| [L9 — Testing, Documentare & Prezentare Finală](l9-testing-docs.md) | `Unity · Doxygen · GitHub Actions · Show & Tell` | Ziua 5 + Săptămâna 2 online | 2h sesiune + async |
+| [L0 — Setup Toolchain & Prima Aplicație](lessons/l0-setup-toolchain.md) | `Toolchain · Build System · Debug` | Ziua 0 — Pre-school (asincron) | ~3h asincron |
+| [L1 — GPIO — Control Digital & Butoane](lessons/l1-gpio.md) | `PORT · GPIO · FGPIO` | Ziua 1, 22 iunie — dimineață | 2h (09:00–11:00) |
+| [L2 — LPUART — Comunicație Serială](lessons/l2-lpuart.md) | `LPUART0 · VCOM · FRO_HF_DIV` | Ziua 1, 22 iunie — după-amiază | 2h (13:00–15:00) |
+| [L3 — Întreruperi Externe & NVIC](lessons/l3-intreruperi.md) | `GPIO IRQ · NVIC · SysTick` | Ziua 2, 23 iunie — dimineață | 2h (09:00–11:00) |
+| [L4 — Timer & PWM — SCTimer și CTIMER](lessons/l4-timer-pwm.md) | `SCTimer/PWM · CTIMER0 · FRO_HF` | Ziua 2, 23 iunie — după-amiază | 2h (13:00–15:00) |
+| [L5 — LPADC — Conversie Analogică 12 biți](lessons/l5-lpadc.md) | `LPADC0 · Command Queue · VREFH 3.3V` | Ziua 3, 24 iunie — dimineață | 2h (09:00–11:00) |
+| [L6 — LPSPI — Comunicație SPI & Device Extern](lessons/l6-lpspi.md) | `LPSPI0 · Arduino Header · FIFO` | Ziua 3, 24 iunie — după-amiază | 2h (13:00–15:00) |
+| [L7 — LPI2C — Senzorul P3T1755 On-Board](lessons/l7-lpi2c-p3t1755.md) | `LPI2C0 · P3T1755DPJ · 400 kHz Fast Mode` | Ziua 4, 25 iunie — dimineață | 2h (09:00–11:00) |
+| [L8 — Integrare — Sistem Complet cu FSM](lessons/l8-integrare.md) | `Toate perifericele · FSM · Super-loop` | Ziua 4, 25 iunie — după-amiază + Ziua 5 | 3h (13:00–16:00) |
+| [L9 — Testing, Documentare & Prezentare Finală](lessons/l9-testing-docs.md) | `Unity · Doxygen · GitHub Actions · Show & Tell` | Ziua 5 + Săptămâna 2 online | 2h sesiune + async |
 
 ---
 
