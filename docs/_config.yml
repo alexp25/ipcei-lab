@@ -2,9 +2,6 @@ title: IPCEI NXP — Lecții FRDM-MCXA153
 description: GenAI & Embedded Engineering — Școala de vară UPB–NXP 2026
 theme: jekyll-theme-cayman # This gives you that green header!
 
-url: https://alexp25.github.io
-baseurl: /ipcei-lab
-
 color_scheme: light
 search_enabled: true
 heading_anchors: true
