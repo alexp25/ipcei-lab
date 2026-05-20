@@ -1,14 +1,13 @@
-title: Lecții FRDM-MCXA153 — IPCEI NXP 2026
-description: GenAI & Embedded Engineering — Școala de vară UPB–NXP
-theme: just-the-docs
+title: IPCEI NXP — Lecții FRDM-MCXA153
+description: GenAI & Embedded Engineering — Școala de vară UPB–NXP 2026
+theme: jekyll-theme-cayman # This gives you that green header!
 
-url: https://ipcei-upb.github.io
-baseurl: /frdm-mcxa153-lessons
+url: https://alexp25.github.io
+baseurl: /ipcei-lab
 
 color_scheme: light
 search_enabled: true
 heading_anchors: true
-
 nav_sort: order
 
-footer_content: "Proiect IPCEI ME/CT · Tema 6: Upgrading Curricula · UPB – NXP Semiconductors · 2026"
+footer_content: "Proiect IPCEI - UPB-NXP - 2026"
