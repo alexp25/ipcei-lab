@@ -205,3 +205,12 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# MCUXpresso SDK (fetched via West, not tracked)
+**/mcuxsdk/
+
+# CMake build output
+debug/
+
+# West internal symlinks
+__repo__

@@ -14,10 +14,9 @@ layout: default
 
 | | |
 |---|---|
-| **Ziua / Sesiunea** | Ziua 0 — Pre-school (asincron) |
+| **Ziua / Sesiunea** | Ziua 1 — Setup Workshop |
 | **Periferic** | `Toolchain · Build System · Debug` |
-| **Durată** | ~3h asincron |
-| **Responsabil** | Stefan Turcu |
+| **Durată** | ~3h |
 | **Hardware** | FRDM-MCXA153 + cablu USB Type-C · PC Windows/Linux/macOS |
 
 ## 📌 Context și Motivație
@@ -43,7 +42,7 @@ Pasul zero, livrat asincron înainte de ziua 1 fizică. Participanții primesc u
 | `Async` | **Build + flash** | `cmake --preset frdm-mcxa153-debug` → `cmake --build build/` → drag-drop `.bin` pe MCU-Link drive. | student |
 | `Async` | **Debug session** | F5 în VS Code → breakpoint pe `GPIO_PinWrite()` → step-over → LED schimbă starea. | student |
 
-## 🤖 Prompte pentru Asistentul AI UPB
+## 🤖 Prompt-uri pentru Asistentul AI UPB
 
 > **Regulă:** Copiați prompt-ul complet — contextul hardware este obligatoriu.
 > AI-ul va genera cod greșit (pentru alte familii NXP sau Arduino) fără aceste informații.
@@ -70,13 +69,24 @@ Include:
 Explică de ce GPIO LOW aprinde LED-ul (anod comun).
 ```
 
-## ⚠️ Capcane Critice
+## ⚠️ Capcane
 
 > Ce GenAI **nu știe** fără context explicit — verificați înainte de upload pe placă.
 
 - **Path SDK cu spații** → CMake eșuează; folosiți path fără spații (ex: `C:/NXP/SDK`)
 - **MCU-Link driver**: Windows necesită Zadig pentru OpenOCD; Linux necesită regulă udev
 - **LED RGB anod comun**: `GPIO LOW` = LED **APRINS** (opus intuiției Arduino standard)
+
+
+## Note
+
+Instalați extensia MCUXpresso pentru Visual Studio Code
+
+Bifați componentele necesare (includeți LinkServer, acesta va permite încărcarea și testarea codului pe placă)
+
+![LinkServer](../l0-setup-toolchain/images/setup_linkserver.png)
+
+Instalarea durează mult. Folosiți acest timp pentru a înțelege mai bine placa (specificații, pinout)
 
 ## ✅ Deliverable
 
