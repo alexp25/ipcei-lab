@@ -1,0 +1,126 @@
+/* Rouge syntax highlighting — Atom One Dark theme */
+
+.highlight {
+  background: #282c34;
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  margin: .75rem 0 1rem;
+}
+
+.highlight pre {
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+}
+
+.highlight code {
+  font-family: 'Consolas', 'Fira Mono', monospace;
+  font-size: .88rem;
+  line-height: 1.6;
+  color: #abb2bf;
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* Comments */
+.highlight .c,
+.highlight .c1,
+.highlight .cm,
+.highlight .cs,
+.highlight .cp  { color: #5c6370; font-style: italic }
+
+/* Keywords */
+.highlight .k,
+.highlight .kc,
+.highlight .kd,
+.highlight .kn,
+.highlight .kp,
+.highlight .kr  { color: #c678dd }
+
+/* Keyword.Type */
+.highlight .kt  { color: #e5c07b }
+
+/* Strings */
+.highlight .s,
+.highlight .s1,
+.highlight .s2,
+.highlight .sb,
+.highlight .sc,
+.highlight .sd,
+.highlight .se,
+.highlight .sh,
+.highlight .si,
+.highlight .sx,
+.highlight .ss  { color: #98c379 }
+
+/* Strings.Regex */
+.highlight .sr  { color: #56b6c2 }
+
+/* Numbers */
+.highlight .m,
+.highlight .mb,
+.highlight .mf,
+.highlight .mh,
+.highlight .mi,
+.highlight .ml,
+.highlight .mo,
+.highlight .mx,
+.highlight .il  { color: #d19a66 }
+
+/* Names */
+.highlight .n,
+.highlight .ni,
+.highlight .nl,
+.highlight .nn,
+.highlight .nx,
+.highlight .py,
+.highlight .p   { color: #abb2bf }
+
+/* Name.Builtin */
+.highlight .nb,
+.highlight .bp  { color: #e5c07b }
+
+/* Name.Class */
+.highlight .nc  { color: #e5c07b }
+
+/* Name.Constant */
+.highlight .no  { color: #d19a66 }
+
+/* Name.Decorator */
+.highlight .nd  { color: #61afef }
+
+/* Name.Exception */
+.highlight .ne  { color: #e06c75 }
+
+/* Name.Function */
+.highlight .nf  { color: #61afef }
+
+/* Name.Tag */
+.highlight .nt  { color: #e06c75 }
+
+/* Name.Variable */
+.highlight .na,
+.highlight .nv,
+.highlight .vc,
+.highlight .vg,
+.highlight .vi  { color: #e06c75 }
+
+/* Operators */
+.highlight .o,
+.highlight .ow  { color: #56b6c2 }
+
+/* Literals */
+.highlight .l,
+.highlight .ld  { color: #98c379 }
+
+/* Error */
+.highlight .err { color: #e06c75; background: transparent }
+
+/* Generic diff */
+.highlight .gd  { color: #e06c75 }
+.highlight .gi  { color: #98c379 }
+.highlight .gh  { color: #61afef; font-weight: bold }
+.highlight .gu  { color: #c678dd; font-weight: bold }

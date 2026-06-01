@@ -3,7 +3,7 @@ title: "L3 — Întreruperi Externe & NVIC"
 description: "GPIO IRQ pe Cortex-M33, volatile, debounce"
 nav_order: 4
 parent: Lecții FRDM-MCXA153
-layout: default
+layout: lesson
 ---
 
 # ⚡ L3 — Întreruperi Externe & NVIC
@@ -85,4 +85,4 @@ cauzează re-intrarea continuă? Ce se întâmplă în NVIC?
 
 ---
 
-[← L2: LPUART — Comunicație Serială](l2-lpuart.md) · [L4: Timer & PWM — SCTimer și CTIMER →](l4-timer-pwm.md)
+[← L2: LPUART — Comunicație Serială](../l2-lpuart) · [L4: Timer & PWM — SCTimer și CTIMER →](../l4-timer-pwm)

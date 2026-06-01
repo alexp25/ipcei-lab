@@ -3,7 +3,7 @@ title: "L9 — Testing, Documentare & Prezentare Finală"
 description: "Unity, Doxygen, CI/CD, Show & Tell NXP"
 nav_order: 10
 parent: Lecții FRDM-MCXA153
-layout: default
+layout: lesson
 ---
 
 # ✅ L9 — Testing, Documentare & Prezentare Finală
@@ -67,7 +67,7 @@ IMPORTANT: funcția testată este PURĂ — mock-ul LPI2C nu este necesar.
 Generează comentarii Doxygen complete, stil NXP SDK, pentru funcțiile:
   float p3t1755_read_temp_celsius(void)
   void p3t1755_set_threshold(float temp_c)
-  status_t p3t1755_init(LPI2C_Type *base, uint32_t src_clock_hz)
+  status_t p3t1755_init(../lPI2C_Type *base, uint32_t src_clock_hz)
 Include per funcție:
   @brief   — 1 linie
   @param   — tip + descriere
@@ -91,4 +91,4 @@ Format: doxygen C style ( /** ... */ ), fără markdown.
 
 ---
 
-[← L8: Integrare — Sistem Complet cu FSM](l8-integrare.md)
+[← L8: Integrare — Sistem Complet cu FSM](../l8-integrare)

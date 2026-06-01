@@ -3,7 +3,7 @@ title: "L8 — Integrare — Sistem Complet cu FSM"
 description: "Toate perifericele, super-loop, Show & Tell"
 nav_order: 9
 parent: Lecții FRDM-MCXA153
-layout: default
+layout: lesson
 ---
 
 # 🔧 L8 — Integrare — Sistem Complet cu FSM
@@ -50,7 +50,7 @@ Sesiunea de integrare testează dacă perifericele învățate separat funcțion
 
 ```text
 FRDM-MCXA153, toate perifericele active simultan:
-  LPI2C0 (P3T1755 1Hz), LPUART0 (log), SCTimer PWM (LED), LPADC0 (prag), GPIO IRQ SW3.
+  LPI2C0 (P3T1755 1Hz), LPUART0 (../log), SCTimer PWM (../lED), LPADC0 (prag), GPIO IRQ SW3.
 Sarcina: schelet FSM în C — DOAR structura, nu implementarea completă.
 typedef enum { STATE_IDLE, STATE_MONITORING, STATE_ALERT, STATE_COOLING } app_state_t;
 Arhitectura: super-loop cu flag-uri volatile setate din ISR-uri, fără RTOS.
@@ -89,4 +89,4 @@ Explică tradeoff-urile.
 
 ---
 
-[← L7: LPI2C — Senzorul P3T1755 On-Board](l7-lpi2c-p3t1755.md) · [L9: Testing, Documentare & Prezentare Finală →](l9-testing-docs.md)
+[← L7: LPI2C — Senzorul P3T1755 On-Board](../l7-lpi2c-p3t1755) · [L9: Testing, Documentare & Prezentare Finală →](../l9-testing-docs)

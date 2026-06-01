@@ -3,7 +3,7 @@ title: "L6 — LPSPI — Comunicație SPI & Device Extern"
 description: "Master Mode 0, Arduino header, MAX7219"
 nav_order: 7
 parent: Lecții FRDM-MCXA153
-layout: default
+layout: lesson
 ---
 
 # 🔗 L6 — LPSPI — Comunicație SPI & Device Extern
@@ -86,4 +86,4 @@ Afișare cifra '5' pe digit 0.
 
 ---
 
-[← L5: LPADC — Conversie Analogică 12 biți](l5-lpadc.md) · [L7: LPI2C — Senzorul P3T1755 On-Board →](l7-lpi2c-p3t1755.md)
+[← L5: LPADC — Conversie Analogică 12 biți](../l5-lpadc) · [L7: LPI2C — Senzorul P3T1755 On-Board →](../l7-lpi2c-p3t1755)

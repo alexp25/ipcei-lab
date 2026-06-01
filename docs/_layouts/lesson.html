@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ page.title }} — IPCEI NXP</title>
+
+  <link rel="stylesheet" href="{{ '/assets/css/syntax.css' | relative_url }}" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:      #0D1B3E;
+      --blue:      #1565C0;
+      --sky:       #1E88E5;
+      --ice:       #E3F2FD;
+      --white:     #FFFFFF;
+      --off:       #F5F7FA;
+      --muted:     #78909C;
+      --gray:      #455A64;
+      --border:    #D0D8E8;
+      --green:     #2E7D32;
+      --font:      'Segoe UI', system-ui, sans-serif;
+      --mono:      'Consolas', 'Fira Mono', monospace;
+      --sidebar-w: 260px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font); font-size: 15px; color: var(--gray); background: var(--off); line-height: 1.65; }
+
+    /* ── Page header ── */
+    .page-header {
+      background: var(--navy); color: var(--white);
+      padding: 2rem; border-bottom: 4px solid var(--sky);
+    }
+    .page-header h1 { font-size: 1.6rem; font-weight: 700; color: var(--white); }
+    .page-header .meta {
+      display: flex; gap: 1.5rem; flex-wrap: wrap;
+      margin-top: .5rem; font-size: .82rem; color: #90A4AE;
+    }
+    .page-header .meta span::before { content: "● "; color: var(--sky); }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: .35rem;
+      font-size: .8rem; font-weight: 600; color: #90A4AE;
+      border: 1px solid #2A4A7F; border-radius: 5px;
+      padding: .3rem .75rem; text-decoration: none;
+      margin-bottom: .75rem; transition: color .15s, border-color .15s;
+    }
+    .back-btn:hover { color: var(--white); border-color: var(--sky); }
+
+    /* ── Body layout: sidebar + content ── */
+    .page-body {
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      align-items: start;
+    }
+
+    /* ── TOC Sidebar ── */
+    .toc-sidebar {
+      position: sticky; top: 0;
+      height: 100vh; overflow-y: auto;
+      background: var(--white); border-right: 1px solid var(--border);
+      padding: 1.25rem 1rem 2rem;
+      scrollbar-width: thin;
+    }
+    .toc-sidebar::-webkit-scrollbar { width: 4px; }
+    .toc-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .toc-title {
+      font-size: .7rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: .75rem; padding-bottom: .4rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #toc-list { list-style: none; }
+    #toc-list li a {
+      display: block; font-size: .82rem; color: var(--gray);
+      text-decoration: none; padding: .28rem .4rem;
+      border-radius: 4px; border-left: 2px solid transparent;
+      line-height: 1.4; transition: color .15s, background .15s, border-color .15s;
+    }
+    #toc-list li a:hover { color: var(--blue); background: var(--ice); }
+    #toc-list li.active > a {
+      color: var(--blue); font-weight: 600;
+      background: var(--ice); border-left-color: var(--sky);
+    }
+
+    #toc-list .toc-h1 a { padding-left: .4rem; font-weight: 600; color: var(--navy); }
+    #toc-list .toc-h2 a { padding-left: .4rem; font-weight: 600; color: var(--navy); }
+    #toc-list .toc-h3 a { padding-left: 1.2rem; font-size: .78rem; }
+    #toc-list .toc-h4 a { padding-left: 1.8rem; font-size: .74rem; color: var(--muted); }
+
+    /* ── Main content ── */
+    .content { max-width: 860px; padding: 2rem 2rem 4rem; }
+
+    /* ── Markdown rendering ── */
+    #lesson-content h1 {
+      font-size: 1.45rem; font-weight: 700; color: var(--navy);
+      margin: 2.5rem 0 .75rem; padding-bottom: .3rem;
+      border-bottom: 3px solid var(--sky);
+    }
+    #lesson-content h1:first-child { margin-top: 0; }
+    #lesson-content h2 {
+      font-size: 1.2rem; font-weight: 700; color: var(--navy);
+      margin: 2.5rem 0 .75rem; padding-bottom: .3rem;
+      border-bottom: 2px solid var(--border);
+    }
+    #lesson-content h3 { font-size: 1.0rem; font-weight: 600; color: var(--blue); margin: 1.75rem 0 .5rem; }
+    #lesson-content h4 { font-size: .92rem; font-weight: 600; color: var(--gray); margin: 1.25rem 0 .4rem; }
+
+    #lesson-content p  { margin-bottom: .85rem; }
+    #lesson-content ul, #lesson-content ol { padding-left: 1.4rem; margin-bottom: .85rem; }
+    #lesson-content li { margin-bottom: .3rem; }
+    #lesson-content strong { color: var(--navy); }
+    #lesson-content em { color: var(--muted); }
+
+    /* Inline code */
+    #lesson-content code {
+      font-family: var(--mono); font-size: .88em;
+      background: #EEF2F7; padding: .1em .35em;
+      border-radius: 3px; color: var(--blue);
+    }
+    /* Code blocks (syntax.css handles .highlight div; override inline code inside them) */
+    #lesson-content .highlight code,
+    #lesson-content pre code {
+      background: none; padding: 0; border-radius: 0; color: inherit;
+    }
+    #lesson-content pre {
+      margin: .75rem 0 1rem;
+    }
+
+    /* Blockquotes → callout boxes */
+    #lesson-content blockquote {
+      border-left: 4px solid var(--sky); background: var(--ice);
+      padding: .85rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0;
+    }
+    #lesson-content blockquote p { margin-bottom: 0; }
+    #lesson-content blockquote strong { color: var(--blue); }
+
+    /* Tables */
+    #lesson-content table {
+      width: 100%; border-collapse: collapse;
+      font-size: .9rem; margin: 1rem 0;
+      overflow-x: auto; display: block;
+    }
+    #lesson-content th {
+      background: var(--navy); color: var(--white);
+      padding: .55rem .75rem; text-align: left; font-weight: 600;
+    }
+    #lesson-content td { padding: .5rem .75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    #lesson-content tr:nth-child(even) td { background: #F8FAFC; }
+
+    #lesson-content hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+    #lesson-content img { max-width: 100%; border-radius: 6px; margin: .5rem 0; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center; padding: 2rem;
+      font-size: .82rem; color: var(--muted);
+      border-top: 1px solid var(--border); margin-top: 3rem;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .page-body { grid-template-columns: 1fr; }
+      .toc-sidebar { display: none; }
+      .content { padding: 1.25rem 1rem 3rem; }
+      #lesson-content table { font-size: .82rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="page-header">
+  <a class="back-btn" href="{{ '/' | relative_url }}">&#8592; Lecții</a>
+  <h1>{{ page.title }}</h1>
+  {% if page.description %}
+  <div class="meta">
+    <span>{{ page.description }}</span>
+    <span>FRDM-MCXA153 · MCUXpresso SDK 24.12</span>
+  </div>
+  {% endif %}
+</header>
+
+<div class="page-body">
+  <nav class="toc-sidebar" aria-label="Cuprins">
+    <p class="toc-title">Cuprins</p>
+    <ul id="toc-list"></ul>
+  </nav>
+
+  <main>
+    <div class="content">
+      <div id="lesson-content">
+        {{ content }}
+      </div>
+    </div>
+  </main>
+</div>
+
+<footer>IPCEI NXP · Lecții FRDM-MCXA153 · UPB–NXP Semiconductors · 2026</footer>
+
+<script>
+function buildTOC() {
+  const headings = document.querySelectorAll('#lesson-content h1, #lesson-content h2, #lesson-content h3, #lesson-content h4');
+  const tocList  = document.getElementById('toc-list');
+
+  headings.forEach(h => {
+    if (!h.id) return;
+
+    const li = document.createElement('li');
+    li.className  = `toc-${h.tagName.toLowerCase()}`;
+    li.dataset.id = h.id;
+
+    const a = document.createElement('a');
+    a.href = `#${h.id}`;
+    // Strip emoji and leading punctuation for cleaner TOC labels
+    a.textContent = h.textContent
+      .replace(/[\u{1F000}-\u{1FFFF}]|\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F\uDE80-\uDEFF]/gu, '')
+      .replace(/[☀-➿]/g, '')
+      .replace(/^\s*[^\w\sÀ-ɏ]+\s*/, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    li.appendChild(a);
+    tocList.appendChild(li);
+  });
+}
+
+function initScrollSpy() {
+  const items = Array.from(document.querySelectorAll('#toc-list li'));
+  if (!items.length) return;
+
+  const headingEls = items.map(li => document.getElementById(li.dataset.id)).filter(Boolean);
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        items.forEach(li => li.classList.remove('active'));
+        const active = items.find(li => li.dataset.id === entry.target.id);
+        if (active) {
+          active.classList.add('active');
+          active.scrollIntoView({ block: 'nearest' });
+        }
+      }
+    });
+  }, { rootMargin: '0px 0px -70% 0px', threshold: 0 });
+
+  headingEls.forEach(el => observer.observe(el));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  buildTOC();
+  initScrollSpy();
+});
+</script>
+</body>
+</html>

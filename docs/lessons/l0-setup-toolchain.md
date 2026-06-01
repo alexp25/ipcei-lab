@@ -3,7 +3,7 @@ title: "L0 — Setup Toolchain & Prima Aplicație"
 description: "Hello World pe FRDM-MCXA153"
 nav_order: 1
 parent: Lecții FRDM-MCXA153
-layout: default
+layout: lesson
 ---
 
 # 🛠️ L0 — Setup Toolchain & Prima Aplicație
@@ -78,15 +78,105 @@ Explică de ce GPIO LOW aprinde LED-ul (anod comun).
 - **LED RGB anod comun**: `GPIO LOW` = LED **APRINS** (opus intuiției Arduino standard)
 
 
-## Note
+## 🔧 Pași de Setup
 
-Instalați extensia MCUXpresso pentru Visual Studio Code
+### 1. Instalare extensie MCUXpresso pentru VS Code
 
-Bifați componentele necesare (includeți LinkServer, acesta va permite încărcarea și testarea codului pe placă)
+Căutați **MCUXpresso for VS Code** în Extensions Marketplace și instalați-o. La prima deschidere apare pagina **Discover NXP MCUXpresso for VS Code** cu secțiunea **Check Tool Dependencies**.
 
-![LinkServer](../l0-setup-toolchain/images/setup_linkserver.png)
+![MCUXpresso for VS Code — Check Tool Dependencies](../img/lab0/install_mcuxpresso_extension.png)
 
-Instalarea durează mult. Folosiți acest timp pentru a înțelege mai bine placa (specificații, pinout)
+Apăsați **Open Installer** pentru a lansa MCUXpresso Installer.
+
+### 2. Instalare componente prin MCUXpresso Installer
+
+Selectați și instalați cel puțin:
+- **NXP libraries and header files for Arm GNU Toolchain** — compilatorul ARM
+- **LinkServer** — server GDB pentru probe-ul MCU-Link de pe placă
+- **MCUXpresso Configuration Tools** — unealta grafică pentru configurare pini, clock, periferice
+
+![MCUXpresso Installer — LinkServer și Config Tools selectate](../img/lab0/install_linkserver_before_debug.png)
+
+> Instalarea durează câteva minute. Urmăriți log-ul din partea de jos a ferestrei și așteptați `*** Installation completed successfully ***`.
+
+### 3. Import SDK repository
+
+În panoul **MCUXPRESSO FOR VS CODE → QUICKSTART PANEL**, apăsați **Import Repository**. Configurați:
+- **Repository:** MCUXpresso SDK (`https://github.com/nxp-mcuxpresso/mcuxsdk-manifests`)
+- **Name:** `mcuxsdk`
+- **Location:** un folder fără spații în cale (ex. `c:\WORKSPACE\facultate\ipcei-lab\src\sdks`)
+
+![Import Repository — MCUXpresso SDK în progres](../img/lab0/import_mcuxpresso_repo_takes_a_long_time.png)
+
+> **Atenție:** Importul SDK durează mult (descarcă ~2 GB via west/git). Folosiți acest timp pentru a citi specificațiile plăcii FRDM-MCXA153.
+
+### 4. Import exemplu din repository
+
+După ce SDK-ul este importat, apăsați **Import Example from Repository**. Selectați:
+- **Board:** FRDM-MCXA153
+- **Template:** `demo_apps/hello_world`
+
+![Import Example from Repository — hello_world pe FRDM-MCXA153](../img/lab0/import_example.png)
+
+Alternativ, puteți crea un proiect nou de la zero cu **New Project Wizard**:
+
+![New Project Wizard — FRDM-MCXA153 selectat](../img/lab0/create_new_project.png)
+
+### 5. Build proiect
+
+Apăsați **Build** din panoul proiectului (sau `Ctrl+Shift+B`). Prima compilare rulează CMake și generează fișierele de build.
+
+![led_blinky.c deschis — build cu succes în terminal](../img/lab0/new_project_wizard.png)
+
+### 6. Rezolvare erori de build cu AI
+
+Dacă apar erori de build, folosiți asistentul AI integrat în VS Code pentru diagnoză și corectare.
+
+**Eroare cale SDK în CMakePresets.json:**
+
+![AI diagnostichează eroarea de cale SDK](../img/lab0/use_genai_to_fix_build_error_sdk_path.png)
+
+**Eroare include CMSIS lipsă:**
+
+![AI identifică include-ul fsl_lpuart_cmsis.h lipsă](../img/lab0/use_genai_to_fix_build_error_cmsis.png)
+
+**CMakeLists.txt după corectare:**
+
+![CMakeLists.txt cu include-urile CMSIS adăugate corect](../img/lab0/use_genai_to_fix_build_error_cmsis_fixed.png)
+
+### 7. Deschidere MCUXpresso Config Tools
+
+Configurația perifericelor (pini, clock, periferice) este stocată în fișierul `.mex`. Poate fi deschis în două moduri:
+
+**Din Windows Explorer** — fișierul `led_blinky.mex` are tipul *MCUXpresso Config Tools Settings File*:
+
+![led_blinky.mex în Explorer — tip MCUXpresso Config Tools Settings File](../img/lab0/configurator_open_mex_file.png)
+
+**Din VS Code** — click dreapta pe orice fișier din proiect → **Open with MCUXpresso Config Tools**:
+
+![Meniu contextual VS Code — Open with MCUXpresso Config Tools](../img/lab0/open_with_config.png)
+
+### 8. Debug pe placă
+
+Conectați placa FRDM-MCXA153 prin USB Type-C (portul J6 — MCU-Link) și apăsați **F5** sau butonul **Run and Debug**.
+
+![Debug session activă — led_blinky rulând pe placă](../img/lab0/run_debug.png)
+
+Setați un breakpoint în cod și observați execuția pas cu pas:
+
+![Breakpoint activ în debug session](../img/lab0/run_debug_breakpoint.png)
+
+> **Eroare frecventă `No probe detected`:** apare dacă LinkServer nu este instalat sau placa nu e conectată la portul corect. Verificați că LED-ul verde de pe MCU-Link este aprins.
+
+![Eroare — No probe detected](../img/lab0/run_error_no_probe_detected.png)
+
+### 9. AI explică codul generat
+
+Folosiți Copilot sau Claude din VS Code pentru a înțelege codul SDK generat automat:
+
+![AI explică structura led_blinky.c](../img/lab0/codex_explain_code.png)
+
+---
 
 ## ✅ Deliverable
 
@@ -94,4 +184,4 @@ Instalarea durează mult. Folosiți acest timp pentru a înțelege mai bine plac
 
 ---
 
-[L1: GPIO — Control Digital & Butoane →](l1-gpio.md)
+[L1: GPIO — Control Digital & Butoane →](../l1-gpio)

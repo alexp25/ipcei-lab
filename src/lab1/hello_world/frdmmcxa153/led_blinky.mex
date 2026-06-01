@@ -22,8 +22,8 @@
    <tools>
       <pins name="Pins" version="17.0" enabled="true" update_project_code="true">
          <generated_project_files>
-            <file path="../frdmmcxa153/led_blinky/pin_mux.c" update_enabled="true"/>
-            <file path="../frdmmcxa153/led_blinky/pin_mux.h" update_enabled="true"/>
+            <file path="board/pin_mux.c" update_enabled="true"/>
+            <file path="board/pin_mux.h" update_enabled="true"/>
          </generated_project_files>
          <pins_profile>
             <processor_version>26.03.20</processor_version>
@@ -33,6 +33,9 @@
                <pin_label pin_num="36" pin_signal="P3_14/WUU0_IN25/LPUART2_RXD/CT_INP6/PWM0_X2" label="LED_BLUE" identifier="LED_BLUE"/>
                <pin_label pin_num="46" pin_signal="P3_0/WUU0_IN22/TRIG_IN0/CT_INP16/PWM0_A0" label="LED_BLUE" identifier="LED_BLUE"/>
             </pin_labels>
+            <external_user_signals>
+               <properties/>
+            </external_user_signals>
          </pins_profile>
          <functions_list>
             <function name="BOARD_InitPins">
@@ -96,8 +99,8 @@
       </pins>
       <clocks name="Clocks" version="20.0" enabled="true" update_project_code="true">
          <generated_project_files>
-            <file path="../frdmmcxa153/frdmmcxa153/clock_config.c" update_enabled="true"/>
-            <file path="../frdmmcxa153/frdmmcxa153/clock_config.h" update_enabled="true"/>
+            <file path="board/clock_config.c" update_enabled="true"/>
+            <file path="board/clock_config.h" update_enabled="true"/>
          </generated_project_files>
          <clocks_profile>
             <processor_version>26.03.20</processor_version>
@@ -344,8 +347,8 @@
             </dependency>
          </dependencies>
          <generated_project_files>
-            <file path="../led_blinky/peripherals.c" update_enabled="true"/>
-            <file path="../led_blinky/peripherals.h" update_enabled="true"/>
+            <file path="board/peripherals.c" update_enabled="true"/>
+            <file path="board/peripherals.h" update_enabled="true"/>
          </generated_project_files>
          <peripherals_profile>
             <processor_version>26.03.20</processor_version>
@@ -367,7 +370,7 @@
                   <instance name="SysTick" uuid="215141b3-050d-4e80-83a0-dcc127de4271" type="systick" type_id="systick" mode="GENERAL" peripheral="SysTick" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
                      <config_set name="fsl_systick">
                         <struct name="timingConfig">
-                           <setting name="clockSource" value="SYSTICKFunctionClock"/>
+                           <setting name="clockSource" value="ProcessorClock"/>
                            <setting name="clockSourceFreq" value="custom:12000000"/>
                            <setting name="reload" value="1s"/>
                         </struct>

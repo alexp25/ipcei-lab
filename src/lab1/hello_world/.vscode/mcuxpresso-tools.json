@@ -7,8 +7,8 @@
   "projectType": "sdk-v2-freestanding",
   "projectName": "hello_world",
   "sdk": {
-    "version": "26.3.0",
-    "path": "c:\\WORKSPACE\\proiecte\\ipcei-lab\\src\\lab1\\sdks\\hello_world_sdk",
+    "path": "c:\\WORKSPACE\\facultate\\ipcei-lab\\src\\sdks\\mcuxsdk",
+    "version": "26.6.0",
     "boardId": "frdmmcxa153",
     "deviceId": "MCXA153",
     "coreId": "cm33_core0"

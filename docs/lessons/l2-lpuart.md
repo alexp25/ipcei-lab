@@ -3,7 +3,7 @@ title: "L2 — LPUART — Comunicație Serială"
 description: "VCOM USB prin MCU-Link, printf retargetat"
 nav_order: 3
 parent: Lecții FRDM-MCXA153
-layout: default
+layout: lesson
 ---
 
 # 🔌 L2 — LPUART — Comunicație Serială
@@ -72,6 +72,56 @@ Hint: CLOCK_SetClkDiv pentru FRO_HF_DIV, range-ul acceptat de BRR,
 și dacă srcClock_Hz corespunde cu div-ul setat.
 ```
 
+## 🔧 Configurare LPUART0 în MCUXpresso Config Tools
+
+### Asignare pini UART în vederea Pins
+
+În toolul **Pins**, selectați pinul pentru semnalul LPUART. Fereastra de selecție afișează toate funcțiile multiplexate disponibile pe acel pin:
+
+![Selectare semnal LPUART — popup cu funcțiile pinului](../img/lab0/setup_pinout_uart.png)
+
+Selectați semnalul LPUART0 (RX sau TX) din lista de semnale:
+
+![Dialog asignare semnal LPUART0](../img/lab0/configurator_uart_selection.png)
+
+### Rutare RX și TX în dialogul Peripheral LPUART0
+
+Click pe pictograma periferică a LPUART0 deschide dialogul **LPUART0 signals for routing**. Bifați **RX** și **TX** pentru a le ruta pe pinii fizici:
+- **RX ←** `[51] P0_2/TDO/SWO/LPUART0_RXD/...`
+- **TX →** `[52] P0_3/TDI/LPUART0_TXD/...`
+
+![Dialog rutare LPUART0 — RX și TX bifate](../img/lab0/configurator_uart_pins.png)
+
+### Eroare SysTick la Update Code
+
+Când apăsați **Update Code**, pot apărea erori dacă componenta SysTick are sursa de clock configurată greșit (`SYSTICKFunctionClock` nu este validă pe MCXA153):
+
+![Update Files — eroare SysTick la generarea codului](../img/lab0/debug_config_error.png)
+
+**Diagnosticare cu AI:** Deschideți fișierul `.mex` în VS Code și întrebați asistentul AI despre eroare — acesta identifică că `SYSTICKFunctionClock` nu există pe MCXA153:
+
+![AI explică eroarea SysTick din fișierul .mex](../img/lab0/debug_config_error_output.png)
+
+**Detaliu eroare în Config Tools:** Selectați componenta SysTick — tooltip-ul arată exact câmpul problematic (`Clock source — The value is not available`):
+
+![Config Tools — eroare SysTick clock source](../img/lab0/debug_config_error_trace.png)
+
+**Rezolvare:** Schimbați **Clock source** din `SYSTICKFunctionClock` în `System_clock`. Câmpul *Calculated interrupt period* se actualizează automat (12 000 000 ticks; 1 Hz; 1 s):
+
+![SysTick configurat corect cu System_clock — eroare dispărută](../img/lab0/debug_config_error_fixed.png)
+
+### Serial Monitor — output UART în VS Code
+
+După flash, deschideți **Serial Monitor** din bara de jos a VS Code și selectați portul COM al MCU-Link VCOM (ex. `COM3 — MCU-Link VCom Port`):
+
+![Deschidere Serial Monitor — selectare port COM](../img/lab0/open_serial_monitor_port.png)
+
+Mesajul `Hello from FRDM-MCXA153!` apare în terminal la 115200 baud:
+
+![Output Serial Monitor — Hello from FRDM-MCXA153!](../img/lab0/open_serial_monitor_port_output.png)
+
+---
+
 ## ⚠️ Capcane Critice
 
 > Ce GenAI **nu știe** fără context explicit — verificați înainte de upload pe placă.
@@ -86,4 +136,4 @@ Hint: CLOCK_SetClkDiv pentru FRO_HF_DIV, range-ul acceptat de BRR,
 
 ---
 
-[← L1: GPIO — Control Digital & Butoane](l1-gpio.md) · [L3: Întreruperi Externe & NVIC →](l3-intreruperi.md)
+[← L1: GPIO — Control Digital & Butoane](../l1-gpio) · [L3: Întreruperi Externe & NVIC →](../l3-intreruperi)

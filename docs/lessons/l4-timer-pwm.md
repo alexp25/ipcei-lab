@@ -3,7 +3,7 @@ title: "L4 — Timer & PWM — SCTimer și CTIMER"
 description: "Breathing LED, timer periodic, osciloscop"
 nav_order: 5
 parent: Lecții FRDM-MCXA153
-layout: default
+layout: lesson
 ---
 
 # ⏱️ L4 — Timer & PWM — SCTimer și CTIMER
@@ -86,4 +86,4 @@ Arată calculul match value pentru exact 1 secundă.
 
 ---
 
-[← L3: Întreruperi Externe & NVIC](l3-intreruperi.md) · [L5: LPADC — Conversie Analogică 12 biți →](l5-lpadc.md)
+[← L3: Întreruperi Externe & NVIC](../l3-intreruperi) · [L5: LPADC — Conversie Analogică 12 biți →](../l5-lpadc)

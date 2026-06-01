@@ -3,7 +3,7 @@ title: "L5 — LPADC — Conversie Analogică 12 biți"
 description: "Command/result queue, voltmetru, prag LED"
 nav_order: 6
 parent: Lecții FRDM-MCXA153
-layout: default
+layout: lesson
 ---
 
 # 📊 L5 — LPADC — Conversie Analogică 12 biți
@@ -88,4 +88,4 @@ Explică ordinea corectă a operațiilor.
 
 ---
 
-[← L4: Timer & PWM — SCTimer și CTIMER](l4-timer-pwm.md) · [L6: LPSPI — Comunicație SPI & Device Extern →](l6-lpspi.md)
+[← L4: Timer & PWM — SCTimer și CTIMER](../l4-timer-pwm) · [L6: LPSPI — Comunicație SPI & Device Extern →](../l6-lpspi)

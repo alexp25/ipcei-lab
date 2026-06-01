@@ -3,7 +3,7 @@ title: "L1 — GPIO — Control Digital & Butoane"
 description: "PORT mux + GPIO data pe Cortex-M33"
 nav_order: 2
 parent: Lecții FRDM-MCXA153
-layout: default
+layout: lesson
 ---
 
 # 💡 L1 — GPIO — Control Digital & Butoane
@@ -50,7 +50,7 @@ Prima lecție de periferic introduce arhitectura GPIO pe Cortex-M33/MCX A — fu
 
 ```text
 Context hardware: FRDM-MCXA153, MCX A153 Cortex-M33 @ 96 MHz, SDK MCUXpresso 24.12.
-RGB LED D3: R=PIO1_7, G=PIO3_12, B=PIO3_13 — ANOD COMUN (LOW=aprins, HIGH=stins).
+RGB LED D3: R=PIO1_7, G=PIO3_12, B=PIO3_13 — ANOD COMUN (../lOW=aprins, HIGH=stins).
 Buton SW3: PIO0_6, pull-up intern activat.
 Sarcina: funcție void led_set(bool r, bool g, bool b) + FSM semafor RED→YELLOW→GREEN.
 Include:
@@ -68,8 +68,34 @@ Problema: PORT_SetPinMux(PORT3, 12u, kPORT_MuxAsGpio) + GPIO_PinWrite(GPIO3, 12u
 dar LED-ul verde nu se aprinde. LED-ul roșu (PIO1_7) funcționează corect.
 Ce verific?
 Hint: CLOCK_EnableClock pe port-ul 3, valoarea kPORT_MuxAsGpio,
-și logica anodului comun (LOW = aprins).
+și logica anodului comun (../lOW = aprins).
 ```
+
+## 🔧 Configurare GPIO în MCUXpresso Config Tools
+
+Deschideți fișierul `led_blinky.mex` cu MCUXpresso Config Tools (click dreapta în VS Code → **Open with MCUXpresso Config Tools**).
+
+### Vederea Pins — pachetul fizic MCXA153VLH
+
+Toolul **Pins** afișează pachetul LQFP 64 al MCU-ului și lista completă de semnale disponibile. Fiecare pin poate fi asignat unui periferic sau configurat ca GPIO.
+
+![Config Tools — vederea Pins cu pachetul MCXA153VLH LQFP 64](../img/lab0/setup_pinout.png)
+
+### Asignare semnal GPIO
+
+Faceți click pe un pin din pachet sau din lista din stânga și selectați semnalul GPIO dorit. Fereastra de selecție afișează toate semnalele disponibile pe acel pin:
+
+![Selectare semnal GPIO — popup cu semnale disponibile](../img/lab0/setup_pinout_gpio.png)
+
+### Rezultat — GPIO3_12 configurat ca output (../lED verde)
+
+Pinul `GPIO3_12` este asignat ca `LED_GREEN_D3` cu direcție **Output**. Observați că în tabelul de jos apare semnalul, portul, pinul și configurația de drive:
+
+![GPIO3_12 configurat ca LED_GREEN_D3 output](../img/lab0/configurator_uart.png)
+
+> **Notă:** După orice modificare în Config Tools, apăsați **Update Code** pentru a regenera fișierele `pin_mux.c` / `pin_mux.h`.
+
+---
 
 ## ⚠️ Capcane Critice
 
@@ -85,4 +111,4 @@ Hint: CLOCK_EnableClock pe port-ul 3, valoarea kPORT_MuxAsGpio,
 
 ---
 
-[← L0: Setup Toolchain & Prima Aplicație](l0-setup-toolchain.md) · [L2: LPUART — Comunicație Serială →](l2-lpuart.md)
+[← L0: Setup Toolchain & Prima Aplicație](../l0-setup-toolchain) · [L2: LPUART — Comunicație Serială →](../l2-lpuart)

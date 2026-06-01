@@ -8,7 +8,13 @@
 #include "board.h"
 #include "app.h"
 #include "fsl_debug_console.h"
+#include "peripherals.h"
 #include <stdio.h>
+
+void LPUART0_SignalEvent(uint32_t event)
+{
+    (void)event;
+}
 
 /*******************************************************************************
  * Definitions
