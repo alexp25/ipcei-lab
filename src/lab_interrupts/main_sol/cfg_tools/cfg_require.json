@@ -1,0 +1,21 @@
+﻿{
+  "projects": [{
+    "core": "cm33_core0",
+    "addComponents": [{
+      "kconfig_id": "driver.cmsis_lpuart",
+      "manifest_id": "platform.drivers.lpuart_cmsis",
+      "version": "2.8.0"
+    }],
+    "device_package": "MCXA153VLH",
+    "addIncludes": ["c:/WORKSPACE/proiecte/ipcei-lab/src/lab_interrupts/main_sol/frdmmcxa153/board"],
+    "projectBoardFolder": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_interrupts/main_sol/frdmmcxa153",
+    "source_generated_cmake_file_path": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_interrupts/main_sol/frdmmcxa153/cfg_tools_generated.cmake",
+    "addFiles": ["c:/WORKSPACE/proiecte/ipcei-lab/src/lab_interrupts/main_sol/frdmmcxa153/board/RTE_Device.h"],
+    "name": "main",
+    "removeFiles": [],
+    "projectRootPath": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_interrupts/main_sol",
+    "component_edit_prj_file_path": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_interrupts/main_sol/prj.conf",
+    "board": "frdmmcxa153"
+  }],
+  "$schema": "https://mcuxpresso.nxp.com/staticdata/mcux/schema/cfg_require/cfg_require_schema_1.0.json"
+}

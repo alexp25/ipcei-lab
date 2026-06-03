@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "mcuxpresso-debug",
+      "name": "Debug",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "CMake: build",
+      "executable": {
+        "elf": "${workspaceFolder}/debug/main.elf"
+      },
+      "stopAtSymbol": "main",
+      "probeSerialNumber": "",
+      "isAttach": false,
+      "skipBuildBeforeDebug": true,
+      "gdbInitCommands": [
+        "set remotetimeout 600",
+        "set debug-file-directory",
+        "set non-stop off"
+      ],
+      "gdbServerConfigs": {
+        "linkserver": {
+          "device": "MCXA153:FRDM-MCXA153",
+          "connectReset": true
+        },
+        "segger": {},
+        "pemicro": {}
+      },
+      "showDevDebugOutput": "parsed"
+    }
+  ]
+}

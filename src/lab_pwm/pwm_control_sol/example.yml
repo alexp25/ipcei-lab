@@ -1,0 +1,14 @@
+pwm_control:
+  boards:
+    frdmmcxa153: []
+  contents:
+    document:
+      brief: PWM control application for the FRDM-MCXA153 board.
+      category: lab_apps
+      example_readme:
+      - examples/pwm_control/readme.md
+      - ${board_root}/${board}/pwm_control/example_board_readme.md
+      name: pwm_control${core_id_suffix_name}
+    meta_path: examples/pwm_control
+    project-root-path: boards/${board}/pwm_control/${multicore_foldername}
+  section-type: freestanding_application

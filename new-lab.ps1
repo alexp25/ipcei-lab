@@ -6,12 +6,12 @@
     Copies the template, rewires the __repo__ junction to the shared SDK,
     and patches all hardcoded paths and the project name in config files.
 .EXAMPLE
-    .\new-lab.ps1 -Dest src\lab2\blinky -Name blinky
+    .\new-lab.ps1 -Dest src\lab_pwm\blinky -Name blinky
 .EXAMPLE
     .\new-lab.ps1 -Dest src\lab3\uart_demo -Name uart_demo -Template src\lab1\hello_world
 #>
 param(
-    [Parameter(Mandatory, HelpMessage = "Destination relative to repo root, e.g. src\lab2\blinky")]
+    [Parameter(Mandatory, HelpMessage = "Destination relative to repo root, e.g. src\lab_pwm\blinky")]
     [string]$Dest,
 
     [Parameter(Mandatory, HelpMessage = "CMake project name, e.g. blinky")]
@@ -25,7 +25,9 @@ $ErrorActionPreference = "Stop"
 $root   = $PSScriptRoot
 $src    = Join-Path $root $Template
 $dst    = Join-Path $root $Dest
-$sdkNew = Join-Path $root "src\sdks\mcuxsdk"
+$sdkRootNew = Join-Path $root "src\sdks"
+$sdkNew = Join-Path $sdkRootNew "mcuxsdk"
+$boardId = "frdmmcxa153"
 
 # ── Validate inputs ───────────────────────────────────────────────────────────
 if (-not (Test-Path $src))    { throw "Template not found: $src" }
@@ -47,17 +49,18 @@ $oldName = Split-Path $src -Leaf
 # Templates cloned from SDK demos often keep the demo's source name
 # (e.g. "led_blinky") even when the project folder has a different name.
 $boardFileNames = @('board', 'clock_config', 'pin_mux', 'peripherals', 'hardware_init')
-$templateMainC  = Get-ChildItem $src -MaxDepth 1 -Filter "*.c" |
+$templateMainC  = Get-ChildItem $src -Filter "*.c" |
     Where-Object { $_.BaseName -notin $boardFileNames } |
     Select-Object -First 1
 $srcSourceName = if ($templateMainC) { $templateMainC.BaseName } else { $oldName }
+$srcConfigured = Join-Path (Split-Path $src -Parent) $srcSourceName
 
 Write-Host ""
 Write-Host "Template : $Template"
 Write-Host "Dest     : $Dest"
 Write-Host "Name     : $Name"
 Write-Host "SDK old  : $sdkOld"
-Write-Host "SDK new  : src\sdks\mcuxsdk"
+Write-Host "SDK new  : src\sdks"
 if ($srcSourceName -ne $oldName) {
     Write-Host "Source   : $srcSourceName -> $Name (template source file name differs from folder name)"
 }
@@ -65,7 +68,7 @@ Write-Host ""
 
 # ── 1. Copy files (skip the __repo__ junction and debug build folder) ─────────
 Write-Host "Copying files..."
-robocopy $src $dst /E /XJ /XD debug /NFL /NDL /NJH /NJS | Out-Null
+robocopy $src $dst /E /XJ /XD debug release .cmake /NFL /NDL /NJH /NJS | Out-Null
 Get-ChildItem $dst -Recurse -Filter "*.bak" | Remove-Item -Force
 $processed = Join-Path $dst "cfg_tools\cfg_require.json.processed"
 if (Test-Path $processed) { Remove-Item $processed -Force }
@@ -128,6 +131,7 @@ $patchFiles = @(
     ".vscode\launch.json",
     ".vscode\mcuxpresso-tools.json",
     "frdmmcxa153\board_files.cmake",
+    "frdmmcxa153\cfg_tools_generated.cmake",
     "cfg_tools\project_info.json",
     "cfg_tools\cfg_require.json",
     "$Name.mex",
@@ -140,8 +144,14 @@ foreach ($rel in $patchFiles) {
 
     $text = [IO.File]::ReadAllText($file, [Text.Encoding]::UTF8)
 
-    $text = Replace-Path $text $sdkOld $sdkNew   # SDK path
+    $text = Replace-Path $text $sdkOld $sdkRootNew   # SDK root path used by CMake presets
+    $rootFwd = [regex]::Escape($root.Replace('\', '/'))
+    $sdkNewFwd = $sdkNew.Replace('\', '/')
+    $text = $text -replace "$rootFwd/src/lab1/sdks/[^`"]+/mcuxsdk", $sdkNewFwd
     $text = Replace-Path $text $src    $dst       # project root path
+    if ($srcConfigured -ne $src) {
+        $text = Replace-Path $text $srcConfigured $dst
+    }
 
     # Source file name -> new name (before template folder name, to avoid double-replace)
     if ($srcSourceName -ne $Name) { $text = $text.Replace($srcSourceName, $Name) }
@@ -155,12 +165,7 @@ foreach ($rel in $patchFiles) {
     # finding CMAKE_PROJECT_NAME; fill in the board ID that the rest of the
     # project already assumes (frdmmcxa153).
     if ($rel -eq "CMakePresets.json") {
-        $text = $text -replace '"board":\s*""', '"board": "frdmmcxa153"'
-    }
-
-    # launch.json ships with elf="" which causes GDB to disconnect immediately.
-    if ($rel -eq ".vscode\launch.json") {
-        $text = $text -replace '"elf":\s*""', "`"elf`": `"`${workspaceFolder}/debug/$Name.elf`""
+        $text = $text -replace '"board":\s*""', "`"board`": `"$boardId`""
     }
 
     [IO.File]::WriteAllText($file, $text, [Text.Encoding]::UTF8)
@@ -170,14 +175,135 @@ foreach ($rel in $patchFiles) {
 # ── 5. Clear stale project_links in .mex files ────────────────────────────────
 # Templates may carry links to unrelated projects; remove them so MCUXpresso
 # doesn't try to resolve paths from a different workspace.
+$vscodeDir = Join-Path $dst ".vscode"
+if (-not (Test-Path $vscodeDir)) { New-Item -ItemType Directory -Path $vscodeDir | Out-Null }
+
+$settingsFile = Join-Path $vscodeDir "settings.json"
+$settingsJson = @"
+{
+  "cmake.configureOnOpen": false,
+  "C_Cpp.errorSquiggles": "disabled",
+  "C_Cpp.files.exclude": {
+    "**/.vscode": true,
+    "**/__repo__": true
+  },
+  "C_Cpp.exclusionPolicy": "checkFolders",
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "cmake.useCMakePresets": "always",
+  "cmake.buildTask": true,
+  "cmake.skipConfigureIfCachePresent": false,
+  "cmake.sourceDirectory": "`${workspaceFolder}"
+}
+"@
+[IO.File]::WriteAllText($settingsFile, $settingsJson, [Text.Encoding]::UTF8)
+Write-Host "Patched  : .vscode\settings.json"
+
+$tasksJson = @"
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "CMake: build",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "--preset",
+        "debug"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [
+        "`$gcc"
+      ],
+      "detail": "Build debug preset"
+    },
+    {
+      "type": "shell",
+      "label": "CMake: clean",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "--preset",
+        "debug",
+        "--target",
+        "clean"
+      ],
+      "problemMatcher": [
+        "`$gcc"
+      ],
+      "detail": "Clean debug preset"
+    },
+    {
+      "type": "shell",
+      "label": "CMake: configure",
+      "command": "cmake",
+      "args": [
+        "--preset",
+        "debug"
+      ],
+      "problemMatcher": [
+        "`$gcc"
+      ],
+      "detail": "Configure debug preset"
+    }
+  ]
+}
+"@
+[IO.File]::WriteAllText((Join-Path $vscodeDir "tasks.json"), $tasksJson, [Text.Encoding]::UTF8)
+Write-Host "Patched  : .vscode\tasks.json"
+
+$launchJson = @"
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "mcuxpresso-debug",
+      "name": "Debug",
+      "request": "launch",
+      "cwd": "`${workspaceFolder}",
+      "preLaunchTask": "CMake: build",
+      "executable": {
+        "elf": "`${workspaceFolder}/debug/$Name.elf"
+      },
+      "stopAtSymbol": "main",
+      "probeSerialNumber": "",
+      "isAttach": false,
+      "skipBuildBeforeDebug": true,
+      "gdbInitCommands": [
+        "set remotetimeout 600",
+        "set debug-file-directory",
+        "set non-stop off"
+      ],
+      "gdbServerConfigs": {
+        "linkserver": {
+          "device": "MCXA153:FRDM-MCXA153",
+          "connectReset": true
+        },
+        "segger": {},
+        "pemicro": {}
+      },
+      "showDevDebugOutput": "parsed"
+    }
+  ]
+}
+"@
+[IO.File]::WriteAllText((Join-Path $vscodeDir "launch.json"), $launchJson, [Text.Encoding]::UTF8)
+Write-Host "Patched  : .vscode\launch.json"
+
+$dstFwd = $dst.Replace('\', '/')
 foreach ($rel in @("$Name.mex", "frdmmcxa153\$Name.mex")) {
     $file = Join-Path $dst $rel
     if (-not (Test-Path $file)) { continue }
 
     $text = [IO.File]::ReadAllText($file, [Text.Encoding]::UTF8)
     $before = $text
-    $text = $text -replace '\s*<project_link\b[^/]*/>', ''
-    if ($text -ne $before) { Write-Host "Cleared  : project_links in $rel" }
+    $projectLink = "<project_link path=`"$dstFwd/cfg_tools`"/>"
+    $text = $text -replace '\s*<project_link\b[^>]*\s*/>', ''
+    $text = $text -replace '(<project_links>\s*)', "`$1         $projectLink`r`n"
+    if ($text -ne $before) { Write-Host "Patched  : project_link in $rel" }
     [IO.File]::WriteAllText($file, $text, [Text.Encoding]::UTF8)
 }
 

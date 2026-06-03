@@ -104,7 +104,7 @@ Selectați și instalați cel puțin:
 În panoul **MCUXPRESSO FOR VS CODE → QUICKSTART PANEL**, apăsați **Import Repository**. Configurați:
 - **Repository:** MCUXpresso SDK (`https://github.com/nxp-mcuxpresso/mcuxsdk-manifests`)
 - **Name:** `mcuxsdk`
-- **Location:** un folder fără spații în cale (ex. `c:\WORKSPACE\facultate\ipcei-lab\src\sdks`)
+- **Location:** un folder fără spații în cale (ex. `c:\WORKSPACE\proiecte\ipcei-lab\src\sdks`)
 
 ![Import Repository — MCUXpresso SDK în progres](../img/lab0/import_mcuxpresso_repo_takes_a_long_time.png)
 

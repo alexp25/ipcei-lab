@@ -19,7 +19,9 @@ Then open http://localhost:4000/
 
 ## To create a new lab
 
-.\new-lab.ps1 -Template src\lab1\hello_world -Dest src\lab2\blinky -Name blinky
+.\new-lab.ps1 -Template src\lab1\hello_world -Dest src\lab_pwm\blinky -Name blinky
+
+.\new-lab.ps1 -Template src\lab_hello\hello_world -Dest src\lab_interrupts\main -Name main
 
 
 ---
