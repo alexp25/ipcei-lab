@@ -216,5 +216,7 @@ docs/.jekyll-cache/
 # CMake build output
 debug/
 
+release/
+
 # West internal symlinks
 __repo__

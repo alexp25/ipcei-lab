@@ -1,0 +1,17 @@
+﻿{
+  "projects": [{
+    "core": "cm33_core0",
+    "addComponents": [],
+    "device_package": "MCXA153VLH",
+    "addIncludes": [],
+    "projectBoardFolder": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_adc/main/frdmmcxa153",
+    "source_generated_cmake_file_path": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_adc/main/frdmmcxa153/cfg_tools_generated.cmake",
+    "addFiles": [],
+    "name": "main",
+    "removeFiles": [],
+    "projectRootPath": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_adc/main",
+    "component_edit_prj_file_path": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_adc/main/prj.conf",
+    "board": "frdmmcxa153"
+  }],
+  "$schema": "https://mcuxpresso.nxp.com/staticdata/mcux/schema/cfg_require/cfg_require_schema_1.0.json"
+}
