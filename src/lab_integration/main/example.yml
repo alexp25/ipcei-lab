@@ -1,0 +1,16 @@
+﻿main_peripheral:
+  boards:
+    frdmmcxa153: []
+  contents:
+    document:
+      brief: Reads the onboard P3T1755DP temperature sensor through I3C0 in
+        I2C-compatible mode and reports the temperature through the debug console.
+      category: demo_apps
+      example_readme:
+      - examples/main_peripheral/readme.md
+      - ${board_root}/${board}/main/example_board_readme.md
+      - ${board_root}/${board}/examples_shared_readme.md
+      name: main_peripheral${core_id_suffix_name}
+    meta_path: examples/main_peripheral
+    project-root-path: boards/${board}/main/${multicore_foldername}
+  section-type: freestanding_application
