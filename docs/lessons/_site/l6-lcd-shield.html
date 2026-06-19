@@ -1,0 +1,885 @@
+<h1 id="l6---lcd-1602-si-tastatura-analogica">L6 - LCD 1602 si tastatura analogica</h1>
+
+<p><strong>Adaugarea unei aplicatii noi intr-un proiect MCUXpresso existent si alinierea codului cu MCUXpresso Config Tools</strong></p>
+
+<hr />
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Ziua / Sesiunea</strong></td>
+      <td>Ziua 3, 24 iunie - dupa-amiaza</td>
+    </tr>
+    <tr>
+      <td><strong>Periferice</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">GPIO - ADC0/LPADC - Arduino headers - HD44780</code></td>
+    </tr>
+    <tr>
+      <td><strong>Durata</strong></td>
+      <td>2h (13:00-15:00)</td>
+    </tr>
+    <tr>
+      <td><strong>Responsabil</strong></td>
+      <td>Cadru didactic UPB</td>
+    </tr>
+    <tr>
+      <td><strong>Hardware</strong></td>
+      <td>FRDM-MCXA153 si Arduino LCD Keypad Shield 1602</td>
+    </tr>
+    <tr>
+      <td><strong>Proiect</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">src/lab_lcd/main</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="context-si-motivatie">Context si motivatie</h2>
+
+<p>In acest laborator adaugam suport pentru un <strong>Arduino LCD Keypad Shield 1602</strong> intr-un proiect MCUXpresso SDK existent.</p>
+
+<p>Shield-ul contine:</p>
+
+<ul>
+  <li>un LCD 16x2 compatibil HD44780;</li>
+  <li>o interfata paralela in mod 4 biti;</li>
+  <li>cinci butoane conectate printr-o retea de rezistente la Arduino <code class="language-plaintext highlighter-rouge">A0</code>;</li>
+  <li>un semnal optional pentru controlul iluminarii de fundal.</li>
+</ul>
+
+<p>Exercitiul nu urmareste doar functionarea LCD-ului. Accentul este pus pe procesul complet de integrare:</p>
+
+<ol>
+  <li>inspectarea structurii si conventiilor proiectului existent;</li>
+  <li>separarea codului reutilizabil de codul specific placii;</li>
+  <li>configurarea pinilor in fisierul <code class="language-plaintext highlighter-rouge">.mex</code>;</li>
+  <li>regenerarea fisierelor cu MCUXpresso Config Tools;</li>
+  <li>identificarea modificarilor produse de generator;</li>
+  <li>alinierea CMake si a metadatelor proiectului cu noile fisiere generate;</li>
+  <li>verificarea finala prin compilare.</li>
+</ol>
+
+<p>Acest flux este important in proiectele embedded reale. Codul sursa, fisierele generate si configuratia build-ului trebuie sa descrie acelasi hardware.</p>
+
+<h2 id="obiective">Obiective</h2>
+
+<p>La finalul laboratorului, studentul va putea:</p>
+
+<ol>
+  <li>identifica maparea pinilor Arduino pe MCXA153;</li>
+  <li>explica secventa de initializare HD44780 in mod 4 biti;</li>
+  <li>citi o tastatura analogica prin LPADC;</li>
+  <li>scala praguri de tip Arduino 10 biti pentru un ADC de 12 biti;</li>
+  <li>implementa filtrare prin citiri stabile consecutive;</li>
+  <li>organiza codul pe niveluri reutilizabile si specifice placii;</li>
+  <li>adauga pinii in MCUXpresso Config Tools;</li>
+  <li>interpreta modificarile produse de generator;</li>
+  <li>corecta sursele si include path-urile folosite de CMake;</li>
+  <li>verifica faptul ca fisierele generate sunt sursa reala folosita de build.</li>
+</ol>
+
+<h2 id="arhitectura-hardware">Arhitectura hardware</h2>
+
+<h3 id="lcd-hd44780-in-mod-4-biti">LCD HD44780 in mod 4 biti</h3>
+
+<p>Controllerul HD44780 poate transfera un octet folosind:</p>
+
+<ul>
+  <li>8 linii de date; sau</li>
+  <li>4 linii de date, in doua transferuri succesive.</li>
+</ul>
+
+<p>Shield-ul foloseste modul 4 biti. Pentru fiecare octet:</p>
+
+<ol>
+  <li>se scrie nibble-ul superior pe <code class="language-plaintext highlighter-rouge">D4-D7</code>;</li>
+  <li>se genereaza un impuls pe <code class="language-plaintext highlighter-rouge">EN</code>;</li>
+  <li>se scrie nibble-ul inferior;</li>
+  <li>se genereaza un nou impuls pe <code class="language-plaintext highlighter-rouge">EN</code>.</li>
+</ol>
+
+<p>Semnalul <code class="language-plaintext highlighter-rouge">RS</code> selecteaza tipul transferului:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">RS = 0</code>: comanda;</li>
+  <li><code class="language-plaintext highlighter-rouge">RS = 1</code>: caracter pentru memoria DDRAM.</li>
+</ul>
+
+<p>Linia <code class="language-plaintext highlighter-rouge">RW</code> a shield-ului este conectata uzual la masa. Driverul este astfel <strong>write-only</strong> si foloseste delay-uri in locul citirii flagului <code class="language-plaintext highlighter-rouge">busy</code>.</p>
+
+<h3 id="tastatura-analogica">Tastatura analogica</h3>
+
+<p>Butoanele <code class="language-plaintext highlighter-rouge">RIGHT</code>, <code class="language-plaintext highlighter-rouge">UP</code>, <code class="language-plaintext highlighter-rouge">DOWN</code>, <code class="language-plaintext highlighter-rouge">LEFT</code> si <code class="language-plaintext highlighter-rouge">SELECT</code> sunt conectate printr-un divizor rezistiv la <code class="language-plaintext highlighter-rouge">A0</code>.</p>
+
+<p>Fiecare buton produce un domeniu diferit de tensiune. Aplicatia citeste ADC-ul si compara valoarea cu praguri configurabile.</p>
+
+<p>Butonul <code class="language-plaintext highlighter-rouge">RESET</code> nu face parte din tastatura analogica. El actioneaza resetul hardware al placii si nu trebuie raportat ca tasta.</p>
+
+<h2 id="maparea-shield-ului">Maparea shield-ului</h2>
+
+<p>Maparea folosita de proiect este:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Semnal shield</th>
+      <th>Pin Arduino</th>
+      <th>Pin MCXA153</th>
+      <th>Rol</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>LCD <code class="language-plaintext highlighter-rouge">RS</code></td>
+      <td><code class="language-plaintext highlighter-rouge">D8</code></td>
+      <td><code class="language-plaintext highlighter-rouge">P2_7</code></td>
+      <td>selectie comanda/date</td>
+    </tr>
+    <tr>
+      <td>LCD <code class="language-plaintext highlighter-rouge">EN</code></td>
+      <td><code class="language-plaintext highlighter-rouge">D9</code></td>
+      <td><code class="language-plaintext highlighter-rouge">P3_31</code></td>
+      <td>impuls de validare</td>
+    </tr>
+    <tr>
+      <td>LCD <code class="language-plaintext highlighter-rouge">D4</code></td>
+      <td><code class="language-plaintext highlighter-rouge">D4</code></td>
+      <td><code class="language-plaintext highlighter-rouge">P2_5</code></td>
+      <td>bit de date 0</td>
+    </tr>
+    <tr>
+      <td>LCD <code class="language-plaintext highlighter-rouge">D5</code></td>
+      <td><code class="language-plaintext highlighter-rouge">D5</code></td>
+      <td><code class="language-plaintext highlighter-rouge">P3_12</code></td>
+      <td>bit de date 1</td>
+    </tr>
+    <tr>
+      <td>LCD <code class="language-plaintext highlighter-rouge">D6</code></td>
+      <td><code class="language-plaintext highlighter-rouge">D6</code></td>
+      <td><code class="language-plaintext highlighter-rouge">P3_13</code></td>
+      <td>bit de date 2</td>
+    </tr>
+    <tr>
+      <td>LCD <code class="language-plaintext highlighter-rouge">D7</code></td>
+      <td><code class="language-plaintext highlighter-rouge">D7</code></td>
+      <td><code class="language-plaintext highlighter-rouge">P3_1</code></td>
+      <td>bit de date 3</td>
+    </tr>
+    <tr>
+      <td>Backlight</td>
+      <td><code class="language-plaintext highlighter-rouge">D10</code></td>
+      <td><code class="language-plaintext highlighter-rouge">P3_11</code></td>
+      <td>control optional</td>
+    </tr>
+    <tr>
+      <td>Keypad</td>
+      <td><code class="language-plaintext highlighter-rouge">A0</code></td>
+      <td><code class="language-plaintext highlighter-rouge">P1_10 / ADC0_A8</code></td>
+      <td>retea rezistiva</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code class="language-plaintext highlighter-rouge">P3_12</code> si <code class="language-plaintext highlighter-rouge">P3_13</code> sunt conectati si la LED-urile rosu si verde de pe placa. Aceste LED-uri pot palpai in timpul transferurilor catre LCD.</p>
+
+<h2 id="compatibilitate-electrica">Compatibilitate electrica</h2>
+
+<p>FRDM-MCXA153 foloseste GPIO si ADC la <strong>3.3 V</strong>.</p>
+
+<blockquote>
+  <p>Nu aplicati 5 V direct pe un GPIO sau pe intrarea ADC a microcontrolerului.</p>
+</blockquote>
+
+<p>Multe variante de LCD Keypad Shield sunt proiectate pentru placi Arduino alimentate la 5 V. Trebuie verificata schema shield-ului.</p>
+
+<h3 id="intrarea-a0">Intrarea A0</h3>
+
+<p>Unele shield-uri alimenteaza reteaua rezistiva a butoanelor din 5 V. In acest caz, tensiunea de pe <code class="language-plaintext highlighter-rouge">A0</code> poate depasi 3.3 V.</p>
+
+<p>Solutii:</p>
+
+<ul>
+  <li>alimentarea unui shield verificat ca fiind compatibil la 3.3 V;</li>
+  <li>un divizor rezistiv;</li>
+  <li>un circuit de adaptare de nivel.</li>
+</ul>
+
+<p>Un divizor suplimentar modifica valorile ADC. Pragurile trebuie masurate si ajustate.</p>
+
+<h3 id="semnalele-lcd">Semnalele LCD</h3>
+
+<p>Aplicatia nu citeste magistrala LCD, deci LCD-ul nu conduce liniile <code class="language-plaintext highlighter-rouge">D4-D7</code> catre MCU. Totusi, un controller alimentat la 5 V poate sa nu garanteze recunoasterea nivelului logic de 3.3 V ca HIGH.</p>
+
+<p>Folositi:</p>
+
+<ul>
+  <li>un modul LCD compatibil la 3.3 V; sau</li>
+  <li>adaptare de nivel pe semnalele de control si date.</li>
+</ul>
+
+<h3 id="backlight-d10">Backlight D10</h3>
+
+<p>Controlul iluminarii este dezactivat implicit:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#define LCD_SHIELD_ENABLE_BACKLIGHT_CONTROL 0
+</span></code></pre></div></div>
+
+<p>Shield-urile existente folosesc circuite si polaritati diferite pentru D10. Activati controlul numai dupa verificarea schemei.</p>
+
+<h2 id="inspectarea-proiectului-existent">Inspectarea proiectului existent</h2>
+
+<p>Inainte de implementare au fost verificate:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Fisier</th>
+      <th>Rol</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">main.c</code></td>
+      <td>structura aplicatiei si bucla principala</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">CMakeLists.txt</code></td>
+      <td>inregistrarea surselor si include path-urilor</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">frdmmcxa153/prj.conf</code></td>
+      <td>componentele SDK activate</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">main.mex</code></td>
+      <td>configuratia folosita de MCUXpresso Config Tools</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">frdmmcxa153/board_files.cmake</code></td>
+      <td>fisierele specifice placii</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">frdmmcxa153/main/hardware_init.c</code></td>
+      <td>secventa <code class="language-plaintext highlighter-rouge">BOARD_InitHardware()</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">cfg_tools/board/*</code></td>
+      <td>fisierele generate pentru pini, ceasuri si periferice</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>API-urile deja folosite in proiect au fost pastrate:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">GPIO_PinWrite()</code> si <code class="language-plaintext highlighter-rouge">GPIO_PinInit()</code>;</li>
+  <li><code class="language-plaintext highlighter-rouge">LPADC_*</code>;</li>
+  <li><code class="language-plaintext highlighter-rouge">SDK_DelayAtLeastUs()</code>;</li>
+  <li><code class="language-plaintext highlighter-rouge">PRINTF()</code>;</li>
+  <li><code class="language-plaintext highlighter-rouge">BOARD_InitHardware()</code>.</li>
+</ul>
+
+<p>Aceasta inspectie evita introducerea unui HAL paralel sau a unor conventii incompatibile cu restul proiectului.</p>
+
+<h2 id="arhitectura-software">Arhitectura software</h2>
+
+<p>Codul este impartit in patru niveluri:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>main.c
+  |
+  +-- hd44780.c/.h
+  |     Driver LCD reutilizabil
+  |
+  +-- lcd_keypad.c/.h
+  |     Praguri, scalare si debounce
+  |
+  +-- frdmmcxa153_lcd_shield.c/.h
+        Mapare si integrare cu SDK-ul NXP
+             |
+             +-- cfg_tools/board/pin_mux.*
+             +-- fsl_gpio.h
+             +-- fsl_lpadc.h
+</code></pre></div></div>
+
+<h3 id="de-ce-separare">De ce separare?</h3>
+
+<p><code class="language-plaintext highlighter-rouge">hd44780.c</code> nu trebuie sa cunoasca:</p>
+
+<ul>
+  <li>numele placii;</li>
+  <li>perifericul GPIO NXP;</li>
+  <li>numerele pinilor Arduino.</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">lcd_keypad.c</code> nu trebuie sa cunoasca:</p>
+
+<ul>
+  <li>ADC0;</li>
+  <li>canalul 8;</li>
+  <li>registrele MCXA153.</li>
+</ul>
+
+<p>Doar adaptorul <code class="language-plaintext highlighter-rouge">frdmmcxa153_lcd_shield.c</code> leaga driverele reutilizabile de hardware.</p>
+
+<h2 id="driverul-hd44780">Driverul HD44780</h2>
+
+<p>Driverul foloseste callback-uri:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">typedef</span> <span class="k">struct</span>
+<span class="p">{</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">context</span><span class="p">;</span>
+    <span class="n">hd44780_control_write_t</span> <span class="n">write_rs</span><span class="p">;</span>
+    <span class="n">hd44780_control_write_t</span> <span class="n">write_enable</span><span class="p">;</span>
+    <span class="n">hd44780_data_write_t</span> <span class="n">write_data</span><span class="p">;</span>
+    <span class="n">hd44780_delay_t</span> <span class="n">delay_us</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">hd44780_config_t</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Secventa de initializare:</p>
+
+<ol>
+  <li>asteptare dupa alimentare;</li>
+  <li>trimiterea repetata a nibble-ului <code class="language-plaintext highlighter-rouge">0x3</code>;</li>
+  <li>trecerea in mod 4 biti cu <code class="language-plaintext highlighter-rouge">0x2</code>;</li>
+  <li><code class="language-plaintext highlighter-rouge">Function Set</code>: 4 biti, 2 linii;</li>
+  <li>display ON;</li>
+  <li>clear display;</li>
+  <li>entry mode.</li>
+</ol>
+
+<p>API-ul public permite:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">HD44780_Init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lcd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">config</span><span class="p">);</span>
+<span class="n">HD44780_Clear</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lcd</span><span class="p">);</span>
+<span class="n">HD44780_SetCursor</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lcd</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">row</span><span class="p">);</span>
+<span class="n">HD44780_WriteString</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lcd</span><span class="p">,</span> <span class="s">"text"</span><span class="p">);</span>
+<span class="n">HD44780_WriteLine</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lcd</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="s">"text"</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">HD44780_WriteLine()</code> completeaza linia cu spatii pana la 16 caractere. Astfel, un text nou mai scurt nu lasa caractere vechi pe ecran.</p>
+
+<h2 id="driverul-tastaturii">Driverul tastaturii</h2>
+
+<p>Pragurile implicite sunt exprimate ca valori ADC Arduino pe 10 biti:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Buton</th>
+      <th>Domeniu</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">RIGHT</code></td>
+      <td><code class="language-plaintext highlighter-rouge">0-80</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">UP</code></td>
+      <td><code class="language-plaintext highlighter-rouge">81-200</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">DOWN</code></td>
+      <td><code class="language-plaintext highlighter-rouge">201-400</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">LEFT</code></td>
+      <td><code class="language-plaintext highlighter-rouge">401-600</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SELECT</code></td>
+      <td><code class="language-plaintext highlighter-rouge">601-800</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">NONE</code></td>
+      <td><code class="language-plaintext highlighter-rouge">&gt;800</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Configuratia contine pragurile, domeniul ADC si numarul de esantioane stabile:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">typedef</span> <span class="k">struct</span>
+<span class="p">{</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">context</span><span class="p">;</span>
+    <span class="n">lcd_keypad_read_adc_t</span> <span class="n">read_adc</span><span class="p">;</span>
+    <span class="kt">uint16_t</span> <span class="n">adc_max_value</span><span class="p">;</span>
+    <span class="kt">uint8_t</span> <span class="n">stable_sample_count</span><span class="p">;</span>
+    <span class="n">lcd_keypad_thresholds_t</span> <span class="n">thresholds_10bit</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">lcd_keypad_config_t</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h3 id="scalare-12-biti-la-10-biti">Scalare 12 biti la 10 biti</h3>
+
+<p>ADC-ul este citit in domeniul:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0 ... 4095
+</code></pre></div></div>
+
+<p>Pragurile sunt definite in domeniul:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0 ... 1023
+</code></pre></div></div>
+
+<p>Conversia este:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>value_10bit = raw_12bit * 1023 / 4095
+</code></pre></div></div>
+
+<p>Implementarea foloseste aritmetica pe 32 biti si rotunjire.</p>
+
+<h3 id="filtrare">Filtrare</h3>
+
+<p>Aplicatia necesita trei citiri consecutive pentru acelasi buton:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">shield</span><span class="o">-&gt;</span><span class="n">keypad</span><span class="p">.</span><span class="n">stable_sample_count</span> <span class="o">=</span> <span class="mi">3U</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>La o perioada de polling de <code class="language-plaintext highlighter-rouge">5 ms</code>, schimbarea este validata dupa aproximativ <code class="language-plaintext highlighter-rouge">15 ms</code>.</p>
+
+<h3 id="timeout-adc">Timeout ADC</h3>
+
+<p>Citirea rezultatului nu asteapta infinit:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">uint32_t</span> <span class="n">timeout</span> <span class="o">=</span> <span class="n">KEYPAD_ADC_TIMEOUT</span><span class="p">;</span>
+
+<span class="k">while</span> <span class="p">(</span><span class="n">timeout</span> <span class="o">&gt;</span> <span class="mi">0U</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">LPADC_GetConvResult</span><span class="p">(</span><span class="n">ADC0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">result</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="cm">/* rezultat valid */</span>
+    <span class="p">}</span>
+    <span class="n">timeout</span><span class="o">--</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Un periferic neconfigurat corect nu trebuie sa blocheze permanent aplicatia.</p>
+
+<h2 id="configurarea-pinilor-in-mcuxpresso-config-tools">Configurarea pinilor in MCUXpresso Config Tools</h2>
+
+<p>Fisierul canonic al proiectului este:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>src/lab_lcd/main/main.mex
+</code></pre></div></div>
+
+<p>In instrumentul <strong>Pins</strong>, functia <code class="language-plaintext highlighter-rouge">BOARD_InitPins</code> contine:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Identifier</th>
+      <th>Configuratie</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">LCD_D4</code></td>
+      <td><code class="language-plaintext highlighter-rouge">GPIO2, 5</code>, output, initial LOW</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">LCD_D5</code></td>
+      <td><code class="language-plaintext highlighter-rouge">GPIO3, 12</code>, output, initial LOW</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">LCD_D6</code></td>
+      <td><code class="language-plaintext highlighter-rouge">GPIO3, 13</code>, output, initial LOW</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">LCD_D7</code></td>
+      <td><code class="language-plaintext highlighter-rouge">GPIO3, 1</code>, output, initial LOW</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">LCD_RS</code></td>
+      <td><code class="language-plaintext highlighter-rouge">GPIO2, 7</code>, output, initial LOW</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">LCD_EN</code></td>
+      <td><code class="language-plaintext highlighter-rouge">GPIO3, 31</code>, output, initial LOW</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">LCD_BACKLIGHT</code></td>
+      <td><code class="language-plaintext highlighter-rouge">GPIO3, 11</code>, output, initial LOW</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">LCD_KEYPAD_A0</code></td>
+      <td><code class="language-plaintext highlighter-rouge">ADC0_A8</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Pentru <code class="language-plaintext highlighter-rouge">LCD_KEYPAD_A0</code>:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Pull Enable = Disabled</code>;</li>
+  <li><code class="language-plaintext highlighter-rouge">Input Buffer Enable = Disabled</code>;</li>
+  <li>semnalul este <code class="language-plaintext highlighter-rouge">ADC0 A,8</code>.</li>
+</ul>
+
+<p>Fisierele generate sunt:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cfg_tools/board/pin_mux.c
+cfg_tools/board/pin_mux.h
+cfg_tools/board/clock_config.c
+cfg_tools/board/clock_config.h
+cfg_tools/board/peripherals.c
+cfg_tools/board/peripherals.h
+cfg_tools/board/RTE_Device.h
+</code></pre></div></div>
+
+<p>Adaptorul foloseste simbolurile generate:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">BOARD_INITPINS_LCD_RS_GPIO</span>
+<span class="n">BOARD_INITPINS_LCD_RS_PIN</span>
+<span class="n">BOARD_INITPINS_LCD_EN_GPIO</span>
+<span class="n">BOARD_INITPINS_LCD_D4_GPIO</span>
+<span class="n">BOARD_INITPINS_LCD_KEYPAD_A0_PORT</span>
+</code></pre></div></div>
+
+<p>Nu se folosesc numere GPIO hard-coded in driverul reutilizabil.</p>
+
+<h2 id="ce-s-a-intamplat-dupa-regenerare">Ce s-a intamplat dupa regenerare</h2>
+
+<p>Configurarea initiala a proiectului folosea fisiere generate in:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>frdmmcxa153/main/pin_mux.*
+frdmmcxa153/frdmmcxa153/clock_config.*
+main/peripherals.*
+</code></pre></div></div>
+
+<p>Dupa rularea MCUXpresso Config Tools, generatorul a scris fisierele in:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cfg_tools/board/*
+</code></pre></div></div>
+
+<p>Unele dintre fisierele vechi au fost eliminate, dar CMake continua sa le refere. Build-ul a esuat cu un mesaj de forma:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ninja: error: ... clock_config.c, missing and no known rule to make it
+</code></pre></div></div>
+
+<p>Problema nu era in driverul LCD. Configuratia proiectului si fisierele generate nu mai aveau aceeasi structura.</p>
+
+<h2 id="corectiile-de-aliniere">Corectiile de aliniere</h2>
+
+<h3 id="1-sursele-specifice-placii">1. Sursele specifice placii</h3>
+
+<p><code class="language-plaintext highlighter-rouge">frdmmcxa153/board_files.cmake</code> si <code class="language-plaintext highlighter-rouge">frdmmcxa153/cfg_tools_generated.cmake</code> au fost actualizate pentru:</p>
+
+<div class="language-cmake highlighter-rouge"><div class="highlight"><pre class="highlight"><code>../cfg_tools/board/clock_config.c
+../cfg_tools/board/pin_mux.c
+../cfg_tools/board/peripherals.c
+</code></pre></div></div>
+
+<p>Directorul <code class="language-plaintext highlighter-rouge">cfg_tools/board</code> a fost adaugat in include path.</p>
+
+<h3 id="2-eliminarea-surselor-duplicate">2. Eliminarea surselor duplicate</h3>
+
+<p>Vechile:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>main/peripherals.c
+main/peripherals.h
+</code></pre></div></div>
+
+<p>nu mai sunt compilate. Proiectul foloseste versiunea generata din <code class="language-plaintext highlighter-rouge">cfg_tools/board</code>.</p>
+
+<p>Compilarea ambelor versiuni ar produce initializari duplicate sau simboluri definite de mai multe ori.</p>
+
+<h3 id="3-fisierul-mex-canonic">3. Fisierul <code class="language-plaintext highlighter-rouge">.mex</code> canonic</h3>
+
+<p>CMake a fost configurat sa foloseasca fisierul din radacina proiectului:</p>
+
+<div class="language-cmake highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">mcux_add_config_mex_path</span><span class="p">(</span>PATH .<span class="p">)</span>
+</code></pre></div></div>
+
+<p>Astfel, proiectul nu alterneaza intre doua fisiere <code class="language-plaintext highlighter-rouge">.mex</code> din directoare diferite.</p>
+
+<h3 id="4-metadatele-configuration-tools">4. Metadatele Configuration Tools</h3>
+
+<p><code class="language-plaintext highlighter-rouge">cfg_tools/project_info.json</code> a fost actualizat pentru a indica:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cfg_tools/board/clock_config.*
+cfg_tools/board/pin_mux.*
+cfg_tools/board/peripherals.*
+</code></pre></div></div>
+
+<p>Metadatele invechite pot determina o regenerare viitoare sa recreeze structura gresita.</p>
+
+<h3 id="5-o-singura-sursa-pentru-initializarea-pinilor">5. O singura sursa pentru initializarea pinilor</h3>
+
+<p><code class="language-plaintext highlighter-rouge">BOARD_InitPins()</code> generat configureaza:</p>
+
+<ul>
+  <li>clock gate-urile PORT si GPIO;</li>
+  <li>reseturile perifericelor;</li>
+  <li>multiplexarea;</li>
+  <li>proprietatile electrice;</li>
+  <li>directia GPIO;</li>
+  <li>starea initiala.</li>
+</ul>
+
+<p>Adaptorul shield-ului nu mai repeta aceste operatii.</p>
+
+<p>El pastreaza doar:</p>
+
+<ul>
+  <li>scrierea semnalelor LCD;</li>
+  <li>initializarea LPADC;</li>
+  <li>citirea ADC;</li>
+  <li>configurarea callback-urilor.</li>
+</ul>
+
+<p>Aceasta regula este esentiala: modificarile facute in Pins Tool trebuie sa fie respectate de aplicatie, nu suprascrise ulterior de cod manual.</p>
+
+<h2 id="initializarea-lpadc">Initializarea LPADC</h2>
+
+<p>Componenta SDK este activata in:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>frdmmcxa153/prj.conf
+</code></pre></div></div>
+
+<p>prin:</p>
+
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">CONFIG_MCUX_COMPONENT_driver.lpadc</span><span class="p">=</span><span class="s">y</span>
+</code></pre></div></div>
+
+<p>Adaptorul configureaza:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">ADC0</code>;</li>
+  <li>canalul <code class="language-plaintext highlighter-rouge">ADC0_A8</code>;</li>
+  <li>command ID <code class="language-plaintext highlighter-rouge">1</code>;</li>
+  <li>trigger ID <code class="language-plaintext highlighter-rouge">0</code>;</li>
+  <li>software trigger;</li>
+  <li>rezolutie standard de 12 biti;</li>
+  <li>referinta <code class="language-plaintext highlighter-rouge">VDDA</code>.</li>
+</ul>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">LPADC_GetDefaultConvCommandConfig</span><span class="p">(</span><span class="o">&amp;</span><span class="n">command_config</span><span class="p">);</span>
+<span class="n">command_config</span><span class="p">.</span><span class="n">channelNumber</span> <span class="o">=</span> <span class="mi">8U</span><span class="p">;</span>
+<span class="n">command_config</span><span class="p">.</span><span class="n">conversionResolutionMode</span> <span class="o">=</span>
+    <span class="n">kLPADC_ConversionResolutionStandard</span><span class="p">;</span>
+<span class="n">LPADC_SetConvCommandConfig</span><span class="p">(</span><span class="n">ADC0</span><span class="p">,</span> <span class="mi">1U</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">command_config</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h2 id="aplicatia-demo">Aplicatia demo</h2>
+
+<p>Demo-ul poate fi activat sau dezactivat:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#define LCD_KEYPAD_DEMO_ENABLE 1
+</span></code></pre></div></div>
+
+<p>La pornire, LCD-ul afiseaza:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FRDM-MCXA153
+Key: NONE
+</code></pre></div></div>
+
+<p>Bucla principala:</p>
+
+<ol>
+  <li>citeste tastatura;</li>
+  <li>aplica filtrarea;</li>
+  <li>compara butonul stabil cu cel afisat;</li>
+  <li>actualizeaza LCD-ul numai daca valoarea s-a schimbat;</li>
+  <li>scrie numele butonului si in consola.</li>
+</ol>
+
+<p>Valori posibile:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>RIGHT
+UP
+DOWN
+LEFT
+SELECT
+NONE
+</code></pre></div></div>
+
+<h2 id="compilare-si-verificare">Compilare si verificare</h2>
+
+<p>Din directorul proiectului:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cd</span><span class="w"> </span><span class="nx">src/lab_lcd/main</span><span class="w">
+</span><span class="n">cmake</span><span class="w"> </span><span class="nt">--preset</span><span class="w"> </span><span class="nx">debug</span><span class="w">
+</span><span class="n">cmake</span><span class="w"> </span><span class="nt">--build</span><span class="w"> </span><span class="nt">--preset</span><span class="w"> </span><span class="nx">debug</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Fisierele rezultate:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>debug/main.elf
+debug/main.bin
+</code></pre></div></div>
+
+<p>Verificati si lista surselor active:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>debug/main_source_list.txt
+</code></pre></div></div>
+
+<p>Aceasta trebuie sa contina:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cfg_tools/board/clock_config.c
+cfg_tools/board/pin_mux.c
+cfg_tools/board/peripherals.c
+</code></pre></div></div>
+
+<p>Nu trebuie sa contina referinte catre fisiere generate sterse.</p>
+
+<h2 id="verificare-practica">Verificare practica</h2>
+
+<ol>
+  <li>Verificati tensiunile shield-ului inainte de conectare.</li>
+  <li>Conectati shield-ul la headerele Arduino.</li>
+  <li>Conectati placa prin portul MCU-Link.</li>
+  <li>Compilati si programati <code class="language-plaintext highlighter-rouge">debug/main.bin</code>.</li>
+  <li>Deschideti terminalul la <code class="language-plaintext highlighter-rouge">115200 8N1</code>.</li>
+  <li>Verificati mesajul de pornire pe LCD.</li>
+  <li>Apasati fiecare buton.</li>
+  <li>Comparati numele de pe LCD cu mesajul din consola.</li>
+  <li>Daca pragurile sunt gresite, masurati valorile ADC reale si ajustati configuratia.</li>
+</ol>
+
+<h2 id="diagnostic">Diagnostic</h2>
+
+<h3 id="lcd-ul-nu-afiseaza-nimic">LCD-ul nu afiseaza nimic</h3>
+
+<p>Verificati:</p>
+
+<ul>
+  <li>alimentarea si contrastul;</li>
+  <li>maparea <code class="language-plaintext highlighter-rouge">RS</code>, <code class="language-plaintext highlighter-rouge">EN</code>, <code class="language-plaintext highlighter-rouge">D4-D7</code>;</li>
+  <li>nivelurile logice 3.3 V / 5 V;</li>
+  <li>secventa si delay-urile HD44780;</li>
+  <li>daca build-ul foloseste <code class="language-plaintext highlighter-rouge">cfg_tools/board/pin_mux.c</code>.</li>
+</ul>
+
+<h3 id="lcd-ul-afiseaza-caractere-incorecte">LCD-ul afiseaza caractere incorecte</h3>
+
+<p>Posibile cauze:</p>
+
+<ul>
+  <li>ordinea <code class="language-plaintext highlighter-rouge">D4-D7</code> este gresita;</li>
+  <li>impulsul <code class="language-plaintext highlighter-rouge">EN</code> este prea scurt;</li>
+  <li>initializarea in 4 biti este incompleta;</li>
+  <li>nivelul HIGH de 3.3 V nu este acceptat de LCD-ul alimentat la 5 V.</li>
+</ul>
+
+<h3 id="butonul-raportat-este-gresit">Butonul raportat este gresit</h3>
+
+<p>Verificati:</p>
+
+<ul>
+  <li>tensiunea maxima de pe A0;</li>
+  <li>masa comuna;</li>
+  <li>valorile ADC reale;</li>
+  <li>efectul unui divizor de protectie;</li>
+  <li>pragurile configurate.</li>
+</ul>
+
+<h3 id="build-ul-esueaza-dupa-regenerare">Build-ul esueaza dupa regenerare</h3>
+
+<p>Verificati:</p>
+
+<ul>
+  <li>calea fisierelor generate din <code class="language-plaintext highlighter-rouge">.mex</code>;</li>
+  <li><code class="language-plaintext highlighter-rouge">board_files.cmake</code>;</li>
+  <li><code class="language-plaintext highlighter-rouge">cfg_tools_generated.cmake</code>;</li>
+  <li>include path-urile;</li>
+  <li>sursele duplicate;</li>
+  <li><code class="language-plaintext highlighter-rouge">cfg_tools/project_info.json</code>;</li>
+  <li>o noua rulare <code class="language-plaintext highlighter-rouge">cmake --preset debug</code>.</li>
+</ul>
+
+<h2 id="capcane-critice">Capcane critice</h2>
+
+<ul>
+  <li>Nu conectati un A0 de 5 V direct la ADC-ul MCXA153.</li>
+  <li>Nu presupuneti ca toate shield-urile LCD Keypad au aceeasi schema.</li>
+  <li>Nu tratati RESET ca buton analogic.</li>
+  <li>Nu folositi praguri 10 biti direct pe o valoare ADC de 12 biti fara scalare.</li>
+  <li>Nu asteptati infinit rezultatul ADC.</li>
+  <li>Nu reconfigurati manual pinii dupa <code class="language-plaintext highlighter-rouge">BOARD_InitPins()</code> daca Pins Tool trebuie sa ramana sursa de adevar.</li>
+  <li>Nu compilati simultan fisierele <code class="language-plaintext highlighter-rouge">peripherals.c</code> vechi si cele regenerate.</li>
+  <li>Nu presupuneti ca generatorul pastreaza vechiul director de output.</li>
+  <li>Dupa regenerare, rulati intotdeauna configurarea CMake, nu numai build-ul incremental.</li>
+  <li><code class="language-plaintext highlighter-rouge">P3_12</code> si <code class="language-plaintext highlighter-rouge">P3_13</code> sunt partajati cu LED-urile onboard.</li>
+</ul>
+
+<h2 id="exercitii">Exercitii</h2>
+
+<ol>
+  <li>Afisati valoarea ADC bruta pe a doua linie a LCD-ului.</li>
+  <li>Masurati valorile reale pentru fiecare buton si definiti praguri personalizate.</li>
+  <li>Inlocuiti cele trei citiri consecutive cu un filtru bazat pe timp.</li>
+  <li>Implementati detectarea evenimentelor <code class="language-plaintext highlighter-rouge">pressed</code> si <code class="language-plaintext highlighter-rouge">released</code>.</li>
+  <li>Adaugati repetare automata pentru <code class="language-plaintext highlighter-rouge">UP</code> si <code class="language-plaintext highlighter-rouge">DOWN</code>.</li>
+  <li>Mutati perioada de polling pe un timer, fara delay blocant in bucla principala.</li>
+  <li>Activati controlul backlight-ului numai dupa verificarea schemei shield-ului.</li>
+  <li>Mutati un semnal LCD in Pins Tool, regenerati codul si demonstrati ca adaptorul foloseste noul simbol generat.</li>
+</ol>
+
+<h2 id="prompt-recomandat-pentru-un-asistent-ai">Prompt recomandat pentru un asistent AI</h2>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Lucrez intr-un proiect MCUXpresso SDK existent pentru FRDM-MCXA153.
+Vreau sa adaug un Arduino LCD Keypad Shield 1602:
+- HD44780, LCD 16x2, mod paralel 4 biti;
+- RS=D8, EN=D9, D4=D4, D5=D5, D6=D6, D7=D7;
+- backlight optional pe D10;
+- butoane RIGHT, UP, DOWN, LEFT, SELECT prin divizor rezistiv pe A0.
+
+Inainte de modificari:
+1. inspecteaza pattern-urile GPIO, LPADC, delay, logging, pin mux si CMake;
+2. identifica maparea Arduino pentru FRDM-MCXA153;
+3. pastreaza stilul proiectului.
+
+Arhitectura ceruta:
+- driver HD44780 reutilizabil;
+- driver keypad reutilizabil, cu praguri configurabile;
+- adaptor separat pentru FRDM-MCXA153;
+- demo separat si usor de dezactivat.
+
+Praguri Arduino 10 biti:
+- RIGHT 0-80;
+- UP 81-200;
+- DOWN 201-400;
+- LEFT 401-600;
+- SELECT 601-800;
+- NONE peste 800.
+
+Scaleaza pragurile pentru ADC-ul de 12 biti, adauga debounce prin citiri stabile
+si timeout pentru polling ADC.
+
+Adauga pinii in main.mex si foloseste simbolurile BOARD_INITPINS_LCD_* generate.
+Dupa regenerarea MCUXpresso Config Tools:
+- verifica unde au fost generate pin_mux, clock_config si peripherals;
+- aliniaza board_files.cmake, cfg_tools_generated.cmake, include path-urile si
+  cfg_tools/project_info.json;
+- elimina initializarile duplicate;
+- ruleaza cmake --preset debug si cmake --build --preset debug.
+
+Documenteaza explicit compatibilitatea 3.3 V / 5 V.
+Nu face refactorizari fara legatura cu aplicatia.
+</code></pre></div></div>
+
+<h2 id="deliverable">Deliverable</h2>
+
+<p>Aplicatia trebuie sa:</p>
+
+<ul>
+  <li>configureze pinii shield-ului in <code class="language-plaintext highlighter-rouge">main.mex</code>;</li>
+  <li>foloseasca fisierele regenerate din <code class="language-plaintext highlighter-rouge">cfg_tools/board</code>;</li>
+  <li>initializeze LCD-ul in mod 4 biti;</li>
+  <li>afiseze textul de pornire;</li>
+  <li>detecteze <code class="language-plaintext highlighter-rouge">RIGHT</code>, <code class="language-plaintext highlighter-rouge">UP</code>, <code class="language-plaintext highlighter-rouge">DOWN</code>, <code class="language-plaintext highlighter-rouge">LEFT</code>, <code class="language-plaintext highlighter-rouge">SELECT</code> si <code class="language-plaintext highlighter-rouge">NONE</code>;</li>
+  <li>foloseasca praguri configurabile si filtrare;</li>
+  <li>nu blocheze permanent la citirea ADC;</li>
+  <li>pastreze driverele reutilizabile separate de adaptorul placii;</li>
+  <li>compileze cu presetul <code class="language-plaintext highlighter-rouge">debug</code>;</li>
+  <li>documenteze riscurile electrice ale shield-urilor de 5 V.</li>
+</ul>
+
+<hr />
+
+<p><a href="../l5-lpadc">← L5: LPADC - Masurarea tensiunilor analogice</a></p>

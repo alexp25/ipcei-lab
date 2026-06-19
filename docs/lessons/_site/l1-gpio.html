@@ -1,0 +1,321 @@
+<h1 id="-l1--gpio--control-digital--butoane">💡 L1 — GPIO — Control Digital &amp; Butoane</h1>
+
+<p><strong>PORT mux + GPIO data pe Cortex-M33</strong></p>
+
+<hr />
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Ziua / Sesiunea</strong></td>
+      <td>Ziua 1, 22 iunie — dimineață</td>
+    </tr>
+    <tr>
+      <td><strong>Periferic</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">PORT · GPIO · FGPIO</code></td>
+    </tr>
+    <tr>
+      <td><strong>Durată</strong></td>
+      <td>2h (09:00–11:00)</td>
+    </tr>
+    <tr>
+      <td><strong>Responsabil</strong></td>
+      <td>Cadru didactic UPB</td>
+    </tr>
+    <tr>
+      <td><strong>Hardware</strong></td>
+      <td>FRDM-MCXA153 · RGB LED D3 · buton SW3 · osciloscop opțional</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="-context-și-motivație">📌 Context și Motivație</h2>
+
+<p>Prima lecție de periferic introduce arhitectura GPIO pe Cortex-M33/MCX A — fundamental diferită față de DDR/PORT/PIN de pe AVR. Pe MCX A, configurarea pinului (<code class="language-plaintext highlighter-rouge">PORT_SetPinConfig</code>) este separată de controlul datelor (<code class="language-plaintext highlighter-rouge">GPIO_PinWrite</code>). Această separare reflectă realitatea SoC-urilor industriale: mux-ul și drive strength sunt independente de logica aplicației.</p>
+
+<blockquote>
+  <p><strong>Board:</strong> FRDM-MCXA153 · MCX A153 (Cortex-M33 @ 96 MHz) · SDK MCUXpresso 24.12 · VS Code + CMake</p>
+</blockquote>
+
+<h2 id="-obiective">🎯 Obiective</h2>
+
+<ol>
+  <li>Configurare pin ca output GPIO și control independent al celor 3 LED-uri RGB</li>
+  <li>Citire stare buton SW3 (PIO0_6, pull-up intern) prin polling cu debounce software</li>
+  <li>Înțelegerea arhitecturii MCX: PORT (mux + configurare) separat de GPIO (date)</li>
+  <li>Primul prompt contextualizat cu referința completă SDK NXP formulat și testat</li>
+</ol>
+
+<h2 id="-planul-sesiunii">🕐 Planul Sesiunii</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Interval</th>
+      <th>Activitate</th>
+      <th>Detaliu</th>
+      <th>Cine</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">09:00–09:30</code></td>
+      <td><strong>Arhitectura GPIO MCX</strong></td>
+      <td>PORT vs GPIO pe Cortex-M33: pin mux, pull-up/down, drive strength. Registre: <code class="language-plaintext highlighter-rouge">PORT_PCRn</code>, <code class="language-plaintext highlighter-rouge">GPIO_PDDR</code>, <code class="language-plaintext highlighter-rouge">GPIO_PDOR</code>, <code class="language-plaintext highlighter-rouge">GPIO_PDIR</code>. Comparație DDR/PORT AVR.</td>
+      <td>cadru UPB</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">09:30–10:15</code></td>
+      <td><strong>Demo SDK: RGB LED</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">CLOCK_EnableClock(kCLOCK_Port3)</code>, <code class="language-plaintext highlighter-rouge">PORT_SetPinMux(PORT3,12,kPORT_MuxAsGpio)</code>, <code class="language-plaintext highlighter-rouge">GPIO_PinInit()</code>, <code class="language-plaintext highlighter-rouge">GPIO_PinWrite()</code>. Demonstrație anod comun.</td>
+      <td>cadru UPB</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">10:15–11:00</code></td>
+      <td><strong>Lab + GenAI session</strong></td>
+      <td>Studenții: semafor FSM (RED 2s → YELLOW 1s → GREEN 2s) + reset buton SW3. Prompt structurat cu context complet. Identificare erori AI.</td>
+      <td>student + mentor</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="-prompte-pentru-asistentul-ai-upb">🤖 Prompte pentru Asistentul AI UPB</h2>
+
+<blockquote>
+  <p><strong>Regulă:</strong> Copiați prompt-ul complet — contextul hardware este obligatoriu.
+AI-ul va genera cod greșit (pentru alte familii NXP sau Arduino) fără aceste informații.</p>
+</blockquote>
+
+<h3 id="prompt-gpio-config--semafor">Prompt: GPIO config + semafor</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Context hardware: FRDM-MCXA153, MCX A153 Cortex-M33 @ 96 MHz, SDK MCUXpresso 24.12.
+RGB LED D3: R=PIO1_7, G=PIO3_12, B=PIO3_13 — ANOD COMUN (../lOW=aprins, HIGH=stins).
+Buton SW3: PIO0_6, pull-up intern activat.
+Sarcina: funcție void led_set(bool r, bool g, bool b) + FSM semafor RED→YELLOW→GREEN.
+Include:
+  CLOCK_EnableClock(kCLOCK_Port1), CLOCK_EnableClock(kCLOCK_Port3)
+  PORT_SetPinMux(PORT3, 12u, kPORT_MuxAsGpio)
+  GPIO_PinInit(), GPIO_PinWrite()
+NU folosi Arduino/HAL generic — SDK NXP exclusiv.
+</code></pre></div></div>
+
+<h3 id="prompt-debug-gpio">Prompt: Debug GPIO</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FRDM-MCXA153, SDK MCUXpresso 24.12.
+Problema: PORT_SetPinMux(PORT3, 12u, kPORT_MuxAsGpio) + GPIO_PinWrite(GPIO3, 12u, 0u)
+dar LED-ul verde nu se aprinde. LED-ul roșu (PIO1_7) funcționează corect.
+Ce verific?
+Hint: CLOCK_EnableClock pe port-ul 3, valoarea kPORT_MuxAsGpio,
+și logica anodului comun (../lOW = aprins).
+</code></pre></div></div>
+
+<h2 id="-configurare-gpio-în-mcuxpresso-config-tools">🔧 Configurare GPIO în MCUXpresso Config Tools</h2>
+
+<p>Deschideți fișierul <code class="language-plaintext highlighter-rouge">led_blinky.mex</code> cu MCUXpresso Config Tools (click dreapta în VS Code → <strong>Open with MCUXpresso Config Tools</strong>).</p>
+
+<h3 id="vederea-pins--pachetul-fizic-mcxa153vlh">Vederea Pins — pachetul fizic MCXA153VLH</h3>
+
+<p>Toolul <strong>Pins</strong> afișează pachetul LQFP 64 al MCU-ului și lista completă de semnale disponibile. Fiecare pin poate fi asignat unui periferic sau configurat ca GPIO.</p>
+
+<p><img src="../img/lab0/setup_pinout.png" alt="Config Tools — vederea Pins cu pachetul MCXA153VLH LQFP 64" /></p>
+
+<h3 id="asignare-semnal-gpio">Asignare semnal GPIO</h3>
+
+<p>Faceți click pe un pin din pachet sau din lista din stânga și selectați semnalul GPIO dorit. Fereastra de selecție afișează toate semnalele disponibile pe acel pin:</p>
+
+<p><img src="../img/lab0/setup_pinout_gpio.png" alt="Selectare semnal GPIO — popup cu semnale disponibile" /></p>
+
+<h3 id="rezultat--gpio3_12-configurat-ca-output-led-verde">Rezultat — GPIO3_12 configurat ca output (../lED verde)</h3>
+
+<p>Pinul <code class="language-plaintext highlighter-rouge">GPIO3_12</code> este asignat ca <code class="language-plaintext highlighter-rouge">LED_GREEN_D3</code> cu direcție <strong>Output</strong>. Observați că în tabelul de jos apare semnalul, portul, pinul și configurația de drive:</p>
+
+<p><img src="../img/lab0/configurator_uart.png" alt="GPIO3_12 configurat ca LED_GREEN_D3 output" /></p>
+
+<blockquote>
+  <p><strong>Notă:</strong> După orice modificare în Config Tools, apăsați <strong>Update Code</strong> pentru a regenera fișierele <code class="language-plaintext highlighter-rouge">pin_mux.c</code> / <code class="language-plaintext highlighter-rouge">pin_mux.h</code>.</p>
+</blockquote>
+
+<h3 id="cum-se-leagă-mex-config-tools-codul-generat-și-build-ul">Cum se leagă <code class="language-plaintext highlighter-rouge">.mex</code>, Config Tools, codul generat și build-ul</h3>
+
+<p>Fișierul <code class="language-plaintext highlighter-rouge">.mex</code> nu este cod executabil. El este <strong>modelul de configurare</strong> citit de MCUXpresso Config Tools și descrie:</p>
+
+<ul>
+  <li>pinii și funcțiile lor multiplexate în unealta <strong>Pins</strong>;</li>
+  <li>sursele, selectoarele și divizoarele din unealta <strong>Clocks</strong>;</li>
+  <li>instanțele inițializate în unealta <strong>Peripherals</strong>;</li>
+  <li>numele funcțiilor generate și locul în care vor fi scrise fișierele.</li>
+</ul>
+
+<p>La apăsarea <strong>Update Code</strong>, Config Tools transformă modelul <code class="language-plaintext highlighter-rouge">.mex</code> în surse C. Lanțul complet este:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>main.mex
+   │
+   ├── Pins       ──&gt; board/pin_mux.c, board/pin_mux.h
+   ├── Clocks     ──&gt; board/clock_config.c, board/clock_config.h
+   └── Peripherals──&gt; board/peripherals.c, board/peripherals.h
+                              │
+                              └── CMake includează și compilează aceste fișiere
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Principiu important:</strong> configurația din <code class="language-plaintext highlighter-rouge">.mex</code>, fișierele generate și fișierele selectate de CMake trebuie să descrie aceeași configurație și să folosească aceleași căi.</p>
+</blockquote>
+
+<h4 id="piesele-care-se-mișcă">Piesele care se mișcă</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Piesă</th>
+      <th>Rol</th>
+      <th>Cine o modifică</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">main.mex</code></td>
+      <td>Sursa de adevăr pentru Config Tools</td>
+      <td>Config Tools; manual numai cu validare atentă</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">pin_mux.c/.h</code></td>
+      <td>Rutarea și caracteristicile electrice ale pinilor</td>
+      <td>Generate de unealta Pins</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">clock_config.c/.h</code></td>
+      <td>Clock-urile globale ale configurației de boot</td>
+      <td>Generate de unealta Clocks</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">peripherals.c/.h</code></td>
+      <td>Inițializarea instanțelor adăugate în Peripherals</td>
+      <td>Generate de unealta Peripherals</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">board_files.cmake</code> / <code class="language-plaintext highlighter-rouge">cfg_tools_generated.cmake</code></td>
+      <td>Spun build-ului ce surse generate să compileze</td>
+      <td>Proiectul/CMake și integrarea Config Tools</td>
+    </tr>
+    <tr>
+      <td>driverul aplicației</td>
+      <td>API-ul reutilizabil pentru senzor sau periferic</td>
+      <td>Scris manual; nu trebuie suprascris de Config Tools</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">main.c</code></td>
+      <td>Integrarea și logica aplicației</td>
+      <td>Scris manual</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Fișierele generate conțin de obicei avertismentul:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/* This file was generated by the MCUXpresso Config Tools.
+ * Any manual edits made to this file will be overwritten. */</span>
+</code></pre></div></div>
+
+<p>Modificările permanente trebuie făcute în <code class="language-plaintext highlighter-rouge">.mex</code> sau în Config Tools. O corecție scrisă numai în <code class="language-plaintext highlighter-rouge">pin_mux.c</code> ori <code class="language-plaintext highlighter-rouge">clock_config.c</code> poate funcționa până la următorul <strong>Update Code</strong>, când va fi pierdută.</p>
+
+<h4 id="căile-de-generare-trebuie-să-coincidă-cu-build-ul">Căile de generare trebuie să coincidă cu build-ul</h4>
+
+<p>În <code class="language-plaintext highlighter-rouge">.mex</code>, secțiunea <code class="language-plaintext highlighter-rouge">generated_project_files</code> stabilește destinația fiecărui fișier. În acest proiect, fișierele generate sunt grupate în:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>frdmmcxa153/board/
+</code></pre></div></div>
+
+<p>CMake trebuie să compileze exact aceleași fișiere. Dacă <code class="language-plaintext highlighter-rouge">.mex</code> generează în <code class="language-plaintext highlighter-rouge">board/pin_mux.c</code>, dar CMake compilează <code class="language-plaintext highlighter-rouge">main/pin_mux.c</code>, apar două copii:</p>
+
+<ul>
+  <li>Config Tools actualizează una;</li>
+  <li>aplicația compilează alta;</li>
+  <li>interfața grafică arată configurația corectă, dar placa rulează configurația veche.</li>
+</ul>
+
+<p>În dialogul <strong>Update Files</strong>, operații de tip <strong>create</strong> într-un director și <strong>delete</strong> în alt director indică de obicei o nealiniere a căilor, nu o schimbare funcțională intenționată.</p>
+
+<h4 id="exemplu-adăugarea-unui-periferic-i2c">Exemplu: adăugarea unui periferic I2C</h4>
+
+<p>Pentru senzorul P3T1755 de pe FRDM-MCXA153 au trebuit aliniate următoarele:</p>
+
+<ol>
+  <li>În <strong>Pins</strong>, <code class="language-plaintext highlighter-rouge">P0_16</code> și <code class="language-plaintext highlighter-rouge">P0_17</code> sunt rutate ca <code class="language-plaintext highlighter-rouge">LPI2C0_SDA</code> și <code class="language-plaintext highlighter-rouge">LPI2C0_SCL</code>.</li>
+  <li>Pinii au <code class="language-plaintext highlighter-rouge">Alt2</code>, input buffer activ, open-drain activ și pull-up activ.</li>
+  <li><code class="language-plaintext highlighter-rouge">pin_mux.c</code> este generat în directorul compilat de CMake.</li>
+  <li>Driverul senzorului folosește adresa I2C pe 7 biți <code class="language-plaintext highlighter-rouge">0x48</code> și rămâne separat de <code class="language-plaintext highlighter-rouge">main.c</code>.</li>
+  <li>Clock-ul LPI2C0 este pornit în adaptorul hardware înainte de <code class="language-plaintext highlighter-rouge">LPI2C_MasterInit()</code>:</li>
+</ol>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">CLOCK_SetClockDiv</span><span class="p">(</span><span class="n">kCLOCK_DivLPI2C0</span><span class="p">,</span> <span class="mi">1U</span><span class="p">);</span>
+<span class="n">CLOCK_AttachClk</span><span class="p">(</span><span class="n">kFRO_HF_DIV_to_LPI2C0</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Ultimul punct ilustrează două modele valide de ownership:</p>
+
+<ul>
+  <li><strong>Clock global generat:</strong> perifericul este reprezentat complet în Clocks/Peripherals, iar <code class="language-plaintext highlighter-rouge">clock_config.c</code> îi configurează clock-ul.</li>
+  <li><strong>Clock local modulului:</strong> modulul care inițializează perifericul își activează clock-ul înainte de folosire.</li>
+</ul>
+
+<p>Nu combinați accidental cele două modele și nu introduceți manual identificatori necunoscuți în <code class="language-plaintext highlighter-rouge">.mex</code>. Unele clock-uri sunt derivate de Config Tools și acceptă numai setările expuse în interfața grafică. Un câmp XML inventat poate produce mesajul <code class="language-plaintext highlighter-rouge">Invalid settings</code>.</p>
+
+<h4 id="workflow-recomandat-pentru-orice-periferic-nou">Workflow recomandat pentru orice periferic nou</h4>
+
+<ol>
+  <li><strong>Identificați hardware-ul:</strong> instanța periferică, pinii, funcția mux, adresa și clock-ul necesar.</li>
+  <li><strong>Inspectați proiectul:</strong> găsiți <code class="language-plaintext highlighter-rouge">.mex</code> activ, directorul generat și fișierele compilate de CMake.</li>
+  <li><strong>Configurați Pins:</strong> rutați semnalele și setați pull-up/down, open-drain, input buffer și drive strength.</li>
+  <li><strong>Configurați Clocks/Peripherals:</strong> folosiți numai opțiunile acceptate de unealtă. Dacă proiectul inițializează perifericul într-un modul propriu, păstrați ownership-ul clar acolo.</li>
+  <li><strong>Verificați Update Files înainte de OK:</strong> confirmați că se schimbă numai fișierele și liniile așteptate.</li>
+  <li><strong>Regenerați codul:</strong> nu păstrați corecții importante numai în fișierele generate.</li>
+  <li><strong>Verificați CMake:</strong> fiecare fișier generat trebuie să apară o singură dată în build.</li>
+  <li><strong>Compilați curat:</strong> folosiți un clean build pentru a evita obiecte rămase din vechile căi.</li>
+  <li><strong>Testați pe placă:</strong> verificați atât mesajele seriale, cât și semnalele fizice dacă este necesar.</li>
+</ol>
+
+<h4 id="checklist-înainte-de-acceptarea-update-code">Checklist înainte de acceptarea Update Code</h4>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Este deschis fișierul <code class="language-plaintext highlighter-rouge">.mex</code> al aplicației corecte?</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><code class="language-plaintext highlighter-rouge">Project Link</code> indică rădăcina în care trebuie generate fișierele?</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Config Tools și CMake folosesc același <code class="language-plaintext highlighter-rouge">pin_mux.c</code>, <code class="language-plaintext highlighter-rouge">clock_config.c</code> și <code class="language-plaintext highlighter-rouge">peripherals.c</code>?</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Dialogul nu șterge fișiere de aplicație sau drivere scrise manual?</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Diff-ul păstrează pinii, mux-ul, pull-up-urile și clock-urile necesare?</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Nu există două copii concurente ale aceluiași fișier generat?</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Proiectul compilează după regenerare?</li>
+</ul>
+
+<blockquote>
+  <p><strong>Regulă practică:</strong> dacă Config Tools propune o schimbare neașteptată, apăsați <strong>Cancel</strong>, identificați mai întâi ce fișier este sursa de adevăr și ce fișier compilează CMake, apoi corectați modelul sau căile. Nu acceptați dialogul doar pentru a vedea dacă proiectul mai funcționează.</p>
+</blockquote>
+
+<hr />
+
+<h2 id="️-capcane-critice">⚠️ Capcane Critice</h2>
+
+<blockquote>
+  <p>Ce GenAI <strong>nu știe</strong> fără context explicit — verificați înainte de upload pe placă.</p>
+</blockquote>
+
+<ul>
+  <li><strong>PORT și GPIO sunt periferice separate</strong> — <code class="language-plaintext highlighter-rouge">CLOCK_EnableClock(kCLOCK_PortX)</code> trebuie apelat pentru <strong>fiecare port</strong> folosit</li>
+  <li><code class="language-plaintext highlighter-rouge">kPORT_MuxAsGpio</code> poate diferi ca valoare numerică între familii MCX — verificați enum-ul din <code class="language-plaintext highlighter-rouge">fsl_port.h</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GPIO_PinWrite(GPIO3, 12u, 0u)</code> = LED verde <strong>APRINS</strong> (nu stins — anod comun)</li>
+</ul>
+
+<h2 id="-deliverable">✅ Deliverable</h2>
+
+<blockquote>
+  <p>Semafor FSM funcțional pe RGB + buton SW3 polling + 3 prompts documentate în Moodle cu analiza erorilor AI</p>
+</blockquote>
+
+<hr />
+
+<p><a href="../l0-setup-toolchain">← L0: Setup Toolchain &amp; Prima Aplicație</a> · <a href="../l2-lpuart">L2: LPUART — Comunicație Serială →</a></p>

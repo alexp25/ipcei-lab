@@ -1,0 +1,310 @@
+<h1 id="l3---intreruperi-externe--nvic">L3 - Intreruperi Externe &amp; NVIC</h1>
+
+<p><strong>De la polling pentru butonul SW3 la intreruperi GPIO/NVIC</strong></p>
+
+<hr />
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Ziua / Sesiunea</strong></td>
+      <td>Ziua 2, 23 iunie - dimineata</td>
+    </tr>
+    <tr>
+      <td><strong>Periferic</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">GPIO</code> - <code class="language-plaintext highlighter-rouge">GPIO IRQ</code> - <code class="language-plaintext highlighter-rouge">NVIC</code></td>
+    </tr>
+    <tr>
+      <td><strong>Durata</strong></td>
+      <td>2h (09:00-11:00)</td>
+    </tr>
+    <tr>
+      <td><strong>Responsabil</strong></td>
+      <td>Cadru didactic UPB</td>
+    </tr>
+    <tr>
+      <td><strong>Hardware</strong></td>
+      <td>FRDM-MCXA153 - SW3 (<code class="language-plaintext highlighter-rouge">GPIO1</code>, pin 7 / <code class="language-plaintext highlighter-rouge">P1_7</code>) - LED RGB</td>
+    </tr>
+    <tr>
+      <td><strong>Proiect</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">src/lab_interrupts/main</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="context-si-motivatie">Context si Motivatie</h2>
+
+<p>Inainte sa folosim intreruperi, pornim de la o implementare simpla cu polling: programul citeste periodic starea butonului SW3 si comuta LED-urile RGB cand detecteaza o apasare noua.</p>
+
+<p>Codul curent separa clar cele doua idei importante:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">check_button_pressed()</code> verifica butonul fara debounce.</li>
+  <li><code class="language-plaintext highlighter-rouge">check_button_pressed_debounce()</code> verifica butonul cu debounce software.</li>
+  <li><code class="language-plaintext highlighter-rouge">on_button_pressed()</code> contine actiunea comuna: toggle pentru LED-urile RGB si mesaj pe Serial Monitor.</li>
+</ul>
+
+<p>La final, transformati detectia prin polling intr-o solutie cu intreruperi GPIO si NVIC, folosind GenAI ca asistent de conversie si verificand configuratia in MCUXpresso Config Tools.</p>
+
+<blockquote>
+  <p><strong>Board:</strong> FRDM-MCXA153 - MCX A153 (Cortex-M33) - SDK MCUXpresso - VS Code + CMake</p>
+</blockquote>
+
+<h2 id="obiective">Obiective</h2>
+
+<ol>
+  <li>Compilarea si rularea proiectului <code class="language-plaintext highlighter-rouge">src/lab_interrupts/main</code>.</li>
+  <li>Observarea diferentei dintre polling fara debounce si polling cu debounce.</li>
+  <li>Intelegerea comportamentului unui buton mecanic prin mesajele din Serial Monitor.</li>
+  <li>Conversia gestionarii butonului SW3 din polling in intrerupere GPIO/NVIC.</li>
+  <li>Actualizarea fisierului <code class="language-plaintext highlighter-rouge">.mex</code> astfel incat configuratia SW3/IRQ sa fie vizibila in Config Tools.</li>
+</ol>
+
+<h2 id="planul-sesiunii">Planul Sesiunii</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Interval</th>
+      <th>Activitate</th>
+      <th>Detaliu</th>
+      <th>Cine</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">09:00-09:20</code></td>
+      <td><strong>Ex 0: Compile and run</strong></td>
+      <td>Deschideti proiectul, compilati, rulati pe placa si verificati Serial Monitor.</td>
+      <td>student + mentor</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">09:20-10:00</code></td>
+      <td><strong>Ex 1: Polling si debounce</strong></td>
+      <td>Observati cate mesaje apar la o singura apasare SW3, apoi testati functia cu debounce.</td>
+      <td>student</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">10:00-11:00</code></td>
+      <td><strong>Ex 2: Conversie la intreruperi</strong></td>
+      <td>Folositi GenAI pentru a converti apasarea SW3 la GPIO IRQ/NVIC si actualizati <code class="language-plaintext highlighter-rouge">.mex</code>.</td>
+      <td>student + mentor</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="exercitii">Exercitii</h2>
+
+<h3 id="ex-0---compile-and-run">Ex 0 - Compile and Run</h3>
+
+<ol>
+  <li>
+    <p>Deschideti proiectul:</p>
+
+    <div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>src/lab_interrupts/main
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>Compilati proiectul cu presetul <code class="language-plaintext highlighter-rouge">debug</code>:</p>
+
+    <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cmake</span><span class="w"> </span><span class="nt">--preset</span><span class="w"> </span><span class="nx">debug</span><span class="w">
+</span><span class="n">cmake</span><span class="w"> </span><span class="nt">--build</span><span class="w"> </span><span class="nt">--preset</span><span class="w"> </span><span class="nx">debug</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+  <li>Incarcati aplicatia pe placa FRDM-MCXA153.</li>
+  <li>Deschideti Serial Monitor la <code class="language-plaintext highlighter-rouge">115200</code> baud.</li>
+  <li>Apasati SW3 si verificati ca LED-urile RGB se comuta.</li>
+</ol>
+
+<p>La pornire, aplicatia face un scurt self-test pe LED-uri. Dupa aceea, fiecare apasare SW3 ar trebui sa produca mesaje de forma:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SW3 pressed: toggled LEDs (0)
+SW3 pressed: toggled LEDs (1)
+</code></pre></div></div>
+
+<h3 id="ex-1---observati-comportamentul-butonului">Ex 1 - Observati Comportamentul Butonului</h3>
+
+<p>Proiectul porneste cu functia fara debounce activa in <code class="language-plaintext highlighter-rouge">main.c</code>:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">check_button_pressed</span><span class="p">();</span>
+
+    <span class="c1">// check_button_pressed_debounce();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<ol>
+  <li>Rulati proiectul cu <code class="language-plaintext highlighter-rouge">check_button_pressed()</code>.</li>
+  <li>Apasati SW3 o singura data.</li>
+  <li>Urmariti Serial Monitor.</li>
+  <li>Notati cate mesaje apar pentru o singura apasare de buton.</li>
+</ol>
+
+<p>Intrebare de observatie:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>La o singura apasare fizica SW3, apar unul sau mai multe mesaje in Serial Monitor?
+</code></pre></div></div>
+
+<p>Apoi testati varianta cu debounce:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// check_button_pressed();</span>
+
+    <span class="n">check_button_pressed_debounce</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<ol>
+  <li>Recompilati si rulati proiectul.</li>
+  <li>Apasati SW3 de mai multe ori, cate o apasare scurta pe rand.</li>
+  <li>Verificati Serial Monitor.</li>
+</ol>
+
+<p>Rezultatul asteptat: cu functia <code class="language-plaintext highlighter-rouge">check_button_pressed_debounce()</code>, o apasare fizica produce un singur mesaj si o singura comutare a LED-urilor.</p>
+
+<h3 id="ex-2---convertiti-sw3-la-intreruperi">Ex 2 - Convertiti SW3 la Intreruperi</h3>
+
+<p>Pornind de la varianta cu polling, modificati proiectul astfel incat apasarea butonului SW3 sa fie tratata prin intrerupere GPIO/NVIC.</p>
+
+<p>Cerintele minime:</p>
+
+<ol>
+  <li>Configurati SW3 ca input GPIO pe <code class="language-plaintext highlighter-rouge">GPIO1</code>, pin <code class="language-plaintext highlighter-rouge">7</code> (<code class="language-plaintext highlighter-rouge">P1_7</code>).</li>
+  <li>Activati intreruperea pentru apasare pe falling edge.</li>
+  <li>Activati IRQ-ul <code class="language-plaintext highlighter-rouge">GPIO1_IRQn</code>.</li>
+  <li>Implementati handler-ul <code class="language-plaintext highlighter-rouge">GPIO1_IRQHandler</code> sau macro-ul deja definit in <code class="language-plaintext highlighter-rouge">board.h</code>: <code class="language-plaintext highlighter-rouge">BOARD_SW3_IRQ_HANDLER</code>.</li>
+  <li>In handler, verificati flag-ul de intrerupere pentru pinul SW3.</li>
+  <li>Stergeti flag-ul de intrerupere inainte de iesirea din handler.</li>
+  <li>Apelati <code class="language-plaintext highlighter-rouge">on_button_pressed()</code> la fiecare apasare valida.</li>
+  <li>Scoateti apelurile de polling din <code class="language-plaintext highlighter-rouge">while (1)</code>.</li>
+</ol>
+
+<h4 id="cum-ar-trebui-sa-arate-codul-cu-intreruperi">Cum ar trebui sa arate codul cu intreruperi</h4>
+
+<p>Varianta cu intreruperi trebuie sa pastreze ideea buna din codul initial: actiunea la apasarea butonului ramane in <code class="language-plaintext highlighter-rouge">on_button_pressed()</code>. Se schimba doar mecanismul prin care detectam apasarea.</p>
+
+<p>In initializare, puteti fie sa extindeti <code class="language-plaintext highlighter-rouge">init_sw3_gpio()</code>, fie sa creati o functie noua, de exemplu <code class="language-plaintext highlighter-rouge">init_sw3_interrupt()</code>. Pe langa configurarea GPIO deja existenta, functia trebuie sa activeze intreruperea pentru pinul SW3:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">init_sw3_interrupt</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">init_sw3_gpio</span><span class="p">();</span>
+
+    <span class="n">GPIO_SetPinInterruptConfig</span><span class="p">(</span><span class="n">BOARD_SW3_GPIO</span><span class="p">,</span>
+                               <span class="n">BOARD_SW3_GPIO_PIN</span><span class="p">,</span>
+                               <span class="n">kGPIO_InterruptFallingEdge</span><span class="p">);</span>
+    <span class="n">GPIO_PinClearInterruptFlag</span><span class="p">(</span><span class="n">BOARD_SW3_GPIO</span><span class="p">,</span> <span class="n">BOARD_SW3_GPIO_PIN</span><span class="p">);</span>
+
+    <span class="n">NVIC_ClearPendingIRQ</span><span class="p">(</span><span class="n">BOARD_SW3_IRQ</span><span class="p">);</span>
+    <span class="n">EnableIRQ</span><span class="p">(</span><span class="n">BOARD_SW3_IRQ</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Handler-ul trebuie sa verifice ca intreruperea vine de la pinul SW3, sa stearga flag-ul, apoi sa execute actiunea:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">BOARD_SW3_IRQ_HANDLER</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">GPIO_PinGetInterruptFlag</span><span class="p">(</span><span class="n">BOARD_SW3_GPIO</span><span class="p">,</span> <span class="n">BOARD_SW3_GPIO_PIN</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="n">GPIO_PinClearInterruptFlag</span><span class="p">(</span><span class="n">BOARD_SW3_GPIO</span><span class="p">,</span> <span class="n">BOARD_SW3_GPIO_PIN</span><span class="p">);</span>
+        <span class="n">on_button_pressed</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Dupa conversie, <code class="language-plaintext highlighter-rouge">main()</code> nu mai trebuie sa apeleze <code class="language-plaintext highlighter-rouge">check_button_pressed()</code> sau <code class="language-plaintext highlighter-rouge">check_button_pressed_debounce()</code>. Bucla principala poate ramane simpla:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">init_pins</span><span class="p">();</span>
+<span class="n">init_sw3_interrupt</span><span class="p">();</span>
+
+<span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">__WFI</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">__WFI()</code> inseamna “wait for interrupt”: procesorul asteapta urmatoarea intrerupere. Pentru laborator, este acceptabil ca handler-ul sa apeleze <code class="language-plaintext highlighter-rouge">on_button_pressed()</code> direct. In proiecte reale, un ISR ar trebui sa fie cat mai scurt: de obicei seteaza un <code class="language-plaintext highlighter-rouge">volatile bool</code> sau incrementeaza un contor, iar procesarea mai lenta se face in <code class="language-plaintext highlighter-rouge">while (1)</code>.</p>
+
+<h4 id="actualizati-si-fisierul-mex">Actualizati si fisierul <code class="language-plaintext highlighter-rouge">.mex</code></h4>
+
+<p>Dupa modificarea codului, actualizati configuratia proiectului in MCUXpresso Config Tools:</p>
+
+<ol>
+  <li>Deschideti fisierul <code class="language-plaintext highlighter-rouge">.mex</code> al proiectului.</li>
+  <li>Adaugati/confirmati pinul SW3 (<code class="language-plaintext highlighter-rouge">P1_7</code>) in sectiunea Pins.</li>
+  <li>Configurati pinul ca GPIO input cu pull-up.</li>
+  <li>Configurati intreruperea pe falling edge pentru SW3.</li>
+  <li>Confirmati ca setarea este vizibila in Config Tools, nu doar scrisa manual in cod.</li>
+  <li>Salvati <code class="language-plaintext highlighter-rouge">.mex</code> si regenerati fisierele de configurare daca este nevoie.</li>
+  <li>Recompilati proiectul.</li>
+</ol>
+
+<h2 id="prompte-pentru-genai">Prompte Pentru GenAI</h2>
+
+<h3 id="prompt-conversie-polling-la-intrerupere-sw3">Prompt: Conversie polling la intrerupere SW3</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Context hardware: FRDM-MCXA153, MCX A153 Cortex-M33, SDK MCUXpresso.
+Proiect: src/lab_interrupts/main.
+Buton SW3: GPIO1, pin 7 (P1_7), activ low, pull-up intern.
+LED-uri RGB: definite in board.h ca BOARD_LED_RED/GREEN/BLUE.
+
+Codul curent foloseste polling si separa actiunea de detectie:
+- init_sw3_gpio() configureaza SW3 ca input GPIO
+- check_button_pressed() verifica o apasare fara debounce
+- check_button_pressed_debounce() verifica o apasare cu debounce software
+- on_button_pressed() contine actiunea comuna: toggle LED-uri + mesaj serial
+
+Sarcina: converteste detectia apasarii SW3 din polling in intrerupere GPIO/NVIC.
+Include:
+- configurarea SW3 ca input GPIO cu pull-up
+- falling edge interrupt pentru SW3
+- EnableIRQ(GPIO1_IRQn)
+- handler pentru BOARD_SW3_IRQ_HANDLER sau GPIO1_IRQHandler
+- verificarea flag-ului pentru pinul SW3
+- stergerea flag-ului de intrerupere
+- apelarea on_button_pressed() in handler
+- eliminarea apelurilor check_button_pressed() din while (1)
+Explica si ce trebuie actualizat in fisierul .mex ca setarea sa fie vizibila in Config Tools.
+</code></pre></div></div>
+
+<h3 id="prompt-debug-isr-care-se-apeleaza-continuu">Prompt: Debug ISR care se apeleaza continuu</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FRDM-MCXA153, SW3 pe GPIO1 pin 7, intrerupere pe falling edge.
+Problema: dupa prima apasare, handler-ul GPIO1_IRQHandler se apeleaza continuu.
+Verifica daca flag-ul de intrerupere pentru pinul SW3 este sters corect.
+Explica de ce un flag nesters face ca NVIC sa reintre imediat in ISR.
+</code></pre></div></div>
+
+<h2 id="capcane-critice">Capcane Critice</h2>
+
+<ul>
+  <li>SW3 este activ low: apasat inseamna <code class="language-plaintext highlighter-rouge">GPIO_PinRead(...) == 0U</code>.</li>
+  <li>Fara debounce, o singura apasare poate produce mai multe mesaje in Serial Monitor.</li>
+  <li>In varianta cu intreruperi, flag-ul de intrerupere trebuie sters; altfel handler-ul se poate reapela continuu.</li>
+  <li>Dupa conversia la intreruperi, <code class="language-plaintext highlighter-rouge">while (1)</code> nu mai trebuie sa faca polling pentru SW3.</li>
+  <li>Verificati pinul exact pentru acest proiect: SW3 este <code class="language-plaintext highlighter-rouge">GPIO1</code>, pin <code class="language-plaintext highlighter-rouge">7</code> (<code class="language-plaintext highlighter-rouge">P1_7</code>).</li>
+  <li>Dupa conversia la intreruperi, actualizati <code class="language-plaintext highlighter-rouge">.mex</code>; nu lasati configuratia doar in cod.</li>
+  <li>GenAI poate propune API-uri pentru alta familie NXP sau pentru Arduino. Verificati mereu impotriva SDK-ului si a <code class="language-plaintext highlighter-rouge">board.h</code>.</li>
+</ul>
+
+<h2 id="deliverable">Deliverable</h2>
+
+<ol>
+  <li>Proiect compilabil si functional cu polling fara debounce.</li>
+  <li>Observatii in Serial Monitor pentru polling fara debounce vs polling cu debounce.</li>
+  <li>Proiect modificat astfel incat SW3 sa fie gestionat prin intrerupere.</li>
+  <li>Fisier <code class="language-plaintext highlighter-rouge">.mex</code> actualizat, cu SW3/IRQ vizibil in Config Tools.</li>
+  <li>Scurta explicatie: de ce trebuie sters flag-ul de intrerupere in ISR.</li>
+</ol>
+
+<hr />
+
+<p><a href="../l2-lpuart">&lt;- L2: LPUART - Comunicatie Seriala</a> - <a href="../l4-timer-pwm">L4: Timer &amp; PWM - SCTimer si CTIMER -&gt;</a></p>

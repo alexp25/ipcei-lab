@@ -1,0 +1,443 @@
+<h1 id="l5---lpadc---masurarea-tensiunilor-analogice">L5 - LPADC - Masurarea tensiunilor analogice</h1>
+
+<p><strong>Configurare cu MCUXpresso Config Tools, calibrare, software trigger si afisarea tensiunilor in consola</strong></p>
+
+<hr />
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Ziua / Sesiunea</strong></td>
+      <td>Ziua 3, 24 iunie - dimineata</td>
+    </tr>
+    <tr>
+      <td><strong>Periferic</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">ADC0 (LPADC) - command queue - result FIFO - VDDA 3.3 V</code></td>
+    </tr>
+    <tr>
+      <td><strong>Durata</strong></td>
+      <td>2h (09:00-11:00)</td>
+    </tr>
+    <tr>
+      <td><strong>Responsabil</strong></td>
+      <td>Cadru didactic UPB</td>
+    </tr>
+    <tr>
+      <td><strong>Hardware</strong></td>
+      <td>FRDM-MCXA153, cablu USB-C si surse analogice de maximum 3.3 V</td>
+    </tr>
+    <tr>
+      <td><strong>Proiect</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">src/lab_adc/main</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="context-si-motivatie">Context si motivatie</h2>
+
+<p>Convertorul LPADC al microcontrolerului MCXA153 foloseste o arhitectura bazata pe comenzi de conversie, triggere si un FIFO de rezultate. Fluxul este diferit de ADC-urile simple la care selectarea canalului si pornirea conversiei se fac printr-un singur registru.</p>
+
+<p>Aplicatia realizata in acest laborator:</p>
+
+<ol>
+  <li>configureaza pinii analogici din MCUXpresso Config Tools;</li>
+  <li>initializeaza si calibreaza <code class="language-plaintext highlighter-rouge">ADC0</code>;</li>
+  <li>foloseste rezolutia high-resolution de 16 biti;</li>
+  <li>selecteaza succesiv fiecare canal analogic;</li>
+  <li>porneste conversia prin software trigger;</li>
+  <li>converteste valoarea raw in milivolti;</li>
+  <li>afiseaza rezultatele in consola seriala.</li>
+</ol>
+
+<blockquote>
+  <p><strong>Important:</strong> Pe MCXA153 se foloseste driverul <code class="language-plaintext highlighter-rouge">fsl_lpadc.h</code>. Driverul <code class="language-plaintext highlighter-rouge">ADC16</code>, intalnit pe alte familii NXP, nu este compatibil cu acest proiect.</p>
+</blockquote>
+
+<h2 id="obiective">Obiective</h2>
+
+<p>La finalul laboratorului, studentul va putea:</p>
+
+<ol>
+  <li>identifica pinii si canalele ADC pentru <code class="language-plaintext highlighter-rouge">SW3</code> si conectorul Arduino;</li>
+  <li>configura pinii ca intrari analogice in fisierul <code class="language-plaintext highlighter-rouge">.mex</code>;</li>
+  <li>initializa si calibra LPADC;</li>
+  <li>configura o comanda si un software trigger;</li>
+  <li>citi rezultatul din FIFO prin polling;</li>
+  <li>transforma valoarea raw intr-o tensiune;</li>
+  <li>verifica rezultatele prin consola seriala.</li>
+</ol>
+
+<h2 id="maparea-intrarilor-analogice">Maparea intrarilor analogice</h2>
+
+<p>Aplicatia citeste sapte intrari:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nume in aplicatie</th>
+      <th>Pin MCU</th>
+      <th>Conector placa</th>
+      <th>Canal LPADC</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SW3</code></td>
+      <td><code class="language-plaintext highlighter-rouge">P1_7</code></td>
+      <td>buton SW3 / J1[1]</td>
+      <td><code class="language-plaintext highlighter-rouge">ADC0_A23</code></td>
+    </tr>
+    <tr>
+      <td>Arduino <code class="language-plaintext highlighter-rouge">A0</code></td>
+      <td><code class="language-plaintext highlighter-rouge">P1_10</code></td>
+      <td>J4[2]</td>
+      <td><code class="language-plaintext highlighter-rouge">ADC0_A8</code></td>
+    </tr>
+    <tr>
+      <td>Arduino <code class="language-plaintext highlighter-rouge">A1</code></td>
+      <td><code class="language-plaintext highlighter-rouge">P1_12</code></td>
+      <td>J4[4]</td>
+      <td><code class="language-plaintext highlighter-rouge">ADC0_A10</code></td>
+    </tr>
+    <tr>
+      <td>Arduino <code class="language-plaintext highlighter-rouge">A2</code></td>
+      <td><code class="language-plaintext highlighter-rouge">P1_13</code></td>
+      <td>J4[6]</td>
+      <td><code class="language-plaintext highlighter-rouge">ADC0_A11</code></td>
+    </tr>
+    <tr>
+      <td>Arduino <code class="language-plaintext highlighter-rouge">A3</code></td>
+      <td><code class="language-plaintext highlighter-rouge">P2_0</code></td>
+      <td>J4[8]</td>
+      <td><code class="language-plaintext highlighter-rouge">ADC0_A0</code></td>
+    </tr>
+    <tr>
+      <td>Arduino <code class="language-plaintext highlighter-rouge">A4</code></td>
+      <td><code class="language-plaintext highlighter-rouge">P3_31</code></td>
+      <td>J4[10]</td>
+      <td><code class="language-plaintext highlighter-rouge">ADC0_A12</code></td>
+    </tr>
+    <tr>
+      <td>Arduino <code class="language-plaintext highlighter-rouge">A5</code></td>
+      <td><code class="language-plaintext highlighter-rouge">P3_30</code></td>
+      <td>J4[12]</td>
+      <td><code class="language-plaintext highlighter-rouge">ADC0_A13</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Tensiunea aplicata pe un pin ADC trebuie sa ramana in intervalul <code class="language-plaintext highlighter-rouge">0 V ... VDDA</code>. In configuratia laboratorului, <code class="language-plaintext highlighter-rouge">VDDA</code> este considerata <code class="language-plaintext highlighter-rouge">3.3 V</code>.</p>
+
+<p>Butonul <code class="language-plaintext highlighter-rouge">SW3</code> poate fi observat analogic: tensiunea canalului se modifica atunci cand butonul este apasat sau eliberat.</p>
+
+<h2 id="configurarea-pinilor-in-mcuxpresso-config-tools">Configurarea pinilor in MCUXpresso Config Tools</h2>
+
+<p>Deschideti fisierul:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>src/lab_adc/main/frdmmcxa153/main.mex
+</code></pre></div></div>
+
+<p>In instrumentul <strong>Pins</strong>, verificati functia <code class="language-plaintext highlighter-rouge">BOARD_InitPins</code> si configurati:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Eticheta</th>
+      <th>Semnal</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SW3</code></td>
+      <td><code class="language-plaintext highlighter-rouge">ADC0_A23</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ARDUINO_A0</code></td>
+      <td><code class="language-plaintext highlighter-rouge">ADC0_A8</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ARDUINO_A1</code></td>
+      <td><code class="language-plaintext highlighter-rouge">ADC0_A10</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ARDUINO_A2</code></td>
+      <td><code class="language-plaintext highlighter-rouge">ADC0_A11</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ARDUINO_A3</code></td>
+      <td><code class="language-plaintext highlighter-rouge">ADC0_A0</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ARDUINO_A4</code></td>
+      <td><code class="language-plaintext highlighter-rouge">ADC0_A12</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ARDUINO_A5</code></td>
+      <td><code class="language-plaintext highlighter-rouge">ADC0_A13</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Pentru fiecare pin analogic:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Pull Enable</code> trebuie sa fie <code class="language-plaintext highlighter-rouge">Disabled</code>;</li>
+  <li><code class="language-plaintext highlighter-rouge">Input Buffer Enable</code> trebuie sa fie <code class="language-plaintext highlighter-rouge">Disabled</code>;</li>
+  <li>multiplexarea trebuie sa fie functia analogica <code class="language-plaintext highlighter-rouge">ADC0_Ax</code>.</li>
+</ul>
+
+<p>Dupa generarea codului, configuratia apare in:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>frdmmcxa153/main/pin_mux.c
+frdmmcxa153/main/pin_mux.h
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">BOARD_InitPins()</code> activeaza ceasurile pentru porturi, elibereaza perifericele din reset si configureaza pinii ADC cu bufferul digital dezactivat.</p>
+
+<h2 id="activarea-driverului-lpadc">Activarea driverului LPADC</h2>
+
+<p>Driverul trebuie activat in configuratia proiectului:</p>
+
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">CONFIG_MCUX_COMPONENT_driver.lpadc</span><span class="p">=</span><span class="s">y</span>
+</code></pre></div></div>
+
+<p>Codul include:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">"fsl_lpadc.h"</span><span class="cp">
+</span></code></pre></div></div>
+
+<h2 id="structura-aplicatiei">Structura aplicatiei</h2>
+
+<h3 id="lista-canalelor">Lista canalelor</h3>
+
+<p>Canalele sunt descrise intr-un tabel, astfel incat aceeasi functie de citire sa poata fi folosita pentru toate intrarile:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">typedef</span> <span class="k">struct</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">name</span><span class="p">;</span>
+    <span class="kt">uint32_t</span> <span class="n">channel</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">adc_input_t</span><span class="p">;</span>
+
+<span class="k">static</span> <span class="k">const</span> <span class="n">adc_input_t</span> <span class="n">adc_inputs</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">{</span><span class="s">"SW3"</span><span class="p">,</span> <span class="mi">23U</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">"A0"</span><span class="p">,</span> <span class="mi">8U</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">"A1"</span><span class="p">,</span> <span class="mi">10U</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">"A2"</span><span class="p">,</span> <span class="mi">11U</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">"A3"</span><span class="p">,</span> <span class="mi">0U</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">"A4"</span><span class="p">,</span> <span class="mi">12U</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">"A5"</span><span class="p">,</span> <span class="mi">13U</span><span class="p">},</span>
+<span class="p">};</span>
+</code></pre></div></div>
+
+<h3 id="initializarea-adc">Initializarea ADC</h3>
+
+<p>Ceasul ADC este obtinut din FRO de 12 MHz:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">CLOCK_SetClockDiv</span><span class="p">(</span><span class="n">kCLOCK_DivADC0</span><span class="p">,</span> <span class="mi">1U</span><span class="p">);</span>
+<span class="n">CLOCK_AttachClk</span><span class="p">(</span><span class="n">kFRO12M_to_ADC0</span><span class="p">);</span>
+<span class="n">RESET_ReleasePeripheralReset</span><span class="p">(</span><span class="n">kADC0_RST_SHIFT_RSTn</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Configuratia foloseste referinta <code class="language-plaintext highlighter-rouge">VDDA</code> si modul high-resolution:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">LPADC_GetDefaultConfig</span><span class="p">(</span><span class="o">&amp;</span><span class="n">adc_config</span><span class="p">);</span>
+<span class="n">adc_config</span><span class="p">.</span><span class="n">powerLevelMode</span> <span class="o">=</span> <span class="n">kLPADC_PowerLevelAlt4</span><span class="p">;</span>
+<span class="n">adc_config</span><span class="p">.</span><span class="n">enableAnalogPreliminary</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+<span class="n">adc_config</span><span class="p">.</span><span class="n">referenceVoltageSource</span> <span class="o">=</span> <span class="n">kLPADC_ReferenceVoltageAlt3</span><span class="p">;</span>
+<span class="n">LPADC_Init</span><span class="p">(</span><span class="n">ADC0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">adc_config</span><span class="p">);</span>
+
+<span class="n">LPADC_DoOffsetCalibration</span><span class="p">(</span><span class="n">ADC0</span><span class="p">);</span>
+<span class="n">LPADC_DoAutoCalibration</span><span class="p">(</span><span class="n">ADC0</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Calibrarea este efectuata o singura data, dupa initializarea perifericului.</p>
+
+<h3 id="comanda-si-triggerul">Comanda si triggerul</h3>
+
+<p>Aplicatia foloseste:</p>
+
+<ul>
+  <li>command ID <code class="language-plaintext highlighter-rouge">1</code>;</li>
+  <li>trigger ID <code class="language-plaintext highlighter-rouge">0</code>;</li>
+  <li>software trigger;</li>
+  <li>conversie high-resolution.</li>
+</ul>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">LPADC_GetDefaultConvTriggerConfig</span><span class="p">(</span><span class="o">&amp;</span><span class="n">trigger_config</span><span class="p">);</span>
+<span class="n">trigger_config</span><span class="p">.</span><span class="n">targetCommandId</span> <span class="o">=</span> <span class="n">ADC_COMMAND_ID</span><span class="p">;</span>
+<span class="n">trigger_config</span><span class="p">.</span><span class="n">enableHardwareTrigger</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+<span class="n">LPADC_SetConvTriggerConfig</span><span class="p">(</span><span class="n">ADC0</span><span class="p">,</span> <span class="n">ADC_TRIGGER_ID</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">trigger_config</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h3 id="citirea-unui-canal">Citirea unui canal</h3>
+
+<p>Canalul este introdus in configuratia comenzii inaintea fiecarei conversii:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="kt">uint16_t</span> <span class="nf">read_adc_channel</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">channel</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">lpadc_conv_command_config_t</span> <span class="n">command_config</span><span class="p">;</span>
+    <span class="n">lpadc_conv_result_t</span> <span class="n">result</span><span class="p">;</span>
+
+    <span class="n">LPADC_GetDefaultConvCommandConfig</span><span class="p">(</span><span class="o">&amp;</span><span class="n">command_config</span><span class="p">);</span>
+    <span class="n">command_config</span><span class="p">.</span><span class="n">channelNumber</span> <span class="o">=</span> <span class="n">channel</span><span class="p">;</span>
+    <span class="n">command_config</span><span class="p">.</span><span class="n">conversionResolutionMode</span> <span class="o">=</span>
+        <span class="n">kLPADC_ConversionResolutionHigh</span><span class="p">;</span>
+    <span class="n">LPADC_SetConvCommandConfig</span><span class="p">(</span><span class="n">ADC0</span><span class="p">,</span> <span class="n">ADC_COMMAND_ID</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">command_config</span><span class="p">);</span>
+
+    <span class="n">LPADC_DoSoftwareTrigger</span><span class="p">(</span><span class="n">ADC0</span><span class="p">,</span> <span class="n">ADC_TRIGGER_MASK</span><span class="p">);</span>
+    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">LPADC_GetConvResult</span><span class="p">(</span><span class="n">ADC0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">result</span><span class="p">))</span>
+    <span class="p">{</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">result</span><span class="p">.</span><span class="n">convValue</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">LPADC_GetConvResult()</code> returneaza <code class="language-plaintext highlighter-rouge">false</code> pana cand FIFO-ul contine un rezultat valid.</p>
+
+<h2 id="conversia-in-tensiune">Conversia in tensiune</h2>
+
+<p>In modul high-resolution, aplicatia foloseste domeniul:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>raw = 0 ... 65535
+</code></pre></div></div>
+
+<p>Pentru referinta de <code class="language-plaintext highlighter-rouge">3300 mV</code>:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>voltage_mV = raw * 3300 / 65535
+</code></pre></div></div>
+
+<p>Implementarea adauga jumatate din numitor pentru rotunjire:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">uint32_t</span> <span class="n">voltage_mv</span> <span class="o">=</span>
+    <span class="p">((</span><span class="kt">uint32_t</span><span class="p">)</span><span class="n">raw_value</span> <span class="o">*</span> <span class="mi">3300U</span> <span class="o">+</span> <span class="p">(</span><span class="mi">65535U</span> <span class="o">/</span> <span class="mi">2U</span><span class="p">))</span> <span class="o">/</span> <span class="mi">65535U</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Produsul maxim incape intr-un <code class="language-plaintext highlighter-rouge">uint32_t</code>:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>65535 * 3300 = 216265500
+</code></pre></div></div>
+
+<h2 id="bucla-principala">Bucla principala</h2>
+
+<p>Toate intrarile sunt citite la fiecare <code class="language-plaintext highlighter-rouge">500 ms</code>:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0U</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">ARRAY_SIZE</span><span class="p">(</span><span class="n">adc_inputs</span><span class="p">);</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">uint16_t</span> <span class="n">raw_value</span> <span class="o">=</span> <span class="n">read_adc_channel</span><span class="p">(</span><span class="n">adc_inputs</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">channel</span><span class="p">);</span>
+    <span class="cm">/* conversie si PRINTF */</span>
+<span class="p">}</span>
+
+<span class="n">SDK_DelayAtLeastUs</span><span class="p">(</span><span class="mi">500000U</span><span class="p">,</span> <span class="n">SystemCoreClock</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>In codul proiectului, dimensiunea tabelului este calculata cu <code class="language-plaintext highlighter-rouge">sizeof</code>.</p>
+
+<h2 id="consola-seriala">Consola seriala</h2>
+
+<p>Setari:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">115200 baud</code>;</li>
+  <li><code class="language-plaintext highlighter-rouge">8</code> biti de date;</li>
+  <li>fara paritate;</li>
+  <li><code class="language-plaintext highlighter-rouge">1</code> bit de stop;</li>
+  <li>fara flow control.</li>
+</ul>
+
+<p>Exemplu de iesire:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ADC voltage measurement: SW3 and Arduino A0-A5
+SW3     (ADC0_A23)     raw = 65410     voltage = 3.294 V
+A0      (ADC0_A8)      raw = 32760     voltage = 1.650 V
+A1      (ADC0_A10)     raw = 0         voltage = 0.000 V
+A2      (ADC0_A11)     raw = 0         voltage = 0.000 V
+A3      (ADC0_A0)      raw = 0         voltage = 0.000 V
+A4      (ADC0_A12)     raw = 0         voltage = 0.000 V
+A5      (ADC0_A13)     raw = 0         voltage = 0.000 V
+</code></pre></div></div>
+
+<p>Pinii neconectati pot avea valori instabile. O intrare analogica flotanta nu reprezinta automat <code class="language-plaintext highlighter-rouge">0 V</code>.</p>
+
+<h2 id="compilare">Compilare</h2>
+
+<p>Din directorul proiectului:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cd</span><span class="w"> </span><span class="nx">src/lab_adc/main</span><span class="w">
+</span><span class="n">cmake</span><span class="w"> </span><span class="nt">--preset</span><span class="w"> </span><span class="nx">debug</span><span class="w">
+</span><span class="n">cmake</span><span class="w"> </span><span class="nt">--build</span><span class="w"> </span><span class="nt">--preset</span><span class="w"> </span><span class="nx">debug</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Pentru varianta release:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cmake</span><span class="w"> </span><span class="nt">--preset</span><span class="w"> </span><span class="nx">release</span><span class="w">
+</span><span class="n">cmake</span><span class="w"> </span><span class="nt">--build</span><span class="w"> </span><span class="nt">--preset</span><span class="w"> </span><span class="nx">release</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Fisierele rezultate sunt:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>debug/main.elf
+debug/main.bin
+release/main.elf
+release/main.bin
+</code></pre></div></div>
+
+<h2 id="verificare-practica">Verificare practica</h2>
+
+<ol>
+  <li>Conectati placa prin portul MCU-Link.</li>
+  <li>Deschideti terminalul serial la <code class="language-plaintext highlighter-rouge">115200 8N1</code>.</li>
+  <li>Programati fisierul <code class="language-plaintext highlighter-rouge">main.bin</code>.</li>
+  <li>Aplicati o tensiune cunoscuta intre <code class="language-plaintext highlighter-rouge">0 V</code> si <code class="language-plaintext highlighter-rouge">3.3 V</code> pe unul dintre pinii <code class="language-plaintext highlighter-rouge">A0-A5</code>.</li>
+  <li>Conectati masa sursei externe la <code class="language-plaintext highlighter-rouge">GND</code> pe placa.</li>
+  <li>Comparati valoarea afisata cu un multimetru.</li>
+  <li>Apasati <code class="language-plaintext highlighter-rouge">SW3</code> si observati modificarea tensiunii pe <code class="language-plaintext highlighter-rouge">ADC0_A23</code>.</li>
+</ol>
+
+<h2 id="capcane-critice">Capcane critice</h2>
+
+<ul>
+  <li>Nu aplicati tensiuni negative sau mai mari decat <code class="language-plaintext highlighter-rouge">VDDA</code>.</li>
+  <li>Toate echipamentele trebuie sa aiba masa comuna.</li>
+  <li>Bufferul digital trebuie dezactivat pentru pinii analogici.</li>
+  <li>Nu activati rezistentele interne pull-up/pull-down pentru masuratori analogice externe.</li>
+  <li><code class="language-plaintext highlighter-rouge">ADC_COMMAND_ID</code> trebuie sa fie diferit de zero.</li>
+  <li>Triggerul trebuie executat inainte de citirea rezultatului.</li>
+  <li>Canalele Arduino nu corespund numeric cu numele lor: de exemplu, Arduino <code class="language-plaintext highlighter-rouge">A0</code> este <code class="language-plaintext highlighter-rouge">ADC0_A8</code>.</li>
+  <li>O intrare neconectata este flotanta si poate produce valori aparent aleatoare.</li>
+  <li>Formula pe 12 biti, cu numitorul <code class="language-plaintext highlighter-rouge">4095</code>, este gresita pentru configuratia high-resolution folosita in acest proiect.</li>
+  <li>Configuratia trebuie modificata in <code class="language-plaintext highlighter-rouge">frdmmcxa153/main.mex</code>, fisierul <code class="language-plaintext highlighter-rouge">.mex</code> folosit de build.</li>
+</ul>
+
+<h2 id="exercitii">Exercitii</h2>
+
+<ol>
+  <li>Calculati rezolutia teoretica in microvolti per bit pentru <code class="language-plaintext highlighter-rouge">VDDA = 3.3 V</code>.</li>
+  <li>Calculati media a 16 conversii pentru fiecare canal.</li>
+  <li>Afisati numai canalele a caror tensiune s-a modificat cu peste <code class="language-plaintext highlighter-rouge">10 mV</code>.</li>
+  <li>Inlocuiti delay-ul blocant cu un timer periodic.</li>
+  <li>Estimati eroarea masurarii folosind un multimetru de referinta.</li>
+</ol>
+
+<h2 id="deliverable">Deliverable</h2>
+
+<p>Aplicatia trebuie sa:</p>
+
+<ul>
+  <li>configureze in <code class="language-plaintext highlighter-rouge">.mex</code> intrarile <code class="language-plaintext highlighter-rouge">SW3</code> si Arduino <code class="language-plaintext highlighter-rouge">A0-A5</code>;</li>
+  <li>compileze cu driverul LPADC;</li>
+  <li>calibreze ADC-ul;</li>
+  <li>citeasca toate cele sapte canale prin software trigger;</li>
+  <li>afiseze valoarea raw si tensiunea in volti;</li>
+  <li>documenteze maparea pin-canal si formula de conversie.</li>
+</ul>
+
+<hr />
+
+<p><a href="../l4-timer-pwm">← L4: Timer &amp; PWM - SCTimer si CTIMER</a> · <a href="../l6-lpspi">L6: LPSPI - Comunicatie SPI si dispozitiv extern →</a></p>

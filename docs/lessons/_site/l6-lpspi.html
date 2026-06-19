@@ -1,0 +1,139 @@
+<h1 id="-l6--lpspi--comunicație-spi--device-extern">🔗 L6 — LPSPI — Comunicație SPI &amp; Device Extern</h1>
+
+<p><strong>Master Mode 0, Arduino header, MAX7219</strong></p>
+
+<hr />
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Ziua / Sesiunea</strong></td>
+      <td>Ziua 3, 24 iunie — după-amiază</td>
+    </tr>
+    <tr>
+      <td><strong>Periferic</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">LPSPI0 · Arduino Header · FIFO</code></td>
+    </tr>
+    <tr>
+      <td><strong>Durată</strong></td>
+      <td>2h (13:00–15:00)</td>
+    </tr>
+    <tr>
+      <td><strong>Responsabil</strong></td>
+      <td>Cadru didactic UPB</td>
+    </tr>
+    <tr>
+      <td><strong>Hardware</strong></td>
+      <td>FRDM-MCXA153 · device SPI pe Arduino header (MAX7219, SD card, sau loopback MOSI→MISO)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="-context-și-motivație">📌 Context și Motivație</h2>
+
+<p>FRDM-MCXA153 expune LPSPI0 pe Arduino header (D10–D13) — compatibil cu shield-uri Arduino. LP = Low Power, funcționează în stop mode. API mai complex decât SPI AVR (FIFO, frame size, CS modes) dar conceptual identic: MOSI/MISO/SCK/CS. Relevanță NXP: SPI este protocolul principal pentru senzorii externi în automotive.</p>
+
+<blockquote>
+  <p><strong>Board:</strong> FRDM-MCXA153 · MCX A153 (Cortex-M33 @ 96 MHz) · SDK MCUXpresso 24.12 · VS Code + CMake</p>
+</blockquote>
+
+<h2 id="-obiective">🎯 Obiective</h2>
+
+<ol>
+  <li>LPSPI0 Master Mode 0 (CPOL=0, CPHA=0) configurat la 1 MHz</li>
+  <li>Funcții generice <code class="language-plaintext highlighter-rouge">spi_init()</code> și <code class="language-plaintext highlighter-rouge">spi_transfer(tx, rx, len)</code> implementate</li>
+  <li>Loopback MOSI→MISO verificat cu datele identice în TX și RX</li>
+  <li>Driver pentru un dispozitiv extern pe Arduino header (MAX7219 sau echivalent)</li>
+</ol>
+
+<h2 id="-planul-sesiunii">🕐 Planul Sesiunii</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Interval</th>
+      <th>Activitate</th>
+      <th>Detaliu</th>
+      <th>Cine</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">13:00–13:30</code></td>
+      <td><strong>LPSPI arhitectură</strong></td>
+      <td>FIFO TX/RX, frame size, prescaler, CS modes hardware vs software. CPOL/CPHA Mode 0 vs Mode 3. Comparație SPCR/SPDR AVR.</td>
+      <td>cadru UPB</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">13:30–14:15</code></td>
+      <td><strong>Demo: loopback test</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">LPSPI_MasterGetDefaultConfig()</code>, <code class="language-plaintext highlighter-rouge">LPSPI_MasterInit()</code>, <code class="language-plaintext highlighter-rouge">LPSPI_MasterTransferBlocking()</code>. Loopback MOSI→MISO → verificare date identice pe terminal.</td>
+      <td>cadru UPB</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">14:15–15:00</code></td>
+      <td><strong>Lab + GenAI session</strong></td>
+      <td>Studenții: driver device extern specific (MAX7219 LED matrix). Prompt cu protocol device inclus.</td>
+      <td>student + mentor</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="-prompte-pentru-asistentul-ai-upb">🤖 Prompte pentru Asistentul AI UPB</h2>
+
+<blockquote>
+  <p><strong>Regulă:</strong> Copiați prompt-ul complet — contextul hardware este obligatoriu.
+AI-ul va genera cod greșit (pentru alte familii NXP sau Arduino) fără aceste informații.</p>
+</blockquote>
+
+<h3 id="prompt-lpspi0-master">Prompt: LPSPI0 master</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Context hardware: FRDM-MCXA153, MCX A153 Cortex-M33 @ 96 MHz, SDK MCUXpresso 24.12.
+LPSPI0 Master Mode 0 (CPOL=0, CPHA=0), frecvență SPI=1 MHz.
+CS manual pe PIO1_20 (Arduino D10) — GPIO output.
+Sarcina:
+  void spi_init(void)
+  status_t spi_transfer(uint8_t *tx, uint8_t *rx, size_t len)
+Include: LPSPI_MasterGetDefaultConfig, LPSPI_MasterInit, LPSPI_MasterTransferBlocking.
+Clock source: FRO_HF_DIV (48 MHz) → LPSPI0.
+</code></pre></div></div>
+
+<h3 id="prompt-max7219-driver">Prompt: MAX7219 driver</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FRDM-MCXA153, LPSPI0 Master — spi_init() și spi_transfer() deja implementate.
+Device: MAX7219 LED matrix. Protocol: frame 16 biți (reg 8b + data 8b), MSB first, Mode 0.
+CS: PIO1_20 active LOW (GPIO manual).
+Sarcina:
+  void max7219_write(uint8_t addr, uint8_t data)
+  void max7219_init()
+Secvența init: DECODE_MODE=0x00, INTENSITY=0x08, SCAN_LIMIT=0x07, SHUTDOWN=0x01.
+Afișare cifra '5' pe digit 0.
+</code></pre></div></div>
+
+<h2 id="️-capcane-critice">⚠️ Capcane Critice</h2>
+
+<blockquote>
+  <p>Ce GenAI <strong>nu știe</strong> fără context explicit — verificați înainte de upload pe placă.</p>
+</blockquote>
+
+<ul>
+  <li><strong>LPSPI frame size implicit = 8 biți</strong> — dacă device-ul cere 16 biți per frame (ex: MAX7219), setați <code class="language-plaintext highlighter-rouge">bytesPerFrame</code> corect</li>
+  <li>CS hardware NXP și CS manual nu pot fi folosite simultan — dacă faceți CS manual (GPIO), dezactivați CS hardware în LPSPI config</li>
+  <li>SPI Mode 0: CPOL=0, CPHA=0 — date capturate pe front rising. Verificați datasheet device-ului.</li>
+</ul>
+
+<h2 id="-deliverable">✅ Deliverable</h2>
+
+<blockquote>
+  <p>Loopback SPI verificat cu date identice + driver device extern funcțional + test care verifică datele trimise/primite</p>
+</blockquote>
+
+<hr />
+
+<p><a href="../l5-lpadc">← L5: LPADC — Conversie Analogică 12 biți</a> · <a href="../l7-lpi2c-p3t1755">L7: LPI2C — Senzorul P3T1755 On-Board →</a></p>

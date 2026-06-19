@@ -1,0 +1,411 @@
+<h1 id="️-l4--pwm-cu-flexpwm">⏱️ L4 — PWM cu FlexPWM</h1>
+
+<p><strong>Fade LED RGB cu FlexPWM0, pin mux și GenAI</strong></p>
+
+<hr />
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Ziua / Sesiunea</strong></td>
+      <td>Ziua 2, 23 iunie — după-amiază</td>
+    </tr>
+    <tr>
+      <td><strong>Periferic</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">FlexPWM0 · PORT pin mux · LPUART0</code></td>
+    </tr>
+    <tr>
+      <td><strong>Durată</strong></td>
+      <td>2h (13:00–15:00)</td>
+    </tr>
+    <tr>
+      <td><strong>Responsabil</strong></td>
+      <td>Cadru didactic UPB</td>
+    </tr>
+    <tr>
+      <td><strong>Hardware</strong></td>
+      <td>FRDM-MCXA153 · LED RGB · Serial Monitor · osciloscop opțional</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="-context-și-motivație">📌 Context și Motivație</h2>
+
+<p>În acest laborator folosim <code class="language-plaintext highlighter-rouge">FlexPWM0</code>, perifericul specializat pentru semnale PWM. Spre deosebire de un GPIO toggled în software, FlexPWM generează forma de undă în hardware: CPU-ul schimbă doar duty cycle-ul, iar perifericul continuă să producă semnalul la frecvență constantă.</p>
+
+<p>Pe FRDM-MCXA153, LED-urile RGB pot fi legate la FlexPWM prin pin mux:</p>
+
+<ul>
+  <li>roșu: <code class="language-plaintext highlighter-rouge">P3_12 / PWM0_X0</code></li>
+  <li>verde: <code class="language-plaintext highlighter-rouge">P3_13 / PWM0_X1</code></li>
+  <li>albastru: <code class="language-plaintext highlighter-rouge">P3_0 / PWM0_A0</code></li>
+</ul>
+
+<p>Vom porni de la un starter în care roșu și verde fac fade cu PWM. Extensia GenAI a laboratorului cere adăugarea LED-ului albastru pe PWM și implementarea unui color wheel.</p>
+
+<blockquote>
+  <p><strong>Board:</strong> FRDM-MCXA153 · MCX A153 (Cortex-M33 @ 96 MHz) · SDK MCUXpresso 24.12 · VS Code + CMake</p>
+</blockquote>
+
+<h2 id="-obiective">🎯 Obiective</h2>
+
+<ol>
+  <li>Înțelegerea diferenței dintre GPIO și PWM hardware.</li>
+  <li>Configurarea pinilor <code class="language-plaintext highlighter-rouge">P3_12</code> și <code class="language-plaintext highlighter-rouge">P3_13</code> ca ieșiri <code class="language-plaintext highlighter-rouge">FlexPWM0</code>.</li>
+  <li>Inițializarea <code class="language-plaintext highlighter-rouge">FlexPWM0</code> cu <code class="language-plaintext highlighter-rouge">PWM_GetDefaultConfig()</code>, <code class="language-plaintext highlighter-rouge">PWM_Init()</code> și <code class="language-plaintext highlighter-rouge">PWM_SetupPwm()</code>.</li>
+  <li>Actualizarea duty cycle-ului fără reinițializarea perifericului.</li>
+  <li>Folosirea Serial Monitor pentru a urmări duty cycle-ul.</li>
+  <li>Folosirea GenAI pentru a extinde starterul: LED albastru PWM + color wheel RGB.</li>
+</ol>
+
+<h2 id="-planul-sesiunii">🕐 Planul Sesiunii</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Interval</th>
+      <th>Activitate</th>
+      <th>Detaliu</th>
+      <th>Cine</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">13:00–13:25</code></td>
+      <td><strong>PWM hardware</strong></td>
+      <td>De ce folosim FlexPWM în loc de GPIO toggling. Frecvență, duty cycle, pin mux.</td>
+      <td>cadru UPB</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">13:25–14:05</code></td>
+      <td><strong>Starter red/green</strong></td>
+      <td>Citire cod: <code class="language-plaintext highlighter-rouge">PWM_InitLedChannel()</code>, <code class="language-plaintext highlighter-rouge">PWM_SetupPwm()</code>, <code class="language-plaintext highlighter-rouge">PWM_UpdatePwmDutycycle()</code>, <code class="language-plaintext highlighter-rouge">PWM_SetPwmLdok()</code>.</td>
+      <td>cadru UPB + studenți</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">14:05–14:30</code></td>
+      <td><strong>Debugging PWM</strong></td>
+      <td>Pin mux, <code class="language-plaintext highlighter-rouge">kPWM_PwmX</code>, <code class="language-plaintext highlighter-rouge">DISMAP</code>, Serial Monitor.</td>
+      <td>cadru UPB</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">14:30–15:00</code></td>
+      <td><strong>GenAI extension</strong></td>
+      <td>Studenții cer AI-ului să facă blue PWM și color wheel RGB. Verificare cod + <code class="language-plaintext highlighter-rouge">.mex</code> în Config Tools.</td>
+      <td>student + mentor</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="-prompte-pentru-asistentul-ai-upb">🤖 Prompte Pentru Asistentul AI UPB</h2>
+
+<blockquote>
+  <p><strong>Regulă:</strong> Copiați prompt-ul complet. Contextul hardware este obligatoriu.
+În acest laborator cereți explicit <code class="language-plaintext highlighter-rouge">FlexPWM0</code>; nu cereți SCTimer, CTIMER sau cod Arduino.</p>
+</blockquote>
+
+<h3 id="prompt-explică-starterul-flexpwm">Prompt: Explică Starterul FlexPWM</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Am un proiect MCUXpresso SDK pentru FRDM-MCXA153.
+Starterul folosește FlexPWM0 pentru două LED-uri:
+- roșu: P3_12 / PWM0_X0 / kPWM_Module_0 / kPWM_PwmX
+- verde: P3_13 / PWM0_X1 / kPWM_Module_1 / kPWM_PwmX
+
+Explică pe scurt, pentru studenți, cum funcționează:
+1. pin mux-ul către FlexPWM;
+2. PWM_GetDefaultConfig(), PWM_Init(), PWM_SetupPwm();
+3. de ce folosim kPWM_PwmX și kPWM_LowTrue;
+4. de ce trebuie PWM_SetPwmLdok() după PWM_UpdatePwmDutycycle();
+5. de ce există PWM_SetupFaultDisableMap(..., 0U).
+
+Nu rescrie tot codul. Explică pornind de la codul existent.
+</code></pre></div></div>
+
+<h3 id="alte-variante-de-timer">Alte Variante De Timer</h3>
+
+<p>MCX A153 are și alte periferice utile:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">CTIMER</code> este potrivit pentru măsurare de timp, întreruperi periodice și semnale simple.</li>
+  <li><code class="language-plaintext highlighter-rouge">SCTimer</code> poate genera PWM cu evenimente și match registers.</li>
+</ul>
+
+<p>În acest laborator nu folosim aceste variante. Focusul este <code class="language-plaintext highlighter-rouge">FlexPWM0</code>, deoarece este perifericul dedicat pentru PWM multi-canal și se potrivește cel mai bine cu exercițiul RGB.</p>
+
+<h2 id="️-capcane-critice">⚠️ Capcane Critice</h2>
+
+<blockquote>
+  <p>Ce GenAI <strong>nu știe</strong> fără context explicit — verificați înainte de upload pe placă.</p>
+</blockquote>
+
+<ul>
+  <li>Pinul trebuie să fie rutat către FlexPWM în pin mux. Dacă rămâne GPIO, registrele PWM se pot actualiza fără efect vizibil pe LED.</li>
+  <li><code class="language-plaintext highlighter-rouge">PWM0_X0</code> și <code class="language-plaintext highlighter-rouge">PWM0_X1</code> folosesc canalul <code class="language-plaintext highlighter-rouge">kPWM_PwmX</code>, nu <code class="language-plaintext highlighter-rouge">kPWM_PwmA</code> sau <code class="language-plaintext highlighter-rouge">kPWM_PwmB</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">PWM_UpdatePwmDutycycle()</code> actualizează registre bufferizate; apelați <code class="language-plaintext highlighter-rouge">PWM_SetPwmLdok()</code> ca valoarea să devină activă.</li>
+  <li><code class="language-plaintext highlighter-rouge">DISMAP</code> poate ține ieșirea PWM dezactivată dacă fault mapping-ul nu este curățat.</li>
+  <li>Duty cycle 0% sau 100% pot avea comportamente de margine; starterul folosește <code class="language-plaintext highlighter-rouge">[1, 99]</code> pentru fade roșu/verde.</li>
+</ul>
+
+<h2 id="starter-funcțional-flexpwm0-pe-led-roșu-și-verde">Starter Funcțional: FlexPWM0 Pe LED Roșu Și Verde</h2>
+
+<p>În varianta de laborator <code class="language-plaintext highlighter-rouge">src/lab_pwm/pwm_control</code>, PWM-ul este generat cu perifericul <code class="language-plaintext highlighter-rouge">FlexPWM0</code>. Starterul controlează două LED-uri:</p>
+
+<ul>
+  <li>LED roșu: <code class="language-plaintext highlighter-rouge">P3_12 / PWM0_X0</code></li>
+  <li>LED verde: <code class="language-plaintext highlighter-rouge">P3_13 / PWM0_X1</code></li>
+</ul>
+
+<p>LED-ul albastru pornește intenționat ca GPIO/off. Studenții îl vor muta pe PWM în exercițiul GenAI.</p>
+
+<h3 id="1-pin-mux">1. Pin mux</h3>
+
+<p>Pinii trebuie trecuți din GPIO în funcția alternativă FlexPWM:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">P3_12</code> → <code class="language-plaintext highlighter-rouge">PWM0_X0</code> → <code class="language-plaintext highlighter-rouge">kPORT_MuxAlt5</code></li>
+  <li><code class="language-plaintext highlighter-rouge">P3_13</code> → <code class="language-plaintext highlighter-rouge">PWM0_X1</code> → <code class="language-plaintext highlighter-rouge">kPORT_MuxAlt5</code></li>
+</ul>
+
+<p>Fișierul activ pentru acest proiect este <code class="language-plaintext highlighter-rouge">frdmmcxa153/pwm_control/pin_mux.c</code>. Dacă pinii rămân configurați ca GPIO (<code class="language-plaintext highlighter-rouge">kPORT_MuxAlt0</code>), codul poate afișa corect <code class="language-plaintext highlighter-rouge">update duty cycle</code>, dar LED-urile nu se schimbă, deoarece semnalul FlexPWM nu ajunge la pini.</p>
+
+<p><code class="language-plaintext highlighter-rouge">FLEXPWM0</code> trebuie și scos din reset în inițializarea pinilor:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">RESET_ReleasePeripheralReset</span><span class="p">(</span><span class="n">kFLEXPWM0_RST_SHIFT_RSTn</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>După ce roșu și verde sunt conduse de PWM, ele nu se mai inițializează ca GPIO. În starter, LED-ul albastru rămâne GPIO/off.</p>
+
+<h3 id="2-inițializare-flexpwm">2. Inițializare FlexPWM</h3>
+
+<p>Se inițializează două submodule:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">kPWM_Module_0</code> pentru <code class="language-plaintext highlighter-rouge">PWM0_X0</code> / LED roșu</li>
+  <li><code class="language-plaintext highlighter-rouge">kPWM_Module_1</code> pentru <code class="language-plaintext highlighter-rouge">PWM0_X1</code> / LED verde</li>
+</ul>
+
+<p>Configurarea folosește canalul <code class="language-plaintext highlighter-rouge">kPWM_PwmX</code>, modul <code class="language-plaintext highlighter-rouge">kPWM_EdgeAligned</code>, frecvența <code class="language-plaintext highlighter-rouge">1000 Hz</code> și polaritatea <code class="language-plaintext highlighter-rouge">kPWM_LowTrue</code>.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PWM_GetDefaultConfig</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pwmConfig</span><span class="p">);</span>
+<span class="n">PWM_Init</span><span class="p">(</span><span class="n">FLEXPWM0</span><span class="p">,</span> <span class="n">kPWM_Module_0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pwmConfig</span><span class="p">);</span>
+<span class="n">PWM_Init</span><span class="p">(</span><span class="n">FLEXPWM0</span><span class="p">,</span> <span class="n">kPWM_Module_1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pwmConfig</span><span class="p">);</span>
+
+<span class="n">pwmSignal</span><span class="p">.</span><span class="n">pwmChannel</span>       <span class="o">=</span> <span class="n">kPWM_PwmX</span><span class="p">;</span>
+<span class="n">pwmSignal</span><span class="p">.</span><span class="n">level</span>            <span class="o">=</span> <span class="n">kPWM_LowTrue</span><span class="p">;</span>
+<span class="n">pwmSignal</span><span class="p">.</span><span class="n">dutyCyclePercent</span> <span class="o">=</span> <span class="mi">1U</span><span class="p">;</span>
+<span class="n">pwmSignal</span><span class="p">.</span><span class="n">deadtimeValue</span>    <span class="o">=</span> <span class="mi">0U</span><span class="p">;</span>
+<span class="n">pwmSignal</span><span class="p">.</span><span class="n">faultState</span>       <span class="o">=</span> <span class="n">kPWM_PwmFaultState0</span><span class="p">;</span>
+<span class="n">pwmSignal</span><span class="p">.</span><span class="n">pwmchannelenable</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Pentru <code class="language-plaintext highlighter-rouge">PWMX</code>, documentația driverului NXP recomandă PWM edge-aligned și <code class="language-plaintext highlighter-rouge">kPWM_LowTrue</code>, deoarece semnalul PWMX edge-aligned este tratat ca negative-true.</p>
+
+<h3 id="3-pornire-și-actualizare-duty-cycle">3. Pornire și actualizare duty cycle</h3>
+
+<p><code class="language-plaintext highlighter-rouge">PWM_SetupPwm()</code> configurează perioada și duty cycle-ul inițial. După setup, ieșirile PWMX se activează, se încarcă registrele bufferizate cu <code class="language-plaintext highlighter-rouge">LDOK</code>, apoi pornesc timerele:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PWM_SetupPwm</span><span class="p">(</span><span class="n">FLEXPWM0</span><span class="p">,</span> <span class="n">kPWM_Module_0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pwmSignal</span><span class="p">,</span> <span class="mi">1U</span><span class="p">,</span> <span class="n">kPWM_EdgeAligned</span><span class="p">,</span> <span class="mi">1000U</span><span class="p">,</span> <span class="n">SystemCoreClock</span><span class="p">);</span>
+<span class="n">PWM_SetupPwm</span><span class="p">(</span><span class="n">FLEXPWM0</span><span class="p">,</span> <span class="n">kPWM_Module_1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pwmSignal</span><span class="p">,</span> <span class="mi">1U</span><span class="p">,</span> <span class="n">kPWM_EdgeAligned</span><span class="p">,</span> <span class="mi">1000U</span><span class="p">,</span> <span class="n">SystemCoreClock</span><span class="p">);</span>
+
+<span class="n">PWM_OutputEnable</span><span class="p">(</span><span class="n">FLEXPWM0</span><span class="p">,</span> <span class="n">kPWM_PwmX</span><span class="p">,</span> <span class="n">kPWM_Module_0</span><span class="p">);</span>
+<span class="n">PWM_OutputEnable</span><span class="p">(</span><span class="n">FLEXPWM0</span><span class="p">,</span> <span class="n">kPWM_PwmX</span><span class="p">,</span> <span class="n">kPWM_Module_1</span><span class="p">);</span>
+
+<span class="n">PWM_SetPwmLdok</span><span class="p">(</span><span class="n">FLEXPWM0</span><span class="p">,</span> <span class="n">kPWM_Control_Module_0</span> <span class="o">|</span> <span class="n">kPWM_Control_Module_1</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+<span class="n">PWM_StartTimer</span><span class="p">(</span><span class="n">FLEXPWM0</span><span class="p">,</span> <span class="n">kPWM_Control_Module_0</span> <span class="o">|</span> <span class="n">kPWM_Control_Module_1</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>În bucla principală, duty cycle-ul este actualizat fără reinițializarea timerului:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PWM_UpdatePwmDutycycle</span><span class="p">(</span><span class="n">FLEXPWM0</span><span class="p">,</span> <span class="n">kPWM_Module_0</span><span class="p">,</span> <span class="n">kPWM_PwmX</span><span class="p">,</span> <span class="n">kPWM_EdgeAligned</span><span class="p">,</span> <span class="n">red_duty</span><span class="p">);</span>
+<span class="n">PWM_UpdatePwmDutycycle</span><span class="p">(</span><span class="n">FLEXPWM0</span><span class="p">,</span> <span class="n">kPWM_Module_1</span><span class="p">,</span> <span class="n">kPWM_PwmX</span><span class="p">,</span> <span class="n">kPWM_EdgeAligned</span><span class="p">,</span> <span class="n">green_duty</span><span class="p">);</span>
+<span class="n">PWM_SetPwmLdok</span><span class="p">(</span><span class="n">FLEXPWM0</span><span class="p">,</span> <span class="n">kPWM_Control_Module_0</span> <span class="o">|</span> <span class="n">kPWM_Control_Module_1</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">PWM_UpdatePwmDutycycle()</code> scrie valori noi în registre bufferizate. Fără <code class="language-plaintext highlighter-rouge">PWM_SetPwmLdok()</code>, modificarea poate să nu ajungă în registrele active.</p>
+
+<h3 id="4-problema-reală-led-urile-stinse-după-self-test">4. Problema reală: LED-urile stinse după self-test</h3>
+
+<p>În debugging s-a observat următorul comportament:</p>
+
+<ul>
+  <li>UART afișa <code class="language-plaintext highlighter-rouge">update duty cycle</code>, deci bucla principală funcționa.</li>
+  <li>LED-urile se aprindeau într-un self-test GPIO.</li>
+  <li>După trecerea pinilor pe FlexPWM, LED-urile rămâneau stinse.</li>
+</ul>
+
+<p>Asta arată că pinii și LED-urile sunt corecte, iar problema este în calea FlexPWM.</p>
+
+<p>Fixul critic a fost anularea fault disable mapping pentru PWMX:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PWM_SetupFaultDisableMap</span><span class="p">(</span><span class="n">FLEXPWM0</span><span class="p">,</span> <span class="n">kPWM_Module_0</span><span class="p">,</span> <span class="n">kPWM_PwmX</span><span class="p">,</span> <span class="n">kPWM_faultchannel_0</span><span class="p">,</span> <span class="mi">0U</span><span class="p">);</span>
+<span class="n">PWM_SetupFaultDisableMap</span><span class="p">(</span><span class="n">FLEXPWM0</span><span class="p">,</span> <span class="n">kPWM_Module_1</span><span class="p">,</span> <span class="n">kPWM_PwmX</span><span class="p">,</span> <span class="n">kPWM_faultchannel_0</span><span class="p">,</span> <span class="mi">0U</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Motivul: registrele <code class="language-plaintext highlighter-rouge">DISMAP</code> ale FlexPWM pot mapa intrările de fault la ieșiri. Dacă un fault mapat este activ, ieșirea PWM poate fi dezactivată chiar dacă timerul rulează și duty cycle-ul se actualizează. În acest laborator nu folosim intrări de fault, deci maparea se curăță explicit.</p>
+
+<h3 id="5-test-de-diagnostic-recomandat">5. Test de diagnostic recomandat</h3>
+
+<p>Un self-test GPIO înainte de PWM ajută la separarea problemelor de pin mux de problemele FlexPWM:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PORT_SetPinMux</span><span class="p">(</span><span class="n">BOARD_INITPINS_LED_RED_PORT</span><span class="p">,</span> <span class="n">BOARD_INITPINS_LED_RED_PIN</span><span class="p">,</span> <span class="n">kPORT_MuxAlt0</span><span class="p">);</span>
+<span class="n">PORT_SetPinMux</span><span class="p">(</span><span class="n">BOARD_INITPINS_LED_GREEN_PORT</span><span class="p">,</span> <span class="n">BOARD_INITPINS_LED_GREEN_PIN</span><span class="p">,</span> <span class="n">kPORT_MuxAlt0</span><span class="p">);</span>
+
+<span class="n">LED_RED_INIT</span><span class="p">(</span><span class="n">LOGIC_LED_ON</span><span class="p">);</span>
+<span class="n">LED_GREEN_INIT</span><span class="p">(</span><span class="n">LOGIC_LED_ON</span><span class="p">);</span>
+<span class="n">SDK_DelayAtLeastUs</span><span class="p">(</span><span class="mi">500000U</span><span class="p">,</span> <span class="n">SystemCoreClock</span><span class="p">);</span>
+
+<span class="n">LED_RED_OFF</span><span class="p">();</span>
+<span class="n">LED_GREEN_OFF</span><span class="p">();</span>
+
+<span class="n">PORT_SetPinMux</span><span class="p">(</span><span class="n">BOARD_INITPINS_LED_RED_PORT</span><span class="p">,</span> <span class="n">BOARD_INITPINS_LED_RED_PIN</span><span class="p">,</span> <span class="n">kPORT_MuxAlt5</span><span class="p">);</span>
+<span class="n">PORT_SetPinMux</span><span class="p">(</span><span class="n">BOARD_INITPINS_LED_GREEN_PORT</span><span class="p">,</span> <span class="n">BOARD_INITPINS_LED_GREEN_PIN</span><span class="p">,</span> <span class="n">kPORT_MuxAlt5</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Interpretare:</p>
+
+<ul>
+  <li>Dacă LED-urile nu se aprind nici în self-test, problema este la pin mapping, board config sau hardware.</li>
+  <li>Dacă LED-urile se aprind în self-test, dar se sting când trec pe PWM, problema este în configurarea FlexPWM.</li>
+</ul>
+
+<h3 id="capcane-specifice-flexpwm0">Capcane Specifice FlexPWM0</h3>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">PWM0_X0</code> folosește <code class="language-plaintext highlighter-rouge">kPWM_Module_0</code> și <code class="language-plaintext highlighter-rouge">kPWM_PwmX</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">PWM0_X1</code> folosește <code class="language-plaintext highlighter-rouge">kPWM_Module_1</code> și <code class="language-plaintext highlighter-rouge">kPWM_PwmX</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">PWM0_X0/PWM0_X1</code> nu sunt <code class="language-plaintext highlighter-rouge">kPWM_PwmA</code> sau <code class="language-plaintext highlighter-rouge">kPWM_PwmB</code>.</li>
+  <li>După fiecare <code class="language-plaintext highlighter-rouge">PWM_UpdatePwmDutycycle()</code> trebuie apelat <code class="language-plaintext highlighter-rouge">PWM_SetPwmLdok()</code>.</li>
+  <li>Pentru efectul breathing, intervalul <code class="language-plaintext highlighter-rouge">[1, 99]</code> evită cazurile limită 0% și 100%.</li>
+  <li>LED-urile RGB de pe FRDM-MCXA153 sunt active-low (<code class="language-plaintext highlighter-rouge">LOGIC_LED_ON = 0</code>), deci polaritatea PWM trebuie aleasă ținând cont de acest lucru.</li>
+</ul>
+
+<h2 id="exercițiu-genai-adăugați-led-ul-albastru-și-color-wheel">Exercițiu GenAI: adăugați LED-ul albastru și color wheel</h2>
+
+<h3 id="starea-de-pornire">Starea de pornire</h3>
+
+<p>Studenții pornesc de la proiectul <code class="language-plaintext highlighter-rouge">src/lab_pwm/pwm_control</code>, în care:</p>
+
+<ul>
+  <li>LED-ul roșu face fade cu <code class="language-plaintext highlighter-rouge">FlexPWM0</code>, <code class="language-plaintext highlighter-rouge">PWM0_X0</code>, <code class="language-plaintext highlighter-rouge">kPWM_Module_0</code>, <code class="language-plaintext highlighter-rouge">kPWM_PwmX</code>;</li>
+  <li>LED-ul verde face fade cu <code class="language-plaintext highlighter-rouge">FlexPWM0</code>, <code class="language-plaintext highlighter-rouge">PWM0_X1</code>, <code class="language-plaintext highlighter-rouge">kPWM_Module_1</code>, <code class="language-plaintext highlighter-rouge">kPWM_PwmX</code>;</li>
+  <li>LED-ul albastru este încă GPIO/off, pe <code class="language-plaintext highlighter-rouge">P3_0</code>;</li>
+  <li>Serial Monitor afișează duty cycle pentru roșu și verde.</li>
+</ul>
+
+<p>Scopul exercițiului este ca studenții să folosească un asistent GenAI pentru a extinde proiectul, nu pentru a rescrie tot laboratorul.</p>
+
+<h3 id="cerință">Cerință</h3>
+
+<p>Actualizați proiectul astfel încât:</p>
+
+<ol>
+  <li>LED-ul albastru să fie controlat cu PWM, nu GPIO.</li>
+  <li>LED-ul RGB să facă fade între culori:
+    <ul>
+      <li>roșu → verde;</li>
+      <li>verde → albastru;</li>
+      <li>albastru → roșu.</li>
+    </ul>
+  </li>
+  <li>Serial Monitor să afișeze duty cycle pentru toate cele trei canale:</li>
+</ol>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>duty: red=... green=... blue=...
+</code></pre></div></div>
+
+<ol>
+  <li>Fișierul <code class="language-plaintext highlighter-rouge">.mex</code> să fie actualizat, astfel încât în MCUXpresso Config Tools pinul albastru să apară ca FlexPWM, nu GPIO.</li>
+</ol>
+
+<h3 id="informații-hardware-obligatorii-pentru-prompt">Informații hardware obligatorii pentru prompt</h3>
+
+<p>LED-ul albastru folosit pe placă este:</p>
+
+<ul>
+  <li>pin fizic: <code class="language-plaintext highlighter-rouge">P3_0</code>;</li>
+  <li>funcție PWM: <code class="language-plaintext highlighter-rouge">PWM0_A0</code>;</li>
+  <li>FlexPWM: <code class="language-plaintext highlighter-rouge">FLEXPWM0</code>, <code class="language-plaintext highlighter-rouge">kPWM_Module_0</code>, <code class="language-plaintext highlighter-rouge">kPWM_PwmA</code>;</li>
+  <li>pin mux: <code class="language-plaintext highlighter-rouge">kPORT_MuxAlt5</code>.</li>
+</ul>
+
+<p>Important: pe același submodul <code class="language-plaintext highlighter-rouge">kPWM_Module_0</code> vor exista două canale PWM:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">kPWM_PwmX</code> pentru LED roșu (<code class="language-plaintext highlighter-rouge">PWM0_X0</code>);</li>
+  <li><code class="language-plaintext highlighter-rouge">kPWM_PwmA</code> pentru LED albastru (<code class="language-plaintext highlighter-rouge">PWM0_A0</code>).</li>
+</ul>
+
+<h3 id="prompt-recomandat-pentru-studenți">Prompt recomandat pentru studenți</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Am un proiect MCUXpresso SDK pentru FRDM-MCXA153.
+Codul curent face fade între LED roșu și LED verde folosind FlexPWM0:
+- roșu: P3_12 / PWM0_X0 / kPWM_Module_0 / kPWM_PwmX
+- verde: P3_13 / PWM0_X1 / kPWM_Module_1 / kPWM_PwmX
+
+Vreau să adaug LED-ul albastru pe PWM:
+- albastru: P3_0 / PWM0_A0 / kPWM_Module_0 / kPWM_PwmA
+- pin mux pentru P3_0 trebuie schimbat din GPIO în FlexPWM0 A,0, adică kPORT_MuxAlt5
+
+Cerințe:
+1. păstrează codul simplu pentru studenți;
+2. configurează PWM și pentru albastru;
+3. păstrează fixul PWM_SetupFaultDisableMap(..., 0U), inclusiv pentru canalul albastru;
+4. implementează fade color wheel: red -&gt; green -&gt; blue -&gt; red;
+5. afișează în Serial Monitor duty cycle pentru red, green și blue;
+6. spune-mi ce trebuie schimbat și în fișierul .mex ca pinul P3_0 să fie vizibil în Config Tools ca FlexPWM0 A,0.
+</code></pre></div></div>
+
+<h3 id="checklist-de-verificare">Checklist de verificare</h3>
+
+<p>În cod:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">PWM_InitLedChannel()</code> poate primi și canalul PWM (<code class="language-plaintext highlighter-rouge">kPWM_PwmX</code> sau <code class="language-plaintext highlighter-rouge">kPWM_PwmA</code>), nu doar submodulul.</li>
+  <li>Pentru albastru trebuie apelat <code class="language-plaintext highlighter-rouge">PWM_SetupPwm()</code> cu <code class="language-plaintext highlighter-rouge">kPWM_Module_0</code> și <code class="language-plaintext highlighter-rouge">kPWM_PwmA</code>.</li>
+  <li>Pentru albastru trebuie apelat <code class="language-plaintext highlighter-rouge">PWM_SetupFaultDisableMap(FLEXPWM0, kPWM_Module_0, kPWM_PwmA, kPWM_faultchannel_0, 0U)</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">RGB_SetDuty()</code> trebuie să actualizeze trei canale:
+    <ul>
+      <li>roșu: module 0, PWMX;</li>
+      <li>verde: module 1, PWMX;</li>
+      <li>albastru: module 0, PWMA.</li>
+    </ul>
+  </li>
+  <li>După actualizări trebuie apelat <code class="language-plaintext highlighter-rouge">PWM_SetPwmLdok()</code>.</li>
+</ul>
+
+<p>În pin mux:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">P3_0</code> trebuie să fie <code class="language-plaintext highlighter-rouge">PWM0_A0</code>, nu <code class="language-plaintext highlighter-rouge">GPIO3, 0</code>.</li>
+  <li>În <code class="language-plaintext highlighter-rouge">frdmmcxa153/pwm_control/pin_mux.c</code>, <code class="language-plaintext highlighter-rouge">P3_0</code> trebuie să folosească <code class="language-plaintext highlighter-rouge">kPORT_MuxAlt5</code>.</li>
+  <li>Inițializarea GPIO pentru LED-ul albastru trebuie eliminată sau lăsată nefolosită după ce pinul este controlat de PWM.</li>
+</ul>
+
+<p>În <code class="language-plaintext highlighter-rouge">.mex</code>:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">frdmmcxa153/pwm_control.mex</code> trebuie să conțină pinul:</li>
+</ul>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;pin</span> <span class="na">peripheral=</span><span class="s">"FlexPWM0"</span> <span class="na">signal=</span><span class="s">"A, 0"</span> <span class="na">pin_num=</span><span class="s">"46"</span> <span class="na">pin_signal=</span><span class="s">"P3_0/WUU0_IN22/TRIG_IN0/CT_INP16/PWM0_A0"</span><span class="nt">&gt;</span>
+</code></pre></div></div>
+
+<ul>
+  <li>Deschideți <code class="language-plaintext highlighter-rouge">.mex</code> în MCUXpresso Config Tools și verificați vizual că <code class="language-plaintext highlighter-rouge">P3_0</code> apare ca <code class="language-plaintext highlighter-rouge">FlexPWM0 A,0</code>.</li>
+</ul>
+
+<h2 id="-deliverable">✅ Deliverable</h2>
+
+<blockquote>
+  <p>Starter red/green FlexPWM funcțional + duty cycle în Serial Monitor + extensie GenAI pentru blue PWM și color wheel + <code class="language-plaintext highlighter-rouge">.mex</code> verificat vizual în Config Tools</p>
+</blockquote>
+
+<hr />
+
+<p><a href="../l3-intreruperi">← L3: Întreruperi Externe &amp; NVIC</a> · <a href="../l5-lpadc">L5: LPADC — Conversie Analogică 12 biți →</a></p>

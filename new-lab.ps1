@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
     Creates a new lab project from the hello_world template.
@@ -45,13 +45,29 @@ if ($presetsRaw -notmatch '"SdkRootDirPath":\s*"([^"]+)"') {
 $sdkOld = $Matches[1].Replace('/', '\')   # normalise to backslashes
 $oldName = Split-Path $src -Leaf
 
+# Prefer the template's board metadata when available. The fallback matches the
+# FRDM-MCXA153 labs this helper is currently built around.
+$projectInfoFile = Join-Path $src "cfg_tools\project_info.json"
+if (Test-Path $projectInfoFile) {
+    try {
+        $projectInfo = [IO.File]::ReadAllText($projectInfoFile, [Text.Encoding]::UTF8) | ConvertFrom-Json
+        $detectedBoard = $projectInfo.projects | Select-Object -ExpandProperty board -First 1
+        if ($detectedBoard) { $boardId = $detectedBoard }
+    } catch {
+        Write-Warning "Could not read board from $projectInfoFile; using $boardId"
+    }
+}
+
 # Detect the main source file name used in the template root.
 # Templates cloned from SDK demos often keep the demo's source name
 # (e.g. "led_blinky") even when the project folder has a different name.
 $boardFileNames = @('board', 'clock_config', 'pin_mux', 'peripherals', 'hardware_init')
-$templateMainC  = Get-ChildItem $src -Filter "*.c" |
-    Where-Object { $_.BaseName -notin $boardFileNames } |
-    Select-Object -First 1
+$templateMainC = Get-ChildItem $src -Filter "$oldName.c" | Select-Object -First 1
+if (-not $templateMainC) {
+    $templateMainC = Get-ChildItem $src -Filter "*.c" |
+        Where-Object { $_.BaseName -notin $boardFileNames } |
+        Select-Object -First 1
+}
 $srcSourceName = if ($templateMainC) { $templateMainC.BaseName } else { $oldName }
 $srcConfigured = Join-Path (Split-Path $src -Parent) $srcSourceName
 
@@ -59,6 +75,7 @@ Write-Host ""
 Write-Host "Template : $Template"
 Write-Host "Dest     : $Dest"
 Write-Host "Name     : $Name"
+Write-Host "Board    : $boardId"
 Write-Host "SDK old  : $sdkOld"
 Write-Host "SDK new  : src\sdks"
 if ($srcSourceName -ne $oldName) {
@@ -123,6 +140,21 @@ function Replace-Path([string]$text, [string]$oldAbs, [string]$newAbs) {
     return $text
 }
 
+function Set-CMakePresetBoard([string]$text, [string]$board) {
+    $presets = $text | ConvertFrom-Json
+    foreach ($preset in $presets.configurePresets) {
+        if (-not $preset.cacheVariables) {
+            $preset | Add-Member -MemberType NoteProperty -Name cacheVariables -Value ([pscustomobject]@{})
+        }
+        if ($preset.cacheVariables.PSObject.Properties.Name -contains 'board') {
+            $preset.cacheVariables.board = $board
+        } else {
+            $preset.cacheVariables | Add-Member -MemberType NoteProperty -Name board -Value $board
+        }
+    }
+    return ($presets | ConvertTo-Json -Depth 20)
+}
+
 $patchFiles = @(
     "CMakeLists.txt",
     "CMakePresets.json",
@@ -161,11 +193,15 @@ foreach ($rel in $patchFiles) {
     # Remove any residual "demo_apps/<name>" board-port-path segment from CMakeLists
     $text = $text -replace "demo_apps/$([regex]::Escape($Name))", $Name
 
-    # CMakePresets.json ships with board="" which prevents CMake configure from
-    # finding CMAKE_PROJECT_NAME; fill in the board ID that the rest of the
-    # project already assumes (frdmmcxa153).
+    # CMakePresets.json must carry the board ID. If it is empty, CMake configure
+    # stops before writing CMAKE_PROJECT_NAME into the build cache.
     if ($rel -eq "CMakePresets.json") {
-        $text = $text -replace '"board":\s*""', "`"board`": `"$boardId`""
+        $text = Set-CMakePresetBoard $text $boardId
+    }
+    # Some MCUX templates keep the .mex file in the project root. Point CMake
+    # there instead of requiring a board-local .mex under frdmmcxa153.
+    if ($rel -eq "CMakeLists.txt") {
+        $text = $text -replace 'mcux_add_config_mex_path\(\s*PATH\s+\$\{board\}\s*\)', 'mcux_add_config_mex_path( PATH . )'
     }
 
     [IO.File]::WriteAllText($file, $text, [Text.Encoding]::UTF8)

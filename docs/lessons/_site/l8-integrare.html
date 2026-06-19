@@ -1,0 +1,142 @@
+<h1 id="-l8--integrare--sistem-complet-cu-fsm">🔧 L8 — Integrare — Sistem Complet cu FSM</h1>
+
+<p><strong>Toate perifericele, super-loop, Show &amp; Tell</strong></p>
+
+<hr />
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Ziua / Sesiunea</strong></td>
+      <td>Ziua 4, 25 iunie — după-amiază + Ziua 5</td>
+    </tr>
+    <tr>
+      <td><strong>Periferic</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">Toate perifericele · FSM · Super-loop</code></td>
+    </tr>
+    <tr>
+      <td><strong>Durată</strong></td>
+      <td>3h (13:00–16:00)</td>
+    </tr>
+    <tr>
+      <td><strong>Responsabil</strong></td>
+      <td>Echipe + Mentori UPB &amp; NXP</td>
+    </tr>
+    <tr>
+      <td><strong>Hardware</strong></td>
+      <td>FRDM-MCXA153 cu toate conexiunile din lecțiile L1–L7</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="-context-și-motivație">📌 Context și Motivație</h2>
+
+<p>Sesiunea de integrare testează dacă perifericele învățate separat funcționează împreună — cel mai realist exercițiu din perspectivă industrială. Problemele de integrare sunt specifice hardware-ului și nu pot fi detectate de GenAI fără context. AI-ul va genera FSM corect conceptual dar va omite protecția variabilelor partajate.</p>
+
+<blockquote>
+  <p><strong>Board:</strong> FRDM-MCXA153 · MCX A153 (Cortex-M33 @ 96 MHz) · SDK MCUXpresso 24.12 · VS Code + CMake</p>
+</blockquote>
+
+<h2 id="-obiective">🎯 Obiective</h2>
+
+<ol>
+  <li>Sistem integrat funcțional: GPIO + UART + IRQ + Timer/PWM + ADC + LPI2C simultan</li>
+  <li>Mașină de stări (FSM) care coordonează toate perifericele fără RTOS</li>
+  <li>Identificarea și rezolvarea conflictelor de integrare (UART blocking vs IRQ latency)</li>
+  <li>Show &amp; Tell intern: 5 min demo live + reflecție GenAI</li>
+</ol>
+
+<h2 id="-planul-sesiunii">🕐 Planul Sesiunii</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Interval</th>
+      <th>Activitate</th>
+      <th>Detaliu</th>
+      <th>Cine</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">13:00–13:20</code></td>
+      <td><strong>Arhitectura FSM</strong></td>
+      <td>State machine pe embedded: de ce e mai robustă decât if-else cascadat. Super-loop cu flag-uri volatile vs RTOS task. Schelet FSM cu GenAI.</td>
+      <td>cadru UPB</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">13:20–15:00</code></td>
+      <td><strong>Lab: sistem integrat</strong></td>
+      <td>Temperatura I2C 1Hz + UART log + PWM LED funcție de temperatură + alertă ISR buton + ADC potențiometru pentru prag variabil.</td>
+      <td>echipă + mentor</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">15:00–16:00</code></td>
+      <td><strong>Show &amp; Tell intern</strong></td>
+      <td>5 min/echipă: demo live + ce a greșit AI + cum s-a corectat. Agentul AI evaluează calitatea reflecției.</td>
+      <td>panel intern UPB+NXP</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="-prompte-pentru-asistentul-ai-upb">🤖 Prompte pentru Asistentul AI UPB</h2>
+
+<blockquote>
+  <p><strong>Regulă:</strong> Copiați prompt-ul complet — contextul hardware este obligatoriu.
+AI-ul va genera cod greșit (pentru alte familii NXP sau Arduino) fără aceste informații.</p>
+</blockquote>
+
+<h3 id="prompt-schelet-fsm-integrat">Prompt: Schelet FSM integrat</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FRDM-MCXA153, toate perifericele active simultan:
+  LPI2C0 (P3T1755 1Hz), LPUART0 (../log), SCTimer PWM (../lED), LPADC0 (prag), GPIO IRQ SW3.
+Sarcina: schelet FSM în C — DOAR structura, nu implementarea completă.
+typedef enum { STATE_IDLE, STATE_MONITORING, STATE_ALERT, STATE_COOLING } app_state_t;
+Arhitectura: super-loop cu flag-uri volatile setate din ISR-uri, fără RTOS.
+Generează:
+  - header-ele necesare
+  - structura de date globale
+  - funcția void process_fsm(app_state_t *state)
+  - comentarii despre ce trebuie protejat cu DisableIRQ/EnableIRQ.
+</code></pre></div></div>
+
+<h3 id="prompt-conflict-uart-blocking--isr">Prompt: Conflict UART blocking + ISR</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FRDM-MCXA153, sistem integrat.
+Problema: LPUART_WriteBlocking() blochează CPU ~1ms la 115200 baud.
+Impact: ISR-ul butonului SW3 nu poate răspunde în timp real în timpul transmisiei UART.
+Soluții evaluate:
+1. Buffer circular UART + transmisie în background (ISR LPUART TX empty)
+2. LPUART DMA mode — CPU liber în timp ce DMA trimite
+3. Printf mai rar (nu la fiecare ciclu)
+Care e soluția optimă pentru un sistem fără RTOS pe MCX A153?
+Explică tradeoff-urile.
+</code></pre></div></div>
+
+<h2 id="️-capcane-critice">⚠️ Capcane Critice</h2>
+
+<blockquote>
+  <p>Ce GenAI <strong>nu știe</strong> fără context explicit — verificați înainte de upload pe placă.</p>
+</blockquote>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">LPUART_WriteBlocking</code> blochează CPU complet — incompatibil cu ISR time-critical; folosiți buffer circular + TX IRQ sau LPUART DMA</li>
+  <li><strong>GenAI va omite ATOMIC_BLOCK</strong> pentru variabile partajate ISR/main — adăugați <code class="language-plaintext highlighter-rouge">DisableIRQ</code>/<code class="language-plaintext highlighter-rouge">EnableIRQ</code> manual</li>
+  <li>ADC și I2C pot folosi același bus DMA — verificați conflictele de canal DMA dacă folosiți DMA pentru ambele</li>
+</ul>
+
+<h2 id="-deliverable">✅ Deliverable</h2>
+
+<blockquote>
+  <p>Sistem integrat funcțional + FSM documentat cu diagrama stărilor + Show &amp; Tell 5 min + reflecție GenAI (ce a greșit, cum s-a corectat)</p>
+</blockquote>
+
+<hr />
+
+<p><a href="../l7-lpi2c-p3t1755">← L7: LPI2C — Senzorul P3T1755 On-Board</a> · <a href="../l9-testing-docs">L9: Testing, Documentare &amp; Prezentare Finală →</a></p>

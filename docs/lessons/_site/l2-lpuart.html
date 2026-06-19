@@ -1,0 +1,191 @@
+<h1 id="-l2--lpuart--comunicație-serială">🔌 L2 — LPUART — Comunicație Serială</h1>
+
+<p><strong>VCOM USB prin MCU-Link, printf retargetat</strong></p>
+
+<hr />
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Ziua / Sesiunea</strong></td>
+      <td>Ziua 1, 22 iunie — după-amiază</td>
+    </tr>
+    <tr>
+      <td><strong>Periferic</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">LPUART0 · VCOM · FRO_HF_DIV</code></td>
+    </tr>
+    <tr>
+      <td><strong>Durată</strong></td>
+      <td>2h (13:00–15:00)</td>
+    </tr>
+    <tr>
+      <td><strong>Responsabil</strong></td>
+      <td>Cadru didactic UPB</td>
+    </tr>
+    <tr>
+      <td><strong>Hardware</strong></td>
+      <td>FRDM-MCXA153 + USB Type-C J6 (VCOM) · terminal serial pe PC (PuTTY/minicom/screen)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="-context-și-motivație">📌 Context și Motivație</h2>
+
+<p>LPUART0 pe FRDM-MCXA153 este conectat la MCU-Link care oferă un VCOM port pe USB — nu e nevoie de adaptor UART extern. Sursa de clock este <code class="language-plaintext highlighter-rouge">FRO_HF_DIV</code> (configurabilă). LP = Low Power: periferica funcționează în stop mode — relevanță directă pentru aplicații automotive (wake-on-UART). Formula baud rate pe MCX diferă de AVR (UBRR).</p>
+
+<blockquote>
+  <p><strong>Board:</strong> FRDM-MCXA153 · MCX A153 (Cortex-M33 @ 96 MHz) · SDK MCUXpresso 24.12 · VS Code + CMake</p>
+</blockquote>
+
+<h2 id="-obiective">🎯 Obiective</h2>
+
+<ol>
+  <li>LPUART0 configurat la 115200 8N1 — text vizibil în terminal serial</li>
+  <li>Implementare <code class="language-plaintext highlighter-rouge">printf</code> redirecționat (<code class="language-plaintext highlighter-rouge">retarget_putchar</code>) prin LPUART0</li>
+  <li>Înțelegerea formulei baud rate pe FRO96M și verificarea erorii procentuale</li>
+  <li>Prompt corect cu clock source explicit — cel mai frecvent context omis de AI</li>
+</ol>
+
+<h2 id="-planul-sesiunii">🕐 Planul Sesiunii</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Interval</th>
+      <th>Activitate</th>
+      <th>Detaliu</th>
+      <th>Cine</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">13:00–13:30</code></td>
+      <td><strong>LPUART pe MCX A</strong></td>
+      <td>Formula BRR pe MCX vs UBRR AVR. Clock source: <code class="language-plaintext highlighter-rouge">FRO_HF_DIV</code>. FIFO TX/RX 4 intrări. LP = low power.</td>
+      <td>cadru UPB</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">13:30–14:15</code></td>
+      <td><strong>Demo: Hello World UART</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">LPUART_GetDefaultConfig()</code>, <code class="language-plaintext highlighter-rouge">LPUART_Init()</code>, <code class="language-plaintext highlighter-rouge">LPUART_WriteBlocking()</code>. Retarget printf. Terminal la 115200.</td>
+      <td>cadru UPB</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">14:15–15:00</code></td>
+      <td><strong>Lab + GenAI session</strong></td>
+      <td>Studenții: UART echo RX→TX + meniu (1=LED roșu, 2=LED verde, 3=all OFF). Prompt cu clock source explicit.</td>
+      <td>student + mentor</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="-prompte-pentru-asistentul-ai-upb">🤖 Prompte pentru Asistentul AI UPB</h2>
+
+<blockquote>
+  <p><strong>Regulă:</strong> Copiați prompt-ul complet — contextul hardware este obligatoriu.
+AI-ul va genera cod greșit (pentru alte familii NXP sau Arduino) fără aceste informații.</p>
+</blockquote>
+
+<h3 id="prompt-lpuart0-init">Prompt: LPUART0 init</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Context hardware: FRDM-MCXA153, MCX A153 Cortex-M33, SDK MCUXpresso 24.12.
+LPUART0 conectat la MCU-Link VCOM (USB J6). Clock source: FRO_HF_DIV @ 48 MHz.
+Sarcina: init LPUART0 la 115200 8N1 polling (fără DMA/IRQ).
+Include obligatoriu:
+  CLOCK_SetClkDiv(kCLOCK_DivFlexcom0Clk, 1u)
+  CLOCK_AttachClk(kFRO_HF_DIV_to_LPUART0)
+  LPUART_GetDefaultConfig(), LPUART_Init()
+Arată calculul BRR și eroarea de baud rate rezultată.
+Retarget printf prin LPUART_WriteBlocking.
+</code></pre></div></div>
+
+<h3 id="prompt-debug-lpuart">Prompt: Debug LPUART</h3>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FRDM-MCXA153, LPUART0, SDK MCUXpresso 24.12.
+Problema: LPUART_Init returnează kStatus_LPUART_BaudrateNotSupport.
+Config: baudRate_Bps=115200, srcClock_Hz=48000000UL.
+Am apelat CLOCK_AttachClk(kFRO_HF_DIV_to_LPUART0).
+Ce verific?
+Hint: CLOCK_SetClkDiv pentru FRO_HF_DIV, range-ul acceptat de BRR,
+și dacă srcClock_Hz corespunde cu div-ul setat.
+</code></pre></div></div>
+
+<h2 id="-configurare-lpuart0-în-mcuxpresso-config-tools">🔧 Configurare LPUART0 în MCUXpresso Config Tools</h2>
+
+<h3 id="asignare-pini-uart-în-vederea-pins">Asignare pini UART în vederea Pins</h3>
+
+<p>În toolul <strong>Pins</strong>, selectați pinul pentru semnalul LPUART. Fereastra de selecție afișează toate funcțiile multiplexate disponibile pe acel pin:</p>
+
+<p><img src="../img/lab0/setup_pinout_uart.png" alt="Selectare semnal LPUART — popup cu funcțiile pinului" /></p>
+
+<p>Selectați semnalul LPUART0 (RX sau TX) din lista de semnale:</p>
+
+<p><img src="../img/lab0/configurator_uart_selection.png" alt="Dialog asignare semnal LPUART0" /></p>
+
+<h3 id="rutare-rx-și-tx-în-dialogul-peripheral-lpuart0">Rutare RX și TX în dialogul Peripheral LPUART0</h3>
+
+<p>Click pe pictograma periferică a LPUART0 deschide dialogul <strong>LPUART0 signals for routing</strong>. Bifați <strong>RX</strong> și <strong>TX</strong> pentru a le ruta pe pinii fizici:</p>
+<ul>
+  <li><strong>RX ←</strong> <code class="language-plaintext highlighter-rouge">[51] P0_2/TDO/SWO/LPUART0_RXD/...</code></li>
+  <li><strong>TX →</strong> <code class="language-plaintext highlighter-rouge">[52] P0_3/TDI/LPUART0_TXD/...</code></li>
+</ul>
+
+<p><img src="../img/lab0/configurator_uart_pins.png" alt="Dialog rutare LPUART0 — RX și TX bifate" /></p>
+
+<h3 id="eroare-systick-la-update-code">Eroare SysTick la Update Code</h3>
+
+<p>Când apăsați <strong>Update Code</strong>, pot apărea erori dacă componenta SysTick are sursa de clock configurată greșit (<code class="language-plaintext highlighter-rouge">SYSTICKFunctionClock</code> nu este validă pe MCXA153):</p>
+
+<p><img src="../img/lab0/debug_config_error.png" alt="Update Files — eroare SysTick la generarea codului" /></p>
+
+<p><strong>Diagnosticare cu AI:</strong> Deschideți fișierul <code class="language-plaintext highlighter-rouge">.mex</code> în VS Code și întrebați asistentul AI despre eroare — acesta identifică că <code class="language-plaintext highlighter-rouge">SYSTICKFunctionClock</code> nu există pe MCXA153:</p>
+
+<p><img src="../img/lab0/debug_config_error_output.png" alt="AI explică eroarea SysTick din fișierul .mex" /></p>
+
+<p><strong>Detaliu eroare în Config Tools:</strong> Selectați componenta SysTick — tooltip-ul arată exact câmpul problematic (<code class="language-plaintext highlighter-rouge">Clock source — The value is not available</code>):</p>
+
+<p><img src="../img/lab0/debug_config_error_trace.png" alt="Config Tools — eroare SysTick clock source" /></p>
+
+<p><strong>Rezolvare:</strong> Schimbați <strong>Clock source</strong> din <code class="language-plaintext highlighter-rouge">SYSTICKFunctionClock</code> în <code class="language-plaintext highlighter-rouge">System_clock</code>. Câmpul <em>Calculated interrupt period</em> se actualizează automat (12 000 000 ticks; 1 Hz; 1 s):</p>
+
+<p><img src="../img/lab0/debug_config_error_fixed.png" alt="SysTick configurat corect cu System_clock — eroare dispărută" /></p>
+
+<h3 id="serial-monitor--output-uart-în-vs-code">Serial Monitor — output UART în VS Code</h3>
+
+<p>După flash, deschideți <strong>Serial Monitor</strong> din bara de jos a VS Code și selectați portul COM al MCU-Link VCOM (ex. <code class="language-plaintext highlighter-rouge">COM3 — MCU-Link VCom Port</code>):</p>
+
+<p><img src="../img/lab0/open_serial_monitor_port.png" alt="Deschidere Serial Monitor — selectare port COM" /></p>
+
+<p>Mesajul <code class="language-plaintext highlighter-rouge">Hello from FRDM-MCXA153!</code> apare în terminal la 115200 baud:</p>
+
+<p><img src="../img/lab0/open_serial_monitor_port_output.png" alt="Output Serial Monitor — Hello from FRDM-MCXA153!" /></p>
+
+<hr />
+
+<h2 id="️-capcane-critice">⚠️ Capcane Critice</h2>
+
+<blockquote>
+  <p>Ce GenAI <strong>nu știe</strong> fără context explicit — verificați înainte de upload pe placă.</p>
+</blockquote>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">CLOCK_SetClkDiv(kCLOCK_DivFlexcom0Clk, 1u)</code> trebuie apelat <strong>înainte</strong> de <code class="language-plaintext highlighter-rouge">CLOCK_AttachClk</code> — AI omite frecvent această ordine</li>
+  <li><code class="language-plaintext highlighter-rouge">kStatus_LPUART_BaudrateNotSupport</code> apare dacă <code class="language-plaintext highlighter-rouge">srcClock_Hz</code> nu corespunde cu div-ul real setat</li>
+  <li>Pe Windows, COM port-ul MCU-Link apare doar dacă driver-ul MCU-Link este instalat (MCUXpresso IDE installer îl include)</li>
+</ul>
+
+<h2 id="-deliverable">✅ Deliverable</h2>
+
+<blockquote>
+  <p>UART echo + meniu LED funcțional + formula BRR calculată manual + eroarea de baud documentată</p>
+</blockquote>
+
+<hr />
+
+<p><a href="../l1-gpio">← L1: GPIO — Control Digital &amp; Butoane</a> · <a href="../l3-intreruperi">L3: Întreruperi Externe &amp; NVIC →</a></p>

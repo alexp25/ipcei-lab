@@ -1,0 +1,482 @@
+<h1 id="️-l7--lpi2c--senzorul-p3t1755-on-board">🌡️ L7 — LPI2C — Senzorul P3T1755 On-Board</h1>
+
+<p><strong>Driver modular, Config Tools și citirea temperaturii la fiecare 500 ms</strong></p>
+
+<hr />
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Ziua / Sesiunea</strong></td>
+      <td>Ziua 4, 25 iunie — dimineață</td>
+    </tr>
+    <tr>
+      <td><strong>Periferic</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">LPI2C0 · P3T1755DP · 100 kHz</code></td>
+    </tr>
+    <tr>
+      <td><strong>Durată</strong></td>
+      <td>2h (09:00–11:00)</td>
+    </tr>
+    <tr>
+      <td><strong>Responsabil</strong></td>
+      <td>Cadru UPB + Expert NXP</td>
+    </tr>
+    <tr>
+      <td><strong>Hardware</strong></td>
+      <td>FRDM-MCXA153 · senzor P3T1755DP on-board, referință U8</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="-context-și-motivație">📌 Context și Motivație</h2>
+
+<p>FRDM-MCXA153 include senzorul digital de temperatură <strong>NXP P3T1755DP</strong>, referință <strong>U8</strong>. Senzorul este conectat la interfața I3C0 a plăcii, dar poate comunica și în modul compatibil I2C cu două fire. În acest laborator folosim controlerul <strong>LPI2C0</strong> și API-ul MCUXpresso SDK.</p>
+
+<p>Manualul plăcii poate indica adresa <code class="language-plaintext highlighter-rouge">0x90</code>. Aceasta este adresa I2C de <strong>8 biți pentru write</strong>. API-urile normale LPI2C primesc adresa de <strong>7 biți</strong>:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0x90 &gt;&gt; 1 = 0x48
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>Board:</strong> FRDM-MCXA153 · MCX A153 (Cortex-M33) · MCUXpresso SDK · VS Code + CMake</p>
+</blockquote>
+
+<h2 id="-obiective">🎯 Obiective</h2>
+
+<ol>
+  <li>Identificarea pinilor reali ai senzorului și configurarea lor în MCUXpresso Config Tools.</li>
+  <li>Inițializarea LPI2C0 fără blocare infinită dacă senzorul lipsește sau magistrala este ocupată.</li>
+  <li>Separarea driverului P3T1755 de adaptorul hardware și de logica aplicației.</li>
+  <li>Citirea registrului de temperatură și conversia corectă a valorilor pozitive și negative.</li>
+  <li>Afișarea temperaturii în grade Celsius la fiecare <code class="language-plaintext highlighter-rouge">500 ms</code>.</li>
+  <li>Înțelegerea relației dintre <code class="language-plaintext highlighter-rouge">.mex</code>, fișierele generate și fișierele compilate de CMake.</li>
+</ol>
+
+<h2 id="-planul-sesiunii">🕐 Planul Sesiunii</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Interval</th>
+      <th>Activitate</th>
+      <th>Detaliu</th>
+      <th>Cine</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">09:00–09:30</code></td>
+      <td><strong>Hardware și protocol</strong></td>
+      <td>U8, adresa <code class="language-plaintext highlighter-rouge">0x48</code>, registre, tranzacția write-register/read-data și formatul temperaturii.</td>
+      <td>cadru UPB + expert NXP</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">09:30–10:15</code></td>
+      <td><strong>Driver și adaptor LPI2C</strong></td>
+      <td>API reutilizabil, callback-uri de transport, timeout, inițializare clock și transfer nonblocking.</td>
+      <td>cadru UPB</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">10:15–11:00</code></td>
+      <td><strong>Config Tools + bring-up</strong></td>
+      <td>Pins, <code class="language-plaintext highlighter-rouge">.mex</code>, Update Files, CMake, build curat, interpretarea statusurilor și test pe placă.</td>
+      <td>student + mentor</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="-conexiunea-hardware">🔌 Conexiunea Hardware</h2>
+
+<p>Senzorul on-board folosește următorii pini:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Semnal</th>
+      <th>Pin MCU</th>
+      <th>Funcție mux</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SDA</td>
+      <td><code class="language-plaintext highlighter-rouge">P0_16</code></td>
+      <td><code class="language-plaintext highlighter-rouge">LPI2C0_SDA</code>, <code class="language-plaintext highlighter-rouge">Alt2</code></td>
+    </tr>
+    <tr>
+      <td>SCL</td>
+      <td><code class="language-plaintext highlighter-rouge">P0_17</code></td>
+      <td><code class="language-plaintext highlighter-rouge">LPI2C0_SCL</code>, <code class="language-plaintext highlighter-rouge">Alt2</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Caracteristicile electrice folosite în proiect sunt:</p>
+
+<ul>
+  <li>input buffer activ;</li>
+  <li>open-drain activ;</li>
+  <li>pull-up activ;</li>
+  <li>slew rate fast;</li>
+  <li>drive strength low.</li>
+</ul>
+
+<p>Activarea pull-up-urilor a fost importantă la bring-up. Fără o stare idle HIGH stabilă, LPI2C0 poate raporta magistrala ca fiind ocupată înainte de primul transfer.</p>
+
+<h2 id="️-harta-registrelor">🗺️ Harta Registrelor</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Registru</th>
+      <th style="text-align: right">Adresă</th>
+      <th>Rol</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Temperature</td>
+      <td style="text-align: right"><code class="language-plaintext highlighter-rouge">0x00</code></td>
+      <td>valoarea temperaturii, 2 octeți</td>
+    </tr>
+    <tr>
+      <td>Configuration</td>
+      <td style="text-align: right"><code class="language-plaintext highlighter-rouge">0x01</code></td>
+      <td>configurarea senzorului</td>
+    </tr>
+    <tr>
+      <td>TLOW</td>
+      <td style="text-align: right"><code class="language-plaintext highlighter-rouge">0x02</code></td>
+      <td>prag inferior</td>
+    </tr>
+    <tr>
+      <td>THIGH</td>
+      <td style="text-align: right"><code class="language-plaintext highlighter-rouge">0x03</code></td>
+      <td>prag superior</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Inițializarea driverului citește registrul <code class="language-plaintext highlighter-rouge">Configuration</code> fără să modifice setările power-on. Astfel verifică prezența senzorului înainte de bucla principală.</p>
+
+<h2 id="-tranzacția-i2c">📡 Tranzacția I2C</h2>
+
+<p>Pentru citirea temperaturii:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Adresă dispozitiv: 0x48, 7 biți
+Write: [0x00]       selectează registrul Temperature
+Repeated START
+Read:  [MSB, LSB]
+STOP
+</code></pre></div></div>
+
+<p>În implementare, <code class="language-plaintext highlighter-rouge">lpi2c_master_transfer_t</code> descrie aceeași operație:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">transfer</span><span class="p">.</span><span class="n">slaveAddress</span> <span class="o">=</span> <span class="mh">0x48U</span><span class="p">;</span>
+<span class="n">transfer</span><span class="p">.</span><span class="n">direction</span> <span class="o">=</span> <span class="n">kLPI2C_Read</span><span class="p">;</span>
+<span class="n">transfer</span><span class="p">.</span><span class="n">subaddress</span> <span class="o">=</span> <span class="n">P3T1755_REG_TEMPERATURE</span><span class="p">;</span>
+<span class="n">transfer</span><span class="p">.</span><span class="n">subaddressSize</span> <span class="o">=</span> <span class="mi">1U</span><span class="p">;</span>
+<span class="n">transfer</span><span class="p">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">;</span>
+<span class="n">transfer</span><span class="p">.</span><span class="n">dataSize</span> <span class="o">=</span> <span class="mi">2U</span><span class="p">;</span>
+<span class="n">transfer</span><span class="p">.</span><span class="n">flags</span> <span class="o">=</span> <span class="n">kLPI2C_TransferDefaultFlag</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Transferul este pornit cu <code class="language-plaintext highlighter-rouge">LPI2C_MasterTransferNonBlocking()</code>. Un callback salvează rezultatul, iar o limită software oprește așteptarea și apelează <code class="language-plaintext highlighter-rouge">LPI2C_MasterTransferAbort()</code> dacă transferul nu se termină.</p>
+
+<h2 id="️-conversia-temperaturii">🌡️ Conversia Temperaturii</h2>
+
+<p>Temperatura este un număr semnat pe 12 biți, în complement față de 2, aliniat la stânga în cuvântul de 16 biți. Rezoluția este:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.0625 °C / LSB
+</code></pre></div></div>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int16_t</span> <span class="nf">p3t1755_decode_raw</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">msb</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">lsb</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int16_t</span> <span class="n">raw</span> <span class="o">=</span> <span class="p">(</span><span class="kt">int16_t</span><span class="p">)((((</span><span class="kt">uint16_t</span><span class="p">)</span><span class="n">msb</span> <span class="o">&lt;&lt;</span> <span class="mi">8U</span><span class="p">)</span> <span class="o">|</span>
+                             <span class="p">(</span><span class="kt">uint16_t</span><span class="p">)</span><span class="n">lsb</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">4U</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">((</span><span class="n">raw</span> <span class="o">&amp;</span> <span class="mh">0x0800</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">raw</span> <span class="o">|=</span> <span class="p">(</span><span class="kt">int16_t</span><span class="p">)</span><span class="mh">0xF000</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">raw</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">float</span> <span class="nf">p3t1755_raw_to_celsius</span><span class="p">(</span><span class="kt">uint8_t</span> <span class="n">msb</span><span class="p">,</span> <span class="kt">uint8_t</span> <span class="n">lsb</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="p">(</span><span class="kt">float</span><span class="p">)</span><span class="n">p3t1755_decode_raw</span><span class="p">(</span><span class="n">msb</span><span class="p">,</span> <span class="n">lsb</span><span class="p">)</span> <span class="o">*</span> <span class="mi">0</span><span class="p">.</span><span class="mo">0625</span><span class="n">F</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Valori de verificare:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: right">Raw pe 12 biți</th>
+      <th style="text-align: right">Valoare semnată</th>
+      <th style="text-align: right">Temperatură</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: right"><code class="language-plaintext highlighter-rouge">0x190</code></td>
+      <td style="text-align: right"><code class="language-plaintext highlighter-rouge">400</code></td>
+      <td style="text-align: right"><code class="language-plaintext highlighter-rouge">25.0 °C</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: right"><code class="language-plaintext highlighter-rouge">0x000</code></td>
+      <td style="text-align: right"><code class="language-plaintext highlighter-rouge">0</code></td>
+      <td style="text-align: right"><code class="language-plaintext highlighter-rouge">0.0 °C</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: right"><code class="language-plaintext highlighter-rouge">0xE70</code></td>
+      <td style="text-align: right"><code class="language-plaintext highlighter-rouge">-400</code></td>
+      <td style="text-align: right"><code class="language-plaintext highlighter-rouge">-25.0 °C</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>Shift-ul este <code class="language-plaintext highlighter-rouge">4</code>, nu <code class="language-plaintext highlighter-rouge">5</code>. P3T1755 folosește 12 biți și <code class="language-plaintext highlighter-rouge">0.0625 °C/LSB</code>, nu formatul mai vechi de 11 biți cu <code class="language-plaintext highlighter-rouge">0.125 °C/LSB</code> întâlnit la alți senzori.</p>
+</blockquote>
+
+<h2 id="-organizarea-codului">🧱 Organizarea Codului</h2>
+
+<p>Implementarea este separată în trei niveluri:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>main.c
+   │  afișare și perioadă de 500 ms
+   ▼
+onboard_temperature.c/.h
+   │  clock, LPI2C0, callback, timeout
+   ▼
+p3t1755.c/.h
+      registre, API senzor, conversie temperatură
+</code></pre></div></div>
+
+<h3 id="driverul-reutilizabil-p3t1755">Driverul reutilizabil <code class="language-plaintext highlighter-rouge">p3t1755</code></h3>
+
+<p>Driverul nu include apeluri directe la LPI2C0. Primește funcții de transport prin configurație:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">typedef</span> <span class="k">struct</span>
+<span class="p">{</span>
+    <span class="kt">void</span> <span class="o">*</span><span class="n">busContext</span><span class="p">;</span>
+    <span class="n">p3t1755_read_transfer_t</span> <span class="n">readTransfer</span><span class="p">;</span>
+    <span class="n">p3t1755_write_transfer_t</span> <span class="n">writeTransfer</span><span class="p">;</span>
+    <span class="kt">uint8_t</span> <span class="n">deviceAddress</span><span class="p">;</span>
+    <span class="kt">uint32_t</span> <span class="n">timeout</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">p3t1755_config_t</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>API-ul public include:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">status_t</span> <span class="nf">p3t1755_init</span><span class="p">(...);</span>
+<span class="n">status_t</span> <span class="nf">p3t1755_read_register</span><span class="p">(...);</span>
+<span class="n">status_t</span> <span class="nf">p3t1755_write_register</span><span class="p">(...);</span>
+<span class="n">status_t</span> <span class="nf">p3t1755_read_raw</span><span class="p">(...);</span>
+<span class="n">status_t</span> <span class="nf">p3t1755_read_celsius</span><span class="p">(...);</span>
+</code></pre></div></div>
+
+<p>Această separare permite reutilizarea driverului cu alt controler I2C sau cu un adaptor I3C fără schimbarea logicii de conversie.</p>
+
+<h3 id="adaptorul-hardware-onboard_temperature">Adaptorul hardware <code class="language-plaintext highlighter-rouge">onboard_temperature</code></h3>
+
+<p>Adaptorul de placă deține LPI2C0 și pregătește clock-ul înainte de inițializare:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">CLOCK_SetClockDiv</span><span class="p">(</span><span class="n">kCLOCK_DivLPI2C0</span><span class="p">,</span> <span class="mi">1U</span><span class="p">);</span>
+<span class="n">CLOCK_AttachClk</span><span class="p">(</span><span class="n">kFRO_HF_DIV_to_LPI2C0</span><span class="p">);</span>
+
+<span class="n">LPI2C_MasterGetDefaultConfig</span><span class="p">(</span><span class="o">&amp;</span><span class="n">masterConfig</span><span class="p">);</span>
+<span class="n">masterConfig</span><span class="p">.</span><span class="n">baudRate_Hz</span> <span class="o">=</span> <span class="mi">100000U</span><span class="p">;</span>
+<span class="n">LPI2C_MasterInit</span><span class="p">(</span><span class="n">LPI2C0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">masterConfig</span><span class="p">,</span> <span class="n">CLOCK_GetLpi2cClkFreq</span><span class="p">());</span>
+</code></pre></div></div>
+
+<p>Clock-ul este inițializat local de modul deoarece LPI2C0 nu este instanțiat în unealta <strong>Peripherals</strong>. Config Tools poate regenera <code class="language-plaintext highlighter-rouge">clock_config.c</code> fără să elimine funcționalitatea aplicației.</p>
+
+<h3 id="integrarea-în-mainc">Integrarea în <code class="language-plaintext highlighter-rouge">main.c</code></h3>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">status_t</span> <span class="n">status</span> <span class="o">=</span> <span class="n">onboard_temperature_init</span><span class="p">();</span>
+
+<span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">status</span> <span class="o">==</span> <span class="n">kStatus_Success</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">float</span> <span class="n">temperatureCelsius</span><span class="p">;</span>
+        <span class="n">status_t</span> <span class="n">readStatus</span> <span class="o">=</span>
+            <span class="n">onboard_temperature_read_celsius</span><span class="p">(</span><span class="o">&amp;</span><span class="n">temperatureCelsius</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">readStatus</span> <span class="o">==</span> <span class="n">kStatus_Success</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">PRINTF</span><span class="p">(</span><span class="s">"P3T1755 temperature: %.2f C</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span>
+                   <span class="p">(</span><span class="kt">double</span><span class="p">)</span><span class="n">temperatureCelsius</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">else</span>
+        <span class="p">{</span>
+            <span class="n">PRINTF</span><span class="p">(</span><span class="s">"P3T1755 read failed (status %d)</span><span class="se">\r\n</span><span class="s">"</span><span class="p">,</span>
+                   <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">readStatus</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="n">SDK_DelayAtLeastUs</span><span class="p">(</span><span class="mi">500000U</span><span class="p">,</span> <span class="n">SystemCoreClock</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Aplicația nu conține apeluri LPI2C specifice platformei și nu folosește LED-ul sau butonul. Exemplul poate fi dezactivat ușor prin eliminarea inițializării și citirii din <code class="language-plaintext highlighter-rouge">main.c</code>.</p>
+
+<h2 id="️-configurarea-în-mcuxpresso-config-tools">🛠️ Configurarea în MCUXpresso Config Tools</h2>
+
+<p>Deschideți fișierul:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>src/lab_i2c/main/main.mex
+</code></pre></div></div>
+
+<p>În <strong>Pins</strong>, funcția <code class="language-plaintext highlighter-rouge">BOARD_InitPins</code> trebuie să conțină:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">LPI2C0_SDA</code> pe <code class="language-plaintext highlighter-rouge">P0_16</code>;</li>
+  <li><code class="language-plaintext highlighter-rouge">LPI2C0_SCL</code> pe <code class="language-plaintext highlighter-rouge">P0_17</code>;</li>
+  <li>open-drain și pull-up active pentru ambele semnale.</li>
+</ul>
+
+<p>Fișierele generate sunt grupate în:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>frdmmcxa153/board/pin_mux.c
+frdmmcxa153/board/pin_mux.h
+frdmmcxa153/board/clock_config.c
+frdmmcxa153/board/clock_config.h
+frdmmcxa153/board/peripherals.c
+frdmmcxa153/board/peripherals.h
+</code></pre></div></div>
+
+<p>CMake trebuie să compileze exact aceste fișiere. Dacă dialogul <strong>Update Files</strong> propune <code class="language-plaintext highlighter-rouge">create</code> într-un director și <code class="language-plaintext highlighter-rouge">delete</code> în altul, verificați <code class="language-plaintext highlighter-rouge">Project Link</code>, <code class="language-plaintext highlighter-rouge">generated_project_files</code>, <code class="language-plaintext highlighter-rouge">board_files.cmake</code> și <code class="language-plaintext highlighter-rouge">cfg_tools_generated.cmake</code> înainte de a apăsa <strong>OK</strong>.</p>
+
+<p>Pentru explicația generală despre <code class="language-plaintext highlighter-rouge">.mex</code>, ownership și alinierea cu build-ul, consultați secțiunea dedicată din <a href="../l1-gpio#cum-se-leagă-mex-config-tools-codul-generat-și-build-ul">L1 — GPIO</a>.</p>
+
+<h2 id="-build-și-rulare">🧪 Build și Rulare</h2>
+
+<p>Build curat:</p>
+
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cmake</span><span class="w"> </span><span class="nt">--build</span><span class="w"> </span><span class="nt">--preset</span><span class="w"> </span><span class="nx">debug</span><span class="w"> </span><span class="nt">--clean-first</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Output serial așteptat:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Hello from FRDM-MCXA153!
+P3T1755 temperature: 24.94 C
+P3T1755 temperature: 25.00 C
+P3T1755 temperature: 25.06 C
+</code></pre></div></div>
+
+<p>Temperatura este raportată la aproximativ fiecare jumătate de secundă. Atingerea atentă a capsulei senzorului trebuie să producă o creștere graduală a valorii.</p>
+
+<h2 id="-bring-up-și-diagnosticare">🔍 Bring-up și Diagnosticare</h2>
+
+<p>În MCUXpresso SDK, codurile <code class="language-plaintext highlighter-rouge">status_t</code> includ grupul modulului și codul erorii. În timpul integrării au fost întâlnite următoarele situații:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Simptom</th>
+      <th>Interpretare</th>
+      <th>Corecție</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">status 7911</code></td>
+      <td>timeout pe încercarea inițială I3C legacy-I2C</td>
+      <td>verificarea modului de controler și a tranzacției</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">status 7902</code></td>
+      <td>NAK în varianta I3C cu dynamic address assignment</td>
+      <td>folosirea modului compatibil LPI2C la adresa <code class="language-plaintext highlighter-rouge">0x48</code></td>
+    </tr>
+    <tr>
+      <td>break în <code class="language-plaintext highlighter-rouge">fsl_assert</code></td>
+      <td>clock-ul LPI2C0/divizorul nu era pregătit</td>
+      <td>setarea divizorului și atașarea sursei înainte de <code class="language-plaintext highlighter-rouge">LPI2C_MasterInit()</code></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">status 900</code></td>
+      <td><code class="language-plaintext highlighter-rouge">kStatus_LPI2C_Busy</code>; magistrala nu era idle</td>
+      <td>configurarea corectă a pinilor și activarea pull-up-urilor</td>
+    </tr>
+    <tr>
+      <td>Config Tools șterge linii de clock</td>
+      <td>clock-ul era modificat numai în fișierul generat</td>
+      <td>mutarea ownership-ului în adaptorul hardware sau configurarea completă în unealtă</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Invalid settings</code> în Clocks</td>
+      <td>identificator XML adăugat manual, neacceptat de model</td>
+      <td>folosirea numai a setărilor expuse de Config Tools</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="ordinea-recomandată-de-verificare">Ordinea recomandată de verificare</h3>
+
+<ol>
+  <li>Confirmați alimentarea plăcii și adresa <code class="language-plaintext highlighter-rouge">0x48</code>.</li>
+  <li>Verificați în Config Tools <code class="language-plaintext highlighter-rouge">P0_16/P0_17</code>, <code class="language-plaintext highlighter-rouge">Alt2</code>, open-drain și pull-up.</li>
+  <li>Confirmați că CMake compilează fișierele generate din <code class="language-plaintext highlighter-rouge">frdmmcxa153/board</code>.</li>
+  <li>Verificați clock-ul înainte de <code class="language-plaintext highlighter-rouge">LPI2C_MasterInit()</code>.</li>
+  <li>Reduceți temporar magistrala la <code class="language-plaintext highlighter-rouge">100 kHz</code> pentru bring-up.</li>
+  <li>Verificați dacă transferul pornește și dacă callback-ul se execută.</li>
+  <li>Păstrați timeout-ul; nu așteptați infinit după un senzor absent.</li>
+  <li>După orice <strong>Update Code</strong>, executați un clean build și retestați placa.</li>
+</ol>
+
+<h2 id="-prompt-pentru-asistentul-ai">🤖 Prompt pentru Asistentul AI</h2>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Lucrezi într-un proiect MCUXpresso SDK pentru FRDM-MCXA153.
+Senzor on-board: NXP P3T1755DP, U8, accesat prin LPI2C0 în mod I2C.
+Adresă API pe 7 biți: 0x48. Nu folosi 0x90 decât ca adresă write pe 8 biți.
+Pini: SDA=P0_16/LPI2C0_SDA Alt2, SCL=P0_17/LPI2C0_SCL Alt2.
+Activează input buffer, open-drain și pull-up pentru ambii pini.
+Registrul temperaturii: 0x00, 2 octeți MSB first.
+Format: signed 12-bit two's-complement, left-aligned, 0.0625 °C/LSB.
+
+Cerințe:
+- inspectează stilul proiectului înainte de modificări;
+- păstrează driverul P3T1755 separat de adaptorul LPI2C și de main.c;
+- folosește status_t și timeout, fără bucle infinite;
+- configurează clock-ul LPI2C0 înainte de LPI2C_MasterInit();
+- actualizează .mex astfel încât pinii să fie vizibili în Config Tools;
+- aliniază generated_project_files cu fișierele compilate de CMake;
+- citește și afișează temperatura la fiecare 500 ms;
+- verifică valorile raw 0x190=25 °C, 0x000=0 °C, 0xE70=-25 °C;
+- rulează un clean build și raportează rezultatul.
+</code></pre></div></div>
+
+<h2 id="️-capcane-critice">⚠️ Capcane Critice</h2>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">0x90</code> este adresa write pe 8 biți; pentru LPI2C folosiți <code class="language-plaintext highlighter-rouge">0x48</code>.</li>
+  <li>Pinii senzorului sunt <code class="language-plaintext highlighter-rouge">P0_16/P0_17</code>, nu <code class="language-plaintext highlighter-rouge">PIO0_12/PIO0_13</code>.</li>
+  <li>Senzorul este U8 și folosește format semnat pe 12 biți cu <code class="language-plaintext highlighter-rouge">0.0625 °C/LSB</code>.</li>
+  <li>Open-drain fără pull-up poate lăsa magistrala în starea <code class="language-plaintext highlighter-rouge">Busy</code>.</li>
+  <li>Nu modificați permanent numai fișiere generate; următorul <strong>Update Code</strong> le poate suprascrie.</li>
+  <li>Nu introduceți manual setări de clock necunoscute în XML-ul <code class="language-plaintext highlighter-rouge">.mex</code>.</li>
+  <li>Driverul de senzor nu trebuie să depindă direct de <code class="language-plaintext highlighter-rouge">LPI2C0</code> sau de <code class="language-plaintext highlighter-rouge">main.c</code>.</li>
+</ul>
+
+<h2 id="-deliverable">✅ Deliverable</h2>
+
+<blockquote>
+  <p>Aplicație care citește P3T1755 prin LPI2C0 și afișează temperatura la fiecare 500 ms, cu driver modular, timeout, conversie pozitivă/negativă corectă, configurație vizibilă în Config Tools și build curat reușit.</p>
+</blockquote>
+
+<hr />
+
+<p><a href="../l6-lpspi">← L6: LPSPI — Comunicație SPI &amp; Device Extern</a> · <a href="../l8-integrare">L8: Integrare — Sistem Complet cu FSM →</a></p>

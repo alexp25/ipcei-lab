@@ -1,0 +1,16 @@
+﻿main_peripheral:
+  boards:
+    frdmmcxa153: []
+  contents:
+    document:
+      brief: Drives an Arduino Multi-Function Shield with 7-segment display,
+        buttons, LEDs, buzzer, and A0 potentiometer on FRDM-MCXA153.
+      category: demo_apps
+      example_readme:
+      - examples/main_peripheral/readme.md
+      - ${board_root}/${board}/main/example_board_readme.md
+      - ${board_root}/${board}/examples_shared_readme.md
+      name: main_peripheral${core_id_suffix_name}
+    meta_path: examples/main_peripheral
+    project-root-path: boards/${board}/main/${multicore_foldername}
+  section-type: freestanding_application
