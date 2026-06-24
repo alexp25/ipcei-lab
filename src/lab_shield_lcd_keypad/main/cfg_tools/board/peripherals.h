@@ -11,6 +11,9 @@
  **********************************************************************************************************************/
 #include "fsl_common.h"
 #include "fsl_lpuart_cmsis.h"
+#include "fsl_clock.h"
+#include "fsl_lpi2c.h"
+#include "fsl_lpadc.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -24,6 +27,26 @@ extern "C" {
 #define LPUART0_PERIPHERAL Driver_USART0
 /* Definition of the clock source frequency */
 #define LPUART0_CLOCK_SOURCE_FREQ 48000000UL
+/* BOARD_InitPeripherals defines for LPI2C0 */
+/* Definition of peripheral ID */
+#define LPI2C0_PERIPHERAL LPI2C0
+/* Definition of clock source */
+#define LPI2C0_CLOCK_FREQ 12000000UL
+/* Transfer buffer size */
+#define LPI2C0_MASTER_BUFFER_SIZE 1
+/* Definition of follower address */
+#define LPI2C0_MASTER_SLAVE_ADDRESS 0
+/* Alias for ADC0 peripheral */
+#define ADC0_PERIPHERAL ADC0
+
+/***********************************************************************************************************************
+ * Global variables
+ **********************************************************************************************************************/
+extern const lpi2c_master_config_t LPI2C0_masterConfig;
+extern lpi2c_master_transfer_t LPI2C0_masterTransfer;
+extern uint8_t LPI2C0_masterBuffer[LPI2C0_MASTER_BUFFER_SIZE];
+extern lpi2c_master_handle_t LPI2C0_masterHandle;
+extern const lpadc_config_t ADC0_config;
 
 /***********************************************************************************************************************
  * Global functions

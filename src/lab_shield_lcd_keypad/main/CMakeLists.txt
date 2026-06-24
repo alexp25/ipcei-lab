@@ -1,4 +1,3 @@
-﻿
 # Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -11,20 +10,19 @@ include(${SdkRootDirPath}/cmake/extension/mcux.cmake)
 
 project(main LANGUAGES C CXX ASM PROJECT_BOARD_PORT_PATH ${board_root}/${board}/main)
 
-
 include(${board}/board_files.cmake)
 include(${SdkRootDirPath}/CMakeLists.txt)
 
-
 mcux_add_source(
     SOURCES main.c
-            hd44780.c
-            hd44780.h
-            lcd_keypad.c
-            lcd_keypad.h
-            frdmmcxa153_lcd_shield.c
-            frdmmcxa153_lcd_shield.h
-            lcd_demo_config.h
+            dfrobot_rgb_lcd.c
+            dfrobot_rgb_lcd.h
+            dfrobot_lcd_shield.c
+            dfrobot_lcd_shield.h
+            dfrobot_lcd_shield_keypad.c
+            dfrobot_lcd_shield_keypad.h
+            cfg_tools/board/RTE_Device.h
+            cfg_tools/cfg_require.json
 )
 
 mcux_add_source(
@@ -41,8 +39,7 @@ mcux_add_include(
 )
 
 mcux_add_include(
-    INCLUDES frdmmcxa153/board
-             cfg_tools/board
+    INCLUDES cfg_tools/board
 )
 
 mcux_convert_binary(BINARY ${APPLICATION_BINARY_DIR}/${MCUX_SDK_PROJECT_NAME}.bin)

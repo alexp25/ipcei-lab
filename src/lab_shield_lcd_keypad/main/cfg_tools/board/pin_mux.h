@@ -25,141 +25,42 @@ extern "C" {
  */
 void BOARD_InitBootPins(void);
 
-#define PCR_IBE_ibe0 0x00u          /*!<@brief Input Buffer Enable: Disables */
-#define PCR_IBE_ibe1 0x01u          /*!<@brief Input Buffer Enable: Enables */
-#define PCR_PE_pe0 0x00u            /*!<@brief Pull Enable: Disables */
-#define PORT2_PCR5_MUX_mux00 0x00u  /*!<@brief Pin Multiplex Control: Alternative 0 (GPIO) */
-#define PORT2_PCR7_MUX_mux00 0x00u  /*!<@brief Pin Multiplex Control: Alternative 0 (GPIO) */
-#define PORT3_PCR31_MUX_mux00 0x00u /*!<@brief Pin Multiplex Control: Alternative 0 (GPIO) */
+#define PCR_DSE_dse0 0x00u /*!<@brief Drive Strength Enable: Low */
+#define PCR_IBE_ibe0 0x00u /*!<@brief Input Buffer Enable: Disables */
+#define PCR_IBE_ibe1 0x01u /*!<@brief Input Buffer Enable: Enables */
+#define PCR_INV_inv0 0x00u /*!<@brief Invert Input: Does not invert */
+#define PCR_ODE_ode1 0x01u /*!<@brief Open Drain Enable: Enables */
+#define PCR_PE_pe0 0x00u   /*!<@brief Pull Enable: Disables */
+#define PCR_PE_pe1 0x01u   /*!<@brief Pull Enable: Enables */
+#define PCR_PS_ps1 0x01u   /*!<@brief Pull Select: Enables internal pullup resistor */
+#define PCR_SRE_sre0 0x00u /*!<@brief Slew Rate Enable: Fast */
 
-/*! @name PORT3_12 (number 38), LCD_D5_LED_RED
+/*! @name PORT1_8 (number 2), RGBLCD1602_ARDUINO_SDA
   @{ */
 
-/* Symbols to be used with GPIO driver */
-#define BOARD_INITPINS_LCD_D5_GPIO GPIO3                /*!<@brief GPIO peripheral base pointer */
-#define BOARD_INITPINS_LCD_D5_INIT_GPIO_VALUE 0U        /*!<@brief GPIO output initial state */
-#define BOARD_INITPINS_LCD_D5_GPIO_PIN 12U              /*!<@brief GPIO pin number */
-#define BOARD_INITPINS_LCD_D5_GPIO_PIN_MASK (1U << 12U) /*!<@brief GPIO pin mask */
-
 /* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_LCD_D5_PORT PORT3                /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_LCD_D5_PIN 12U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_LCD_D5_PIN_MASK (1U << 12U)      /*!<@brief PORT pin mask */
-                                                        /* @} */
-
-/*! @name PORT3_13 (number 37), LCD_D6_LED_GREEN
-  @{ */
-
-/* Symbols to be used with GPIO driver */
-#define BOARD_INITPINS_LCD_D6_GPIO GPIO3                /*!<@brief GPIO peripheral base pointer */
-#define BOARD_INITPINS_LCD_D6_INIT_GPIO_VALUE 0U        /*!<@brief GPIO output initial state */
-#define BOARD_INITPINS_LCD_D6_GPIO_PIN 13U              /*!<@brief GPIO pin number */
-#define BOARD_INITPINS_LCD_D6_GPIO_PIN_MASK (1U << 13U) /*!<@brief GPIO pin mask */
-
-/* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_LCD_D6_PORT PORT3                /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_LCD_D6_PIN 13U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_LCD_D6_PIN_MASK (1U << 13U)      /*!<@brief PORT pin mask */
-                                                        /* @} */
-
-/*! @name PORT3_0 (number 46), LED_BLUE
-  @{ */
-
-/* Symbols to be used with GPIO driver */
-#define BOARD_INITPINS_LED_BLUE_GPIO GPIO3               /*!<@brief GPIO peripheral base pointer */
-#define BOARD_INITPINS_LED_BLUE_INIT_GPIO_VALUE 0U       /*!<@brief GPIO output initial state */
-#define BOARD_INITPINS_LED_BLUE_GPIO_PIN 0U              /*!<@brief GPIO pin number */
-#define BOARD_INITPINS_LED_BLUE_GPIO_PIN_MASK (1U << 0U) /*!<@brief GPIO pin mask */
-
-/* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_LED_BLUE_PORT PORT3               /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_LED_BLUE_PIN 0U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_LED_BLUE_PIN_MASK (1U << 0U)      /*!<@brief PORT pin mask */
-                                                         /* @} */
-
-/*! @name PORT2_5 (number 19), LCD_D4_ARDUINO_D4
-  @{ */
-
-/* Symbols to be used with GPIO driver */
-#define BOARD_INITPINS_LCD_D4_GPIO GPIO2               /*!<@brief GPIO peripheral base pointer */
-#define BOARD_INITPINS_LCD_D4_INIT_GPIO_VALUE 0U       /*!<@brief GPIO output initial state */
-#define BOARD_INITPINS_LCD_D4_GPIO_PIN 5U              /*!<@brief GPIO pin number */
-#define BOARD_INITPINS_LCD_D4_GPIO_PIN_MASK (1U << 5U) /*!<@brief GPIO pin mask */
-
-/* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_LCD_D4_PORT PORT2               /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_LCD_D4_PIN 5U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_LCD_D4_PIN_MASK (1U << 5U)      /*!<@brief PORT pin mask */
-                                                       /* @} */
-
-/*! @name PORT3_1 (number 45), LCD_D7_ARDUINO_D7
-  @{ */
-
-/* Symbols to be used with GPIO driver */
-#define BOARD_INITPINS_LCD_D7_GPIO GPIO3               /*!<@brief GPIO peripheral base pointer */
-#define BOARD_INITPINS_LCD_D7_INIT_GPIO_VALUE 0U       /*!<@brief GPIO output initial state */
-#define BOARD_INITPINS_LCD_D7_GPIO_PIN 1U              /*!<@brief GPIO pin number */
-#define BOARD_INITPINS_LCD_D7_GPIO_PIN_MASK (1U << 1U) /*!<@brief GPIO pin mask */
-
-/* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_LCD_D7_PORT PORT3               /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_LCD_D7_PIN 1U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_LCD_D7_PIN_MASK (1U << 1U)      /*!<@brief PORT pin mask */
-                                                       /* @} */
-
-/*! @name PORT2_7 (number 21), LCD_RS_ARDUINO_D8
-  @{ */
-
-/* Symbols to be used with GPIO driver */
-#define BOARD_INITPINS_LCD_RS_GPIO GPIO2               /*!<@brief GPIO peripheral base pointer */
-#define BOARD_INITPINS_LCD_RS_INIT_GPIO_VALUE 0U       /*!<@brief GPIO output initial state */
-#define BOARD_INITPINS_LCD_RS_GPIO_PIN 7U              /*!<@brief GPIO pin number */
-#define BOARD_INITPINS_LCD_RS_GPIO_PIN_MASK (1U << 7U) /*!<@brief GPIO pin mask */
-
-/* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_LCD_RS_PORT PORT2               /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_LCD_RS_PIN 7U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_LCD_RS_PIN_MASK (1U << 7U)      /*!<@brief PORT pin mask */
-                                                       /* @} */
-
-/*! @name PORT3_31 (number 30), LCD_EN_ARDUINO_D9
-  @{ */
-
-/* Symbols to be used with GPIO driver */
-#define BOARD_INITPINS_LCD_EN_GPIO GPIO3                /*!<@brief GPIO peripheral base pointer */
-#define BOARD_INITPINS_LCD_EN_INIT_GPIO_VALUE 0U        /*!<@brief GPIO output initial state */
-#define BOARD_INITPINS_LCD_EN_GPIO_PIN 31U              /*!<@brief GPIO pin number */
-#define BOARD_INITPINS_LCD_EN_GPIO_PIN_MASK (1U << 31U) /*!<@brief GPIO pin mask */
-
-/* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_LCD_EN_PORT PORT3                /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_LCD_EN_PIN 31U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_LCD_EN_PIN_MASK (1U << 31U)      /*!<@brief PORT pin mask */
-                                                        /* @} */
-
-/*! @name PORT3_11 (number 39), LCD_BACKLIGHT_ARDUINO_D10
-  @{ */
-
-/* Symbols to be used with GPIO driver */
-#define BOARD_INITPINS_LCD_BACKLIGHT_GPIO GPIO3                /*!<@brief GPIO peripheral base pointer */
-#define BOARD_INITPINS_LCD_BACKLIGHT_INIT_GPIO_VALUE 1U        /*!<@brief GPIO output initial state */
-#define BOARD_INITPINS_LCD_BACKLIGHT_GPIO_PIN 11U              /*!<@brief GPIO pin number */
-#define BOARD_INITPINS_LCD_BACKLIGHT_GPIO_PIN_MASK (1U << 11U) /*!<@brief GPIO pin mask */
-
-/* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_LCD_BACKLIGHT_PORT PORT3                /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_LCD_BACKLIGHT_PIN 11U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_LCD_BACKLIGHT_PIN_MASK (1U << 11U)      /*!<@brief PORT pin mask */
+#define BOARD_INITPINS_RGBLCD1602_SDA_PORT PORT1               /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_RGBLCD1602_SDA_PIN 8U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_RGBLCD1602_SDA_PIN_MASK (1U << 8U)      /*!<@brief PORT pin mask */
                                                                /* @} */
 
-/*! @name PORT1_10 (number 4), LCD_KEYPAD_ARDUINO_A0
+/*! @name PORT1_9 (number 3), RGBLCD1602_ARDUINO_SCL
   @{ */
 
 /* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_LCD_KEYPAD_A0_PORT PORT1                /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_LCD_KEYPAD_A0_PIN 10U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_LCD_KEYPAD_A0_PIN_MASK (1U << 10U)      /*!<@brief PORT pin mask */
+#define BOARD_INITPINS_RGBLCD1602_SCL_PORT PORT1               /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_RGBLCD1602_SCL_PIN 9U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_RGBLCD1602_SCL_PIN_MASK (1U << 9U)      /*!<@brief PORT pin mask */
                                                                /* @} */
+
+/*! @name PORT1_10 (number 4), KEYPAD_ARDUINO_A0
+  @{ */
+
+/* Symbols to be used with PORT driver */
+#define BOARD_INITPINS_KEYPAD_A0_PORT PORT1                /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_KEYPAD_A0_PIN 10U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_KEYPAD_A0_PIN_MASK (1U << 10U)      /*!<@brief PORT pin mask */
+                                                           /* @} */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.
