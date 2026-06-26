@@ -1,0 +1,16 @@
+{
+  "version": "25.3",
+  "toolchainPath": "${userHome}/.mcuxpressotools/arm-gnu-toolchain-14.2.rel1-mingw-w64-x86_64-arm-none-eabi",
+  "linkedProjects": [],
+  "trustZoneType": "none",
+  "multicoreType": "none",
+  "projectType": "sdk-v2-repository",
+  "projectName": "frdmmcxa153_dev_hid_mouse_lite_bm",
+  "sdk": {
+    "version": "26.3.0.0",
+    "path": "c:\\WORKSPACE\\proiecte\\ipcei-lab\\src\\sdks",
+    "boardId": "frdmmcxa153",
+    "deviceId": "MCXA153",
+    "coreId": "cm33_core0"
+  }
+}

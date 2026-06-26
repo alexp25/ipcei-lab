@@ -1,0 +1,7 @@
+C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/arch/arm/CMSIS/Core/Include/core_cm33.h:2358:22:__NVIC_EnableIRQ	16	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/arch/arm/CMSIS/Core/Include/core_cm33.h:2555:22:__NVIC_SetPriority	16	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/drivers/common/fsl_common_arm.h:714:24:EnableIRQ	24	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/examples/_boards/frdmmcxa153/usb_examples/usb_device_hid_mouse_lite/bm/hardware_init.c:25:6:BOARD_InitHardware	8	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/examples/_boards/frdmmcxa153/usb_examples/usb_device_hid_mouse_lite/bm/hardware_init.c:40:6:USB0_IRQHandler	8	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/examples/_boards/frdmmcxa153/usb_examples/usb_device_hid_mouse_lite/bm/hardware_init.c:46:6:USB_DeviceClockInit	8	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/examples/_boards/frdmmcxa153/usb_examples/usb_device_hid_mouse_lite/bm/hardware_init.c:54:6:USB_DeviceIsrEnable	16	static

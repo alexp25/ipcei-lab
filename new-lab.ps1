@@ -302,7 +302,7 @@ $launchJson = @"
       "cwd": "`${workspaceFolder}",
       "preLaunchTask": "CMake: build",
       "executable": {
-        "elf": "`${workspaceFolder}/debug/$Name.elf"
+        "elf": "`${workspaceFolder}/debug/main.elf"
       },
       "stopAtSymbol": "main",
       "probeSerialNumber": "",

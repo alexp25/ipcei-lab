@@ -208,6 +208,24 @@
 
     .open-btn:hover { background: var(--sky); }
 
+    .src-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--blue);
+      background: transparent;
+      border: 1.5px solid var(--blue);
+      border-radius: 6px;
+      padding: .4rem .9rem;
+      text-decoration: none;
+      transition: background .15s, color .15s;
+    }
+    .src-btn:hover { background: var(--ice); }
+
+    .card-actions { display: flex; gap: .5rem; flex-shrink: 0; }
+
     footer {
       text-align: center;
       padding: 2rem;
@@ -250,7 +268,10 @@
             <span class="tag c">C</span>
             <span class="tag setup">Debug</span>
           </div>
-          <a class="open-btn" href="./lessons/l0-setup-toolchain/">Deschide &#8594;</a>
+          <div class="card-actions">
+            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_hello/hello_world">Cod &#8594;</a>
+            <a class="open-btn" href="./lessons/l0-setup-toolchain/">Deschide &#8594;</a>
+          </div>
         </div>
       </div>
 
@@ -267,7 +288,10 @@
             <span class="tag c">C</span>
             <span class="tag gpio">GPIO</span>
           </div>
-          <a class="open-btn" href="./lessons/l1-gpio/">Deschide &#8594;</a>
+          <div class="card-actions">
+            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_hello/hello_world">Cod &#8594;</a>
+            <a class="open-btn" href="./lessons/l1-gpio/">Deschide &#8594;</a>
+          </div>
         </div>
       </div>
 
@@ -284,7 +308,10 @@
             <span class="tag c">C</span>
             <span class="tag uart">LPUART</span>
           </div>
-          <a class="open-btn" href="./lessons/l2-lpuart/">Deschide &#8594;</a>
+          <div class="card-actions">
+            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_uart/main">Cod &#8594;</a>
+            <a class="open-btn" href="./lessons/l2-lpuart/">Deschide &#8594;</a>
+          </div>
         </div>
       </div>
 
@@ -302,7 +329,10 @@
             <span class="tag irq">IRQ</span>
             <span class="tag irq">NVIC</span>
           </div>
-          <a class="open-btn" href="./lessons/l3-intreruperi/">Deschide &#8594;</a>
+          <div class="card-actions">
+            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_interrupts/main">Cod &#8594;</a>
+            <a class="open-btn" href="./lessons/l3-intreruperi/">Deschide &#8594;</a>
+          </div>
         </div>
       </div>
 
@@ -320,7 +350,10 @@
             <span class="tag timer">Timer</span>
             <span class="tag timer">PWM</span>
           </div>
-          <a class="open-btn" href="./lessons/l4-timer-pwm/">Deschide &#8594;</a>
+          <div class="card-actions">
+            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_pwm/pwm_control">Cod &#8594;</a>
+            <a class="open-btn" href="./lessons/l4-timer-pwm/">Deschide &#8594;</a>
+          </div>
         </div>
       </div>
 
@@ -337,7 +370,10 @@
             <span class="tag c">C</span>
             <span class="tag adc">LPADC</span>
           </div>
-          <a class="open-btn" href="./lessons/l5-lpadc/">Deschide &#8594;</a>
+          <div class="card-actions">
+            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_adc/main">Cod &#8594;</a>
+            <a class="open-btn" href="./lessons/l5-lpadc/">Deschide &#8594;</a>
+          </div>
         </div>
       </div>
 
@@ -370,7 +406,10 @@
             <span class="tag gpio">GPIO</span>
             <span class="tag spi">SPI</span>
           </div>
-          <a class="open-btn" href="./lessons/l6-lpspi-tft-lcd/">Deschide &#8594;</a>
+          <div class="card-actions">
+            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_shield_tft_lcd/main">Cod &#8594;</a>
+            <a class="open-btn" href="./lessons/l6-lpspi-tft-lcd/">Deschide &#8594;</a>
+          </div>
         </div>
 
       </div>
@@ -389,7 +428,10 @@
             <span class="tag i2c">LPI2C</span>
             <span class="tag i2c">P3T1755</span>
           </div>
-          <a class="open-btn" href="./lessons/l7-lpi2c-p3t1755/">Deschide &#8594;</a>
+          <div class="card-actions">
+            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_i2c/main">Cod &#8594;</a>
+            <a class="open-btn" href="./lessons/l7-lpi2c-p3t1755/">Deschide &#8594;</a>
+          </div>
         </div>
       </div>
 
@@ -407,7 +449,10 @@
             <span class="tag fsm">FSM</span>
             <span class="tag gpio">Toate perifericele</span>
           </div>
-          <a class="open-btn" href="./lessons/l8-integrare/">Deschide &#8594;</a>
+          <div class="card-actions">
+            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_integration/main">Cod &#8594;</a>
+            <a class="open-btn" href="./lessons/l8-integrare/">Deschide &#8594;</a>
+          </div>
         </div>
       </div>
 
@@ -449,7 +494,31 @@
             <span class="tag adc">LPADC</span>
             <span class="tag gpio">Shield</span>
           </div>
-          <a class="open-btn" href="./lessons/lp2-shield-dfrobot-lcd/">Deschide &#8594;</a>
+          <div class="card-actions">
+            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_shield_lcd_keypad/main">Cod &#8594;</a>
+            <a class="open-btn" href="./lessons/lp2-shield-dfrobot-lcd/">Deschide &#8594;</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="lab-card">
+        <div class="card-top">
+          <div class="lab-num">LP3</div>
+          <div class="card-titles">
+            <h2>USB HID Mouse Jiggler</h2>
+          </div>
+        </div>
+        <p class="card-desc">Placa se enumeră ca mouse USB HID și mișcă periodic cursorul (jiggler); SW3 activează/dezactivează mișcarea, LED-ul roșu indică starea activă. Bazat pe exemplul SDK <code>usb_device_hid_mouse_lite</code>.</p>
+        <div class="card-footer">
+          <div class="tags">
+            <span class="tag uart">USB HID</span>
+            <span class="tag gpio">GPIO</span>
+            <span class="tag setup">SDK</span>
+          </div>
+          <div class="card-actions">
+            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_usb_hid/usb_device_hid_mouse_lite/bm">Cod &#8594;</a>
+            <a class="open-btn" href="./lessons/lp3-usb-hid-mouse/">Deschide &#8594;</a>
+          </div>
         </div>
       </div>
 

@@ -16,7 +16,7 @@
       <enable_parallel_routing>true</enable_parallel_routing>
       <generate_registers_defines>false</generate_registers_defines>
       <project_links>
-               <project_link path="C:/WORKSPACE/proiecte/ipcei-lab/src/lab_uart/main/cfg_tools"/>
+         <project_link path="C:/WORKSPACE/proiecte/ipcei-lab/src/lab_uart/main/cfg_tools"/>
 </project_links>
    </preferences>
    <tools>

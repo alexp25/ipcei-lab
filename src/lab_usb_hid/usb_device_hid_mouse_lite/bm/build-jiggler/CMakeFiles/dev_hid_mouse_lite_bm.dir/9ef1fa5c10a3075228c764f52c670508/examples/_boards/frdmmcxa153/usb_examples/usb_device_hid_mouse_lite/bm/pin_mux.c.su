@@ -1,0 +1,4 @@
+C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/devices/MCX/MCXA/MCXA153/drivers/fsl_clock.h:539:20:CLOCK_EnableClock	32	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/drivers/port/fsl_port.h:360:20:PORT_SetPinConfig	32	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/examples/_boards/frdmmcxa153/usb_examples/usb_device_hid_mouse_lite/bm/pin_mux.c:35:6:BOARD_InitBootPins	8	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/examples/_boards/frdmmcxa153/usb_examples/usb_device_hid_mouse_lite/bm/pin_mux.c:60:6:BOARD_InitPins	16	static

@@ -112,6 +112,11 @@ Când apăsați **Update Code**, pot apărea erori dacă componenta SysTick are 
 
 ### Serial Monitor — output UART în VS Code
 
+Pentru o interfață accesibilă instalați extensia **Serial Monitor** în VS Code:
+
+![Instalare extensie Serial Monitor](../img/lab-uart/install_serial_monitor.png)
+
+
 După flash, deschideți **Serial Monitor** din bara de jos a VS Code și selectați portul COM al MCU-Link VCOM (ex. `COM3 — MCU-Link VCom Port`):
 
 ![Deschidere Serial Monitor — selectare port COM](../img/lab0/open_serial_monitor_port.png)

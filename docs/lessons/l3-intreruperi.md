@@ -31,7 +31,7 @@ Codul curent separa clar cele doua idei importante:
 - `check_button_pressed_debounce()` verifica butonul cu debounce software.
 - `on_button_pressed()` contine actiunea comuna: toggle pentru LED-urile RGB si mesaj pe Serial Monitor.
 
-La final, transformati detectia prin polling intr-o solutie cu intreruperi GPIO si NVIC, folosind GenAI ca asistent de conversie si verificand configuratia in MCUXpresso Config Tools.
+La final, transformati detectia prin polling intr-o solutie cu intreruperi GPIO si NVIC (**Nested Vectored Interrupt Controller**), folosind GenAI ca asistent de conversie si verificand configuratia in MCUXpresso Config Tools.
 
 > **Board:** FRDM-MCXA153 - MCX A153 (Cortex-M33) - SDK MCUXpresso - VS Code + CMake
 
