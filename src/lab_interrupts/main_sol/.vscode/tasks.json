@@ -1,14 +1,13 @@
-﻿{
+{
   "version": "2.0.0",
   "tasks": [
     {
-      "type": "shell",
+      "type": "cmake",
       "label": "CMake: build",
-      "command": "cmake",
-      "args": [
-        "--build",
-        "--preset",
-        "debug"
+      "command": "build",
+      "preset": "debug",
+      "targets": [
+        "all"
       ],
       "group": {
         "kind": "build",
@@ -17,36 +16,27 @@
       "problemMatcher": [
         "$gcc"
       ],
-      "detail": "Build debug preset"
+      "detail": "CMake template build task"
     },
     {
-      "type": "shell",
+      "type": "cmake",
       "label": "CMake: clean",
-      "command": "cmake",
-      "args": [
-        "--build",
-        "--preset",
-        "debug",
-        "--target",
-        "clean"
-      ],
+      "command": "clean",
+      "preset": "debug",
       "problemMatcher": [
         "$gcc"
       ],
-      "detail": "Clean debug preset"
+      "detail": "CMake template clean task"
     },
     {
-      "type": "shell",
+      "type": "cmake",
       "label": "CMake: configure",
-      "command": "cmake",
-      "args": [
-        "--preset",
-        "debug"
-      ],
+      "command": "configure",
+      "preset": "debug",
       "problemMatcher": [
         "$gcc"
       ],
-      "detail": "Configure debug preset"
+      "detail": "CMake template configure task"
     }
   ]
 }
