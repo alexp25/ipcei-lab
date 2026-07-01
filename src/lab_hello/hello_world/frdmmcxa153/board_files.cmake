@@ -28,19 +28,19 @@ mcux_add_include(
 )
 
 mcux_add_source(
-    SOURCES blinky/pin_mux.c
-            blinky/pin_mux.h
+    SOURCES main/pin_mux.c
+            main/pin_mux.h
 )
 
 mcux_add_include(
-    INCLUDES blinky
+    INCLUDES main
 )
 
 mcux_add_source(
-    SOURCES blinky/app.h
-            blinky/hardware_init.c
+    SOURCES main/app.h
+            main/hardware_init.c
 )
 
 mcux_add_include(
-    INCLUDES blinky
+    INCLUDES main
 )

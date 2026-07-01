@@ -6,7 +6,7 @@
       "request": "launch",
       "cwd": "${workspaceFolder}",
       "executable": {
-        "elf": "${workspaceFolder}/debug/blinky.elf"
+        "elf": "${workspaceFolder}/debug/main.elf"
       },
       "stopAtSymbol": "main",
       "probeSerialNumber": "",

@@ -9,7 +9,7 @@ cmake_path(APPEND conf_file_path ${CMAKE_CURRENT_LIST_DIR} ${board} prj.conf)
 set(CONF_FILE ${conf_file_path} ${CONF_FILE})
 include(${SdkRootDirPath}/cmake/extension/mcux.cmake)
 
-project(blinky LANGUAGES C CXX ASM PROJECT_BOARD_PORT_PATH ${board_root}/${board}/blinky)
+project(main LANGUAGES C CXX ASM PROJECT_BOARD_PORT_PATH ${board_root}/${board}/main)
 
 
 include(${board}/board_files.cmake)
@@ -17,12 +17,12 @@ include(${SdkRootDirPath}/CMakeLists.txt)
 
 
 mcux_add_source(
-    SOURCES blinky.c
+    SOURCES main.c
 )
 
 mcux_add_source(
-    SOURCES blinky/peripherals.c
-            blinky/peripherals.h
+    SOURCES main/peripherals.c
+            main/peripherals.h
 )
 
 mcux_add_source(
@@ -43,5 +43,5 @@ mcux_add_include(
 )
 
 mcux_convert_binary(BINARY ${APPLICATION_BINARY_DIR}/${MCUX_SDK_PROJECT_NAME}.bin)
-mcux_add_config_mex_path( PATH ${board} )
-mcux_add_include(INCLUDES blinky .)
+mcux_add_config_mex_path( PATH . )
+mcux_add_include(INCLUDES main .)
