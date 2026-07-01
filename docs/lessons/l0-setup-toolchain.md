@@ -42,10 +42,11 @@ Pasul zero, livrat asincron înainte de ziua 1 fizică. Participanții primesc u
 | `Async` | **Build + flash** | `cmake --preset frdm-mcxa153-debug` → `cmake --build build/` → drag-drop `.bin` pe MCU-Link drive. | student |
 | `Async` | **Debug session** | F5 în VS Code → breakpoint pe `GPIO_PinWrite()` → step-over → LED schimbă starea. | student |
 
-## 🤖 Prompt-uri pentru Asistentul AI UPB
+## 🤖 Prompt-uri pentru un asistent AI
 
 > **Regulă:** Copiați prompt-ul complet — contextul hardware este obligatoriu.
-> AI-ul va genera cod greșit (pentru alte familii NXP sau Arduino) fără aceste informații.
+> Puteți folosi orice asistent AI, de exemplu ChatGPT, Gemini, Claude, Copilot sau asistentul integrat în VS Code.
+> AI-ul va genera cod greșit (pentru alte familii NXP sau Arduino) fără informații precise despre placă, SDK și toolchain.
 
 ### Prompt: Setup CMake
 
@@ -67,6 +68,26 @@ Include:
   PORT_SetPinMux(PORT3, 12u, kPORT_MuxAsGpio)
   GPIO_PinInit(), GPIO_PinWrite(), SDK_DelayAtLeastUs()
 Explică de ce GPIO LOW aprinde LED-ul (anod comun).
+```
+
+### Prompt: Analiză proiect și structură cod
+
+```text
+Context: proiect embedded pentru FRDM-MCXA153, MCX A153 Cortex-M33, SDK MCUXpresso 24.12.
+Toolchain: MCUXpresso for VS Code, ARM GNU Toolchain 13.x, CMake, LinkServer/MCU-Link.
+
+Am deschis proiectul importat/generat în VS Code. Analizează structura proiectului și explică rolul fișierelor și directoarelor principale.
+
+Te rog să explici:
+1. Cum pornește execuția programului până ajunge în main().
+2. Rolul fișierelor CMakeLists.txt, CMakePresets.json și al fișierelor de startup/linker.
+3. Rolul fișierelor generate de MCUXpresso Config Tools, cum ar fi pin_mux.c, clock_config.c, board.c și fișierul .mex.
+4. Unde este codul aplicației și unde ar trebui modificat pentru logica de blink LED.
+5. Ce părți sunt generate automat și ar trebui editate cu atenție.
+6. Cum pot naviga proiectul în VS Code ca să găsesc definiția unei funcții SDK, de exemplu GPIO_PinWrite().
+
+Răspunde ca pentru un student care vede pentru prima dată un proiect embedded C pe NXP MCX.
+Nu rescrie codul; explică structura și fluxul de execuție.
 ```
 
 ## ⚠️ Capcane
@@ -172,7 +193,7 @@ Setați un breakpoint în cod și observați execuția pas cu pas:
 
 ### 9. AI explică codul generat
 
-Folosiți Copilot sau Claude din VS Code pentru a înțelege codul SDK generat automat:
+Folosiți orice asistent AI disponibil, de exemplu ChatGPT, Gemini, Claude, Copilot sau asistentul integrat în VS Code, pentru a înțelege codul SDK generat automat:
 
 ![AI explică structura led_blinky.c](../img/lab0/codex_explain_code.png)
 
