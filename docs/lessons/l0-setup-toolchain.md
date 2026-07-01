@@ -37,7 +37,7 @@ Pasul zero, livrat asincron înainte de ziua 1 fizică. Participanții primesc u
 | Interval | Activitate | Detaliu | Cine |
 |---|---|---|---|
 | `Async` | **Instalare toolchain** | VS Code + extensii C/C++, CMake Tools, Cortex-Debug. ARM GNU Toolchain 13.x. OpenOCD pentru CMSIS-DAP. | student |
-| `Async` | **Clone repo template** | `git clone https://github.com/ipcei-upb/frdm-mcxa153-template`<br>Structura: `src/`, `boards/`, `CMakeLists.txt`, `CMakePresets.json` | student |
+| `Async` | **Clone repo template** | `git clone https://github.com/alexp25/ipcei-lab/`<br>Structura: `src/`, `boards/`, `CMakeLists.txt`, `CMakePresets.json` | student |
 | `Async` | **Config SDK** | Descărcare `SDK_24.12_FRDM-MCXA153` de pe mcuxpresso.nxp.com. Setare `NXP_SDK_ROOT` în `CMakePresets.json`. | student |
 | `Async` | **Build + flash** | `cmake --preset frdm-mcxa153-debug` → `cmake --build build/` → drag-drop `.bin` pe MCU-Link drive. | student |
 | `Async` | **Debug session** | F5 în VS Code → breakpoint pe `GPIO_PinWrite()` → step-over → LED schimbă starea. | student |
