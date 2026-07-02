@@ -15,6 +15,10 @@ project(main LANGUAGES C CXX ASM PROJECT_BOARD_PORT_PATH ${board_root}/${board}/
 include(${board}/board_files.cmake)
 include(${SdkRootDirPath}/CMakeLists.txt)
 
+mcux_add_configuration(
+    CC "-include ${CMAKE_CURRENT_LIST_DIR}/rte_device_override.h"
+    CX "-include ${CMAKE_CURRENT_LIST_DIR}/rte_device_override.h"
+)
 
 mcux_add_source(
     SOURCES main.c

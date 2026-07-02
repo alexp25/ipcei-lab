@@ -21,8 +21,9 @@ mcux_add_source(
 )
 
 mcux_add_source(
-    SOURCES main/peripherals.c
-            main/peripherals.h
+    SOURCES cfg_tools/board/RTE_Device.h
+            cfg_tools/board/peripherals.c
+            cfg_tools/board/peripherals.h
 )
 
 mcux_add_source(
@@ -39,9 +40,9 @@ mcux_add_include(
 )
 
 mcux_add_include(
-    INCLUDES frdmmcxa153/board
+    INCLUDES cfg_tools/board
 )
 
 mcux_convert_binary(BINARY ${APPLICATION_BINARY_DIR}/${MCUX_SDK_PROJECT_NAME}.bin)
 mcux_add_config_mex_path( PATH . )
-mcux_add_include(INCLUDES main .)
+mcux_add_include(INCLUDES cfg_tools/board main .)

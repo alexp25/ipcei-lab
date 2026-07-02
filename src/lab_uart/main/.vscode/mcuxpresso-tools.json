@@ -6,8 +6,8 @@
   "multicoreType": "none",
   "projectType": "sdk-v2-freestanding",
   "sdk": {
-    "path": "c:\\WORKSPACE\\proiecte\\ipcei-lab\\src\\sdks",
-    "version": "26.3.0.0",
+    "path": "c:\\WORKSPACE\\proiecte\\ipcei-lab\\src\\sdks\\mcuxsdk\\mcuxsdk",
+    "version": "26.6.0.0",
     "boardId": "frdmmcxa153",
     "deviceId": "MCXA153",
     "coreId": "cm33_core0"

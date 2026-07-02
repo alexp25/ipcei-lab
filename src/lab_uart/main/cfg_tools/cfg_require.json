@@ -1,16 +1,12 @@
-﻿{
+{
   "projects": [{
     "core": "cm33_core0",
-    "addComponents": [{
-      "kconfig_id": "driver.cmsis_lpuart",
-      "manifest_id": "platform.drivers.lpuart_cmsis",
-      "version": "2.8.0"
-    }],
+    "addComponents": [],
     "device_package": "MCXA153VLH",
-    "addIncludes": ["c:/WORKSPACE/proiecte/ipcei-lab/src/lab_uart/main/frdmmcxa153/board"],
+    "addIncludes": ["C:/WORKSPACE/proiecte/ipcei-lab/src/lab_uart/main/cfg_tools/board"],
     "projectBoardFolder": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_uart/main/frdmmcxa153",
     "source_generated_cmake_file_path": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_uart/main/frdmmcxa153/cfg_tools_generated.cmake",
-    "addFiles": ["c:/WORKSPACE/proiecte/ipcei-lab/src/lab_uart/main/frdmmcxa153/board/RTE_Device.h"],
+    "addFiles": ["C:/WORKSPACE/proiecte/ipcei-lab/src/lab_uart/main/cfg_tools/board/RTE_Device.h"],
     "name": "main",
     "removeFiles": [],
     "projectRootPath": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_uart/main",
