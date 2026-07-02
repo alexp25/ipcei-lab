@@ -19,21 +19,31 @@ mcux_add_include(
 )
 
 mcux_add_source(
-    SOURCES frdmmcxa153/clock_config.c
-            frdmmcxa153/clock_config.h
+    SOURCES ../cfg_tools/board/clock_config.c
+            ../cfg_tools/board/clock_config.h
 )
 
 mcux_add_include(
-    INCLUDES frdmmcxa153
+    INCLUDES ../cfg_tools/board
 )
 
 mcux_add_source(
-    SOURCES main/pin_mux.c
-            main/pin_mux.h
+    SOURCES ../cfg_tools/board/pin_mux.c
+            ../cfg_tools/board/pin_mux.h
 )
 
 mcux_add_include(
-    INCLUDES main
+    INCLUDES ../cfg_tools/board
+)
+
+mcux_add_source(
+    SOURCES ../cfg_tools/board/peripherals.c
+            ../cfg_tools/board/peripherals.h
+            ../cfg_tools/board/RTE_Device.h
+)
+
+mcux_add_include(
+    INCLUDES ../cfg_tools/board
 )
 
 mcux_add_source(

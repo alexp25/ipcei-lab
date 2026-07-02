@@ -14,6 +14,8 @@
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_hello/hello_world/main",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab1/sdks/blinky_sdk/mcuxsdk/devices/MCX/MCXA/periph",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab1/sdks/blinky_sdk/mcuxsdk/arch/arm/CMSIS/Core/Include",
+                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab1/sdks/blinky_sdk/mcuxsdk/arch/arm/CMSIS/Driver/Include",
+                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab1/sdks/blinky_sdk/mcuxsdk/components/cmsis_drivers/cmsis_lpuart",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab1/sdks/blinky_sdk/mcuxsdk/components/uart",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab1/sdks/blinky_sdk/mcuxsdk/devices/MCX/MCXA/MCXA153",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_hello/hello_world/frdmmcxa153/frdmmcxa153",
@@ -106,6 +108,9 @@
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab1/sdks/blinky_sdk/mcuxsdk/drivers/gpio/fsl_gpio.c",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab1/sdks/blinky_sdk/mcuxsdk/drivers/lpuart/fsl_lpuart.h",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab1/sdks/blinky_sdk/mcuxsdk/drivers/lpuart/fsl_lpuart.c",
+                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab1/sdks/blinky_sdk/mcuxsdk/arch/arm/CMSIS/Driver/Include/Driver_USART.h",
+                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab1/sdks/blinky_sdk/mcuxsdk/components/cmsis_drivers/cmsis_lpuart/fsl_lpuart_cmsis.h",
+                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab1/sdks/blinky_sdk/mcuxsdk/components/cmsis_drivers/cmsis_lpuart/fsl_lpuart_cmsis.c",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab1/sdks/blinky_sdk/mcuxsdk/drivers/mcx_spc/fsl_spc.h",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab1/sdks/blinky_sdk/mcuxsdk/drivers/mcx_spc/fsl_spc.c",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab1/sdks/blinky_sdk/mcuxsdk/drivers/port/fsl_port.h",
@@ -155,6 +160,9 @@
                 },
                 {
                     "kconfig_id": "driver.lpuart"
+                },
+                {
+                    "kconfig_id": "driver.cmsis_lpuart"
                 },
                 {
                     "kconfig_id": "driver.mcx_spc"

@@ -1,11 +1,7 @@
 {
   "projects": [{
     "core": "cm33_core0",
-    "addComponents": [{
-      "kconfig_id": "driver.cmsis_lpuart",
-      "manifest_id": "platform.drivers.lpuart_cmsis",
-      "version": "2.8.0"
-    }],
+    "addComponents": [],
     "device_package": "MCXA153VLH",
     "addIncludes": ["c:/WORKSPACE/proiecte/ipcei-lab/src/lab_hello/hello_world/frdmmcxa153/board"],
     "projectBoardFolder": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_hello/hello_world/frdmmcxa153",
