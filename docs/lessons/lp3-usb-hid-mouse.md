@@ -1,75 +1,73 @@
 ---
 title: "LP3 - USB HID Mouse Jiggler"
-description: "Adaptarea exemplului SDK usb_device_hid_mouse_lite intr-un dispozitiv USB HID mouse jiggler"
+description: "Adapting the SDK usb_device_hid_mouse_lite example into a USB HID mouse jiggler"
 nav_order: 3
-parent: Demo-uri suplimentare
+parent: Additional Demos
 layout: lesson
+source_url: https://github.com/alexp25/ipcei-lab/tree/main/src/lab_usb_hid/usb_device_hid_mouse_lite/bm
 ---
 
 # LP3 - USB HID Mouse Jiggler
 
-**De la exemplu SDK USB HID mouse la dispozitiv mouse jiggler controlat cu SW3**
+**From SDK USB HID mouse example to SW3-controlled mouse jiggler**
 
 ---
 
 | | |
 |---|---|
-| **Periferice** | `USB0`, `USB HID`, `GPIO`, `PORT` |
-| **Durata** | 2h |
-| **Hardware** | FRDM-MCXA153 - USB device port - SW3 - LED rosu |
-| **Proiect sursa SDK** | `src/sdks/mcuxsdk/examples/usb_examples/usb_device_hid_mouse_lite` |
-| **Proiect local** | `src/lab_usb_hid/usb_device_hid_mouse_lite/bm` |
-| **Rezultat** | Placa se enumera ca mouse HID si misca periodic cursorul cu un model de jiggler; SW3 activeaza/dezactiveaza miscarea; LED-ul indica starea activa |
+| **Peripherals** | `USB0`, `USB HID`, `GPIO`, `PORT` |
+| **Duration** | 2 h |
+| **Hardware** | FRDM-MCXA153, USB device port, SW3, red LED |
+| **SDK source project** | `src/sdks/mcuxsdk/examples/usb_examples/usb_device_hid_mouse_lite` |
+| **Local project** | `src/lab_usb_hid/usb_device_hid_mouse_lite/bm` |
+| **Result** | Board enumerates as a HID mouse; SW3 enables/disables small cursor movements; LED shows active state |
 
 ## Context
 
-Acest laborator porneste de la exemplul NXP MCUXpresso SDK `usb_device_hid_mouse_lite`. Exemplul original se enumera ca mouse USB HID si trimite rapoarte relative care deplaseaza cursorul intr-un traseu dreptunghiular.
+This lab starts from the NXP MCUXpresso SDK `usb_device_hid_mouse_lite` example. The original example enumerates as a USB HID mouse and sends relative mouse reports that move the cursor in a rectangular pattern.
 
-Sarcina este sa folositi un asistent GenAI ca partener de refactorizare si verificare pentru a transforma exemplul intr-un **mouse jiggler** simplu:
+Your task is to turn it into a simple mouse jiggler:
 
-- proiectul local trebuie sa compileze fisierele din folderul laboratorului, nu fisierele din SDK;
-- miscarea cursorului trebuie sa fie diferita de dreptunghiul original;
-- jiggler-ul trebuie sa poata fi activat/dezactivat din SW3;
-- LED-ul trebuie sa fie aprins cand jiggler-ul este activ si stins cand este dezactivat;
-- documentatia scurta a codului trebuie generata cu ajutor GenAI.
+- the local lab project must compile local sources, not SDK example sources;
+- the movement pattern must be different from the original rectangle;
+- SW3 toggles the jiggler on/off;
+- the red LED indicates active state;
+- a short explanation of the final code is generated with AI and checked manually.
 
-> Nota: proiectul SDK sample nu contine fisier `.mex`. Pentru acest laborator, configurarea se face in cod si in `CMakeLists.txt`, fara suport MCUXpresso Config Tools.
+This SDK sample does not use a `.mex` file. Configuration is done in code and CMake.
 
-## Obiective
+## Objectives
 
-La final, studentul trebuie sa poata:
+By the end of the lab you should be able to:
 
-1. Copieze/adapteze un exemplu SDK USB HID intr-un proiect local.
-2. Modifice generatorul de rapoarte HID mouse pentru o miscare de tip jiggler.
-3. Configureze `CMakeLists.txt` astfel incat build-ul sa foloseasca sursele locale.
-4. Compare proiectul rezultat cu exemplul SDK folosind un instrument GenAI.
-5. Verifice practic ca miscarea nu mai este traseul dreptunghiular din exemplul original.
-6. Implementeze toggle cu SW3 si indicator LED pentru starea jiggler-ului.
-7. Foloseasca GenAI pentru explicarea codului si pentru generarea unei documentatii simple.
+1. Copy/adapt a USB HID SDK example into a local project.
+2. Modify HID mouse reports.
+3. Update `CMakeLists.txt` so the build uses local sources.
+4. Compare the local project with the original SDK example.
+5. Implement SW3 toggle and LED active indicator.
+6. Explain how a HID mouse report works.
 
-## Cerinte functionale
+## Functional Requirements
 
-Implementarea finala trebuie sa respecte urmatoarele cerinte:
+The final implementation must:
 
-1. Dispozitivul USB este recunoscut de host ca mouse HID.
-2. Cursorul se misca relativ fata de pozitia curenta.
-3. Miscarea ceruta este de tip jiggler: deplasari de `8` pixeli spre stanga/dreapta/sus/jos fata de pozitia curenta.
-4. Miscarea nu trebuie sa fie dreptunghiul continuu din exemplul SDK original.
-5. SW3 comuta intre modurile:
-   - jiggler activ;
-   - jiggler oprit.
-6. LED-ul este aprins cand jiggler-ul este activ.
-7. LED-ul este stins cand jiggler-ul este oprit.
+1. enumerate as a USB HID mouse;
+2. move the cursor relative to its current position;
+3. use small `8` pixel left/right/up/down movements;
+4. avoid the original continuous rectangle path;
+5. toggle active/inactive state with SW3;
+6. turn the red LED on when active;
+7. turn the red LED off when inactive.
 
-## Structura recomandata a proiectului
+## Project Structure
 
-Punctul de plecare este exemplul SDK:
+Start from the SDK example:
 
 ```text
 src/sdks/mcuxsdk/examples/usb_examples/usb_device_hid_mouse_lite
 ```
 
-Proiectul local pentru laborator trebuie sa fie separat de SDK, de exemplu:
+Create/use a local lab project:
 
 ```text
 src/lab_usb_hid/usb_device_hid_mouse_lite/bm/
@@ -83,18 +81,17 @@ src/lab_usb_hid/usb_device_hid_mouse_lite/bm/
   usb_device_hid.c/.h
 ```
 
-## Import SDK project doar pentru testare
+## Import SDK Project Only for Testing
 
-Puteti importa temporar exemplul SDK in VS Code / MCUXpresso pentru a verifica rapid ca toolchain-ul, placa si exemplul original functioneaza. Imaginea de mai jos arata importul exemplului `usb_device_hid_mouse_lite` din SDK:
+You can import the SDK example briefly to verify the toolchain and board.
 
 ![Import SDK USB HID mouse project](../img/labp2/import_sdk_project_hid_usb.png)
 
-Aceasta varianta este utila **doar pentru testare si inspectie**. Pentru laborator este mai bine sa copiati proiectul SDK intr-un folder local al laboratorului si apoi sa modificati configuratia proiectului astfel incat build-ul sa pointeze la fisierele locale, nu la fisierele din SDK.
+Do not keep editing the SDK copy. The lab project should be local and independent.
 
-Motivul este simplu: daca `CMakeLists.txt` ramane legat de `${SdkRootDirPath}/examples/...`, puteti edita `mouse.c` din proiectul local fara ca firmware-ul compilat sa se schimbe. In practica, asta duce la simptome confuze: cursorul continua sa se miste in dreptunghi, desi codul local pare modificat corect.
-## Atentie la CMakeLists.txt
+## CMake Warning
 
-Un pas esential este actualizarea fisierului `CMakeLists.txt`. Multe exemple SDK au sursele listate relativ la `${SdkRootDirPath}`:
+Many SDK examples list source files relative to `${SdkRootDirPath}`:
 
 ```cmake
 mcux_add_source(
@@ -104,7 +101,7 @@ mcux_add_source(
 )
 ```
 
-Pentru laborator, build-ul trebuie sa foloseasca fisierele locale:
+For this lab, CMake must compile local files:
 
 ```cmake
 mcux_add_include(
@@ -126,41 +123,20 @@ mcux_add_source(
 )
 ```
 
-Daca acest pas este omis, puteti modifica fisierul local `mouse.c` fara ca firmware-ul flash-uit sa se schimbe, deoarece build-ul continua sa compileze exemplul din SDK.
+If this step is missed, you can edit local `mouse.c` while the firmware still uses the SDK file.
 
-## Task GenAI
+## HID Mouse Report
 
-Folositi un instrument GenAI pentru urmatoarea sarcina:
+The example uses a 4-byte mouse report:
 
-```text
-Am un proiect MCUXpresso SDK pentru FRDM-MCXA153 pornit de la:
-src/sdks/mcuxsdk/examples/usb_examples/usb_device_hid_mouse_lite
-
-Vreau sa transform exemplul intr-un USB HID mouse jiggler.
-Cerintele sunt:
-- proiectul local trebuie sa compileze sursele din folderul laboratorului, nu din SDK;
-- actualizeaza CMakeLists.txt pentru surse locale;
-- modifica rapoartele HID mouse astfel incat cursorul sa se miste 8 pixeli stanga/dreapta/sus/jos relativ la pozitia curenta;
-- miscarea nu trebuie sa fie traseul dreptunghiular din exemplul original;
-- SW3 activeaza/dezactiveaza jiggler-ul;
-- LED-ul rosu este aprins cand jiggler-ul este activ si stins cand este dezactivat;
-- proiectul nu are fisier .mex, deci configurarea pinilor se face in cod.
-
-Te rog sa explici fisierele care trebuie modificate si sa propui un patch minimal.
-```
-
-## Implementare: raport HID pentru jiggler
-
-Raportul mouse HID folosit de exemplu are 4 octeti:
-
-| Byte | Semnificatie |
+| Byte | Meaning |
 |---:|---|
-| `0` | butoane mouse |
-| `1` | delta X relativ |
-| `2` | delta Y relativ |
+| `0` | mouse buttons |
+| `1` | relative X delta |
+| `2` | relative Y delta |
 | `3` | wheel |
 
-Pentru o miscare stanga/dreapta/sus/jos cu pas de 8 pixeli, puteti folosi o secventa de pasi:
+Suggested jiggler pattern:
 
 ```c
 static const int8_t s_JigglePattern[][2] = {
@@ -171,7 +147,7 @@ static const int8_t s_JigglePattern[][2] = {
 };
 ```
 
-La fiecare raport HID trimis catre host, selectati urmatorul pas din secventa:
+Fill the report:
 
 ```c
 g_UsbDeviceHidMouse.buffer[0] = 0U;
@@ -180,41 +156,25 @@ g_UsbDeviceHidMouse.buffer[2] = (uint8_t)s_JigglePattern[index][1];
 g_UsbDeviceHidMouse.buffer[3] = 0U;
 ```
 
-Daca jiggler-ul este dezactivat, trimiteti un raport neutru:
+When disabled, send neutral movement:
 
 ```c
 g_UsbDeviceHidMouse.buffer[1] = 0U;
 g_UsbDeviceHidMouse.buffer[2] = 0U;
 ```
 
-## Implementare: SW3 toggle
+## SW3 Toggle
 
-Pe FRDM-MCXA153, SW3 este definit in `board.h` ca:
+SW3 is active-low. A simple solution uses polling with debounce:
 
-```c
-BOARD_SW3_GPIO
-BOARD_SW3_GPIO_PIN
-```
+1. read `GPIO_PinRead(BOARD_SW3_GPIO, BOARD_SW3_GPIO_PIN)` periodically;
+2. require a stable value for several iterations;
+3. on a stable transition to `0`, toggle `jiggle_enabled`;
+4. do not toggle again until the button is released.
 
-In proiectele curente, SW3 este `GPIO1`, pin `7` (`P1_7`) si este citit ca buton activ-low. Pentru o solutie simpla, folositi polling cu debounce software in bucla principala.
+## LED Indicator
 
-Exemplu de strategie:
-
-1. Cititi periodic pinul cu `GPIO_PinRead(BOARD_SW3_GPIO, BOARD_SW3_GPIO_PIN)`.
-2. Stabilizati valoarea pentru cateva iteratii.
-3. La tranzitia stabila spre `0`, comutati variabila `jiggle_enabled`.
-4. Nu comutati din nou pana cand butonul nu este eliberat si apasat din nou.
-
-## Implementare: LED indicator
-
-Proiectul `lab_hello/hello_world` arata conventia LED-urilor de pe placa:
-
-```c
-GPIO_PinWrite(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PIN, LOGIC_LED_ON);
-GPIO_PinWrite(BOARD_LED_RED_GPIO, BOARD_LED_RED_GPIO_PIN, LOGIC_LED_OFF);
-```
-
-Aplicati aceeasi conventie aici:
+Use the board LED macros/conventions:
 
 ```c
 if (jiggle_enabled)
@@ -227,96 +187,91 @@ else
 }
 ```
 
-LED-ul trebuie initializat ca output GPIO. Daca proiectul USB nu initializeaza deja LED-ul in `BOARD_InitHardware()`, adaugati initializarea in codul aplicatiei sau in fisierele locale de pin mux.
+Remember: the FRDM LEDs are active-low.
 
-## Comparatie cu exemplul SDK
-
-Folositi GenAI pentru a compara proiectul rezultat cu exemplul original. Puteti cere asistentului sa compare:
+## AI Task Prompt
 
 ```text
-Compara aceste doua proiecte:
+I have an MCUXpresso SDK project for FRDM-MCXA153 based on:
+src/sdks/mcuxsdk/examples/usb_examples/usb_device_hid_mouse_lite
+I want to turn it into a USB HID mouse jiggler.
+Requirements:
+- local project must compile sources from the lab folder, not the SDK folder;
+- update CMakeLists.txt for local sources;
+- change HID mouse reports to move 8 pixels left/right/up/down relative to current position;
+- movement must not be the original rectangle path;
+- SW3 enables/disables the jiggler;
+- red LED is on when active and off when inactive;
+- there is no .mex file, so pin configuration is in code.
+Explain which files to modify and propose a minimal patch.
+```
+
+## Compare with the SDK Example
+
+Ask AI to compare:
+
+```text
+Compare these two projects:
 1. src/sdks/mcuxsdk/examples/usb_examples/usb_device_hid_mouse_lite
 2. src/lab_usb_hid/usb_device_hid_mouse_lite/bm
-
-Vreau diferentele relevante pentru:
-- CMakeLists.txt si surse locale vs surse SDK;
-- logica din mouse.c;
-- descriptor HID si string-uri USB;
-- suport SW3 si LED;
-- eliminarea traseului dreptunghiular original.
+Focus on CMakeLists.txt, local vs SDK sources, mouse.c logic, HID descriptors, SW3/LED support, and removal of the original rectangle path.
 ```
 
-Verificati manual concluziile. Un raspuns GenAI poate rata faptul ca un build director vechi compileaza inca sursele din SDK. Confirmati prin log-ul de build ca apar obiecte locale, de exemplu:
+Then verify manually that the build log uses local object files.
 
-```text
-Building C object .../mouse.c.obj
-Building C object .../usb_device_descriptor.c.obj
-```
+## Board Verification
 
-## Verificare pe placa
-
-1. Compilati proiectul:
+1. Build:
 
    ```powershell
    cmake --preset debug
    cmake --build --preset debug
    ```
 
-2. Flash-uiti fisierul binar:
+2. Flash the binary:
 
    ```text
    src/lab_usb_hid/usb_device_hid_mouse_lite/bm/debug/dev_hid_mouse_lite_bm.bin
    ```
 
-3. Conectati placa la PC prin portul USB device.
-4. Verificati in sistemul de operare ca apare un mouse HID.
-5. Observati miscarea cursorului:
-   - trebuie sa fie miscari scurte stanga/dreapta/sus/jos;
-   - nu trebuie sa deseneze dreptunghiul original al SDK-ului.
-6. Apasati SW3:
-   - LED-ul se stinge;
-   - cursorul nu mai este deplasat.
-7. Apasati SW3 din nou:
-   - LED-ul se aprinde;
-   - miscarea jiggler reincepe.
+3. Connect the board through the USB device port.
+4. Confirm that the OS sees a HID mouse.
+5. Verify short left/right/up/down movement, not a rectangle.
+6. Press SW3 to stop movement and turn LED off.
+7. Press SW3 again to restart movement and turn LED on.
 
-## Probleme frecvente
+## Common Problems
 
-| Simptom | Cauza probabila | Verificare |
+| Symptom | Likely cause | Check |
 |---|---|---|
-| Cursorul merge tot in dreptunghi | Build-ul compileaza inca sursele SDK | Verificati `CMakeLists.txt`, stergeti/refaceti cache-ul `debug`, cautati in log `mouse.c.obj` local |
-| Dispozitivul apare ca mouse, dar nu misca | Rapoartele HID contin delta zero sau jiggler-ul este dezactivat | Verificati `jiggle_enabled`, SW3 si bufferul HID bytes 1/2 |
-| SW3 nu comuta | Pinul butonului nu este configurat ca GPIO input sau logica active-low este gresita | Verificati `BOARD_SW3_GPIO`, `BOARD_SW3_GPIO_PIN`, `GPIO_PinRead` |
-| LED-ul are logica inversa | LED-urile FRDM folosesc `LOGIC_LED_ON = 0` | Folositi `LOGIC_LED_ON/OFF`, nu `1/0` direct |
-| Config Tools nu poate deschide proiectul | Lipseste fisierul `.mex` | Acest lab configureaza pinii in cod; nu exista suport Config Tools in sample |
+| Cursor still moves in rectangle | build still uses SDK sources | check `CMakeLists.txt` and rebuild cache |
+| Device enumerates but does not move | deltas are zero or disabled | check report bytes 1/2 and `jiggle_enabled` |
+| SW3 does not toggle | wrong GPIO or active-low logic | check `BOARD_SW3_*` and debounce |
+| LED logic inverted | active-low LED | use `LOGIC_LED_ON/OFF` |
+| Config Tools cannot open project | no `.mex` | this lab is code/CMake only |
 
-## Documentatie generata cu GenAI
-
-La final, cereti asistentului GenAI sa explice codul final:
+## Final Documentation Prompt
 
 ```text
-Explica pe scurt codul USB HID mouse jiggler pentru FRDM-MCXA153.
+Explain the final USB HID mouse jiggler code for FRDM-MCXA153.
 Include:
-- cum functioneaza raportul HID mouse;
-- cum se schimba modelul de miscare fata de exemplul SDK;
-- cum comuta SW3 jiggler-ul;
-- cum este folosit LED-ul ca indicator;
-- ce rol are CMakeLists.txt in evitarea surselor SDK originale.
-Scrie explicatia pentru studenti incepatori embedded.
+- how the HID mouse report works;
+- how the movement pattern differs from the SDK example;
+- how SW3 toggles the jiggler;
+- how the LED indicates state;
+- why CMakeLists.txt must use local sources instead of SDK sources.
+Write for beginner embedded students.
 ```
 
-Salvati raspunsul intr-un fisier scurt de documentatie sau intr-o sectiune `README.md` a proiectului local.
+## Deliverable
 
-## Predare
+Submit:
 
-Predarea minima include:
-
-1. Proiectul local care compileaza.
-2. `CMakeLists.txt` actualizat pentru surse locale.
-3. `mouse.c` modificat pentru modelul de jiggler.
-4. Toggle SW3 functional.
-5. LED indicator functional.
-6. O comparatie scurta cu exemplul SDK, generata si verificata cu GenAI.
-7. O explicatie scurta a codului final, generata cu GenAI si corectata manual.
-
+1. local project that builds;
+2. `CMakeLists.txt` using local sources;
+3. modified `mouse.c` jiggler pattern;
+4. working SW3 toggle;
+5. working LED indicator;
+6. short comparison with the SDK example;
+7. short AI-generated explanation corrected by you.
 

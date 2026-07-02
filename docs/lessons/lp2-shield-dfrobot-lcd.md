@@ -1,80 +1,75 @@
 ---
-title: "LP2 — Shield DFRobot RGB LCD + Keypad"
-description: "Integrare shield DFRobot RGBLCD1602 pe FRDM-MCXA153: LPI2C0 pentru LCD si LPADC0 pentru butoane"
+title: "LP2 - DFRobot RGB LCD + Keypad Shield"
+description: "Integrating the DFRobot RGBLCD1602 shield on FRDM-MCXA153: LPI2C0 for LCD and LPADC0 for buttons"
 nav_order: 2
-parent: Demo-uri suplimentare
+parent: Additional Demos
 layout: lesson
+source_url: https://github.com/alexp25/ipcei-lab/tree/main/src/lab_shield_lcd_keypad/main
 ---
 
-# LP2 - Shield DFRobot RGB LCD + Keypad
+# LP2 - DFRobot RGB LCD + Keypad Shield
 
-**LCD 16x2 pe I2C, backlight RGB si butoane citite printr-o scara rezistiva pe ADC**
+**I2C 16x2 LCD, RGB backlight, and ADC keypad buttons**
 
 ---
 
 | | |
 |---|---|
-| **Periferice** | `LPI2C0`, `LPADC0`, `GPIO/pin mux`, consola seriala |
-| **Durata** | 2h |
-| **Hardware** | FRDM-MCXA153 + DFRobot RGB LCD Keypad Shield / RGBLCD1602 compatibil |
-| **Proiect** | `src/lab_shield_lcd_keypad/main` |
-| **Rezultat** | LCD-ul afiseaza text si butonul apasat: RIGHT, UP, DOWN, LEFT, SELECT sau NONE |
+| **Peripherals** | `LPI2C0`, `LPADC0`, `GPIO/pin mux`, serial console |
+| **Duration** | 2 h |
+| **Hardware** | FRDM-MCXA153 + DFRobot RGB LCD Keypad Shield / compatible RGBLCD1602 |
+| **Project** | `src/lab_shield_lcd_keypad/main` |
+| **Result** | LCD shows text and the current button: RIGHT, UP, DOWN, LEFT, SELECT, or NONE |
 
 ## Context
 
-Acest laborator adauga un shield Arduino-style la FRDM-MCXA153. Shield-ul are doua parti diferite:
+This lab adds an Arduino-style shield to FRDM-MCXA153. The shield has two independent parts:
 
-1. LCD 16x2 HD44780-compatible controlat printr-un expander I2C DFRobot RGBLCD1602.
-2. Cinci butoane conectate la o scara rezistiva citita pe Arduino `A0`.
+1. a 16x2 HD44780-compatible LCD controlled through a DFRobot RGBLCD1602 I2C expander;
+2. five buttons connected through a resistor ladder read on Arduino `A0`.
 
-Partea importanta este ca shield-ul foloseste conectorii Arduino ai placii FRDM, nu pinii mikroBUS/Pmod. In acest proiect, LCD-ul comunica pe `LPI2C0`, iar butoanele sunt citite cu `LPADC0`.
+The important detail is that the shield uses the Arduino headers on the FRDM board. In this project, the LCD uses `LPI2C0`, and the buttons use `LPADC0`.
 
-## Obiective
+## Objectives
 
-La final, studentul trebuie sa poata:
+By the end of the lab you should be able to:
 
-1. Identifice pinii corecti ai headerului Arduino pe FRDM-MCXA153.
-2. Configureze `LPI2C0` pentru LCD-ul DFRobot RGBLCD1602.
-3. Configureze `ADC0_A8` pentru butoanele de pe shield.
-4. Integreze fisierele generate de MCUXpresso Config Tools cu proiectul CMake.
-5. Afiseze pe LCD si in consola butonul apasat.
-6. Calibreze praguri ADC folosind valori raw masurate.
+1. Identify the correct Arduino header pins on FRDM-MCXA153.
+2. Configure `LPI2C0` for the DFRobot RGBLCD1602 LCD.
+3. Configure `ADC0_A8` for the keypad resistor ladder.
+4. Keep generated Config Tools files aligned with CMake.
+5. Display button names on the LCD and in the serial console.
+6. Calibrate ADC thresholds from measured raw values.
 
-## Hardware si pinout
+## Hardware and Pinout
 
-Shield-ul se monteaza pe headerul Arduino al placii FRDM-MCXA153.
-
-| Functie shield | Header Arduino | Pin MCXA153 | Periferic |
+| Shield function | Arduino header | MCXA153 pin | Peripheral |
 |---|---:|---|---|
-| SDA LCD | SDA | `P1_8` | `LPI2C0_SDA` |
-| SCL LCD | SCL | `P1_9` | `LPI2C0_SCL` |
-| Butoane | A0 | `P1_10` | `ADC0_A8` |
-| Alimentare | 3.3 V / 5 V, in functie de modul | - | verificati nivelurile |
-| GND | GND | - | masa comuna |
+| LCD SDA | SDA | `P1_8` | `LPI2C0_SDA` |
+| LCD SCL | SCL | `P1_9` | `LPI2C0_SCL` |
+| Buttons | A0 | `P1_10` | `ADC0_A8` |
+| Power | 3.3 V / 5 V depending on module | - | check levels |
+| GND | GND | - | common ground |
 
-Adresele I2C folosite de modulul DFRobot sunt:
+DFRobot addresses:
 
 ```text
 LCD controller: 0x3E
 RGB controller: 0x60
 ```
 
-> Nota: unele documentatii Arduino spun ca SDA/SCL sunt `A4/A5`. Pe Arduino Uno, pinii SDA/SCL sunt legati si la zona A4/A5, dar pe FRDM-MCXA153 trebuie folositi pinii SDA/SCL ai headerului Arduino, adica `P1_8` si `P1_9`.
+Some Arduino documentation says SDA/SCL are `A4/A5`. On FRDM-MCXA153, use the Arduino SDA/SCL header pins mapped to `P1_8` and `P1_9`.
 
-## Nota electrica
+## Electrical Note
 
-FRDM-MCXA153 foloseste niveluri logice de 3.3 V. Inainte de conectarea shield-ului:
+FRDM-MCXA153 uses 3.3 V logic. Before connecting the shield:
 
-- verificati daca pull-up-urile I2C ale modulului sunt la 3.3 V sau 5 V;
-- nu aplicati 5 V direct pe intrari GPIO/ADC ale MCXA153;
-- daca shield-ul forteaza I2C la 5 V, folositi level shifter;
-- pentru ADC A0, tensiunea trebuie sa ramana in domeniul acceptat de placa, raportat la VDDA.
+- check whether I2C pull-ups go to 3.3 V or 5 V;
+- do not apply 5 V directly to MCXA153 GPIO/ADC pins;
+- use a level shifter if the shield forces I2C to 5 V;
+- keep A0 within the board's ADC range relative to `VDDA`.
 
-In testul curent, LCD-ul functioneaza pe SDA/SCL, iar butoanele sunt citite raw prin LPADC.
-
-## Structura codului
-
-Fisierele relevante din proiect sunt:
+## Code Structure
 
 ```text
 src/lab_shield_lcd_keypad/main/
@@ -86,19 +81,17 @@ src/lab_shield_lcd_keypad/main/
   main.mex
 ```
 
-Rolurile sunt separate astfel:
-
-| Fisier | Rol |
+| File | Role |
 |---|---|
-| `dfrobot_rgb_lcd.c/.h` | Driver pentru protocolul DFRobot RGBLCD1602: init LCD, clear, cursor, text, RGB backlight |
-| `dfrobot_lcd_shield.c/.h` | Legatura dintre driverul LCD si placa FRDM: init `LPI2C0`, write I2C, scan adrese |
-| `dfrobot_lcd_shield_keypad.c/.h` | Init `LPADC0`, citire `ADC0_A8`, debounce si mapare raw ADC la butoane |
-| `main.c` | Demo: initializeaza LCD-ul, ruleaza scan I2C, afiseaza butonul curent |
-| `main.mex` | Configuratia MCUXpresso Config Tools pentru pini |
+| `dfrobot_rgb_lcd.c/.h` | DFRobot RGBLCD1602 protocol: init, clear, cursor, text, RGB backlight |
+| `dfrobot_lcd_shield.c/.h` | FRDM board adapter: `LPI2C0` init, I2C write, address scan |
+| `dfrobot_lcd_shield_keypad.c/.h` | `LPADC0` init, `ADC0_A8` read, debounce, raw-to-button mapping |
+| `main.c` | Demo: initialize LCD, scan I2C, display current button |
+| `main.mex` | Config Tools pin configuration |
 
-## Configurare in MCUXpresso Config Tools
+## Config Tools Setup
 
-In `main.mex`, verificati ca Pins Tool contine:
+In `main.mex`, verify:
 
 ```text
 P1_8  -> LPI2C0_SDA  -> RGBLCD1602_ARDUINO_SDA
@@ -106,22 +99,16 @@ P1_9  -> LPI2C0_SCL  -> RGBLCD1602_ARDUINO_SCL
 P1_10 -> ADC0_A8     -> LCD_KEYPAD_ARDUINO_A0
 ```
 
-In fisierele generate trebuie sa fie actualizate aceleasi semnale:
+Generated files should be in:
 
 ```text
 cfg_tools/board/pin_mux.c
 cfg_tools/board/pin_mux.h
 ```
 
-Daca tool-ul genereaza fisiere in alt director, proiectul trebuie realiniat astfel incat CMake sa includa fisierele din `cfg_tools/board`. In acest lab, `CMakeLists.txt` include explicit si fisierele de suport cerute de tool:
+If Config Tools generates files elsewhere, align CMake so it compiles the same generated files that the tool updates.
 
-```text
-cfg_tools/board/RTE_Device.h
-cfg_tools/cfg_require.json
-```
-Daca dupa `Update Code` apar schimbari propuse pentru `pin_mux.h`, `clock_config.c/.h` sau `peripherals.c/.h`, verificati intai daca sunt schimbari generate legitim din `main.mex`. In varianta functionala a acestui lab, Config Tools genereaza si init pentru `LPI2C0` si `ADC0`, iar `BOARD_InitHardware()` apeleaza `BOARD_InitBootPeripherals()` dupa pini si ceasuri.
-
-Un detaliu important descoperit in timpul integrarii: fisierul `cfg_tools/cfg_require.json` poate fi rescris de tool si poate pierde dependintele necesare. Daca apar erori de tipul "LPI2C Driver is not found", "LPADC Driver is not found" sau "LPUART CMSIS Driver is not found", verificati ca `prj.conf`, `frdmmcxa153/prj.conf`, `cfg_tools/project_info.json` si `cfg_tools/cfg_require.json` contin aceleasi componente folosite de proiect:
+Required components include:
 
 ```text
 CONFIG_MCUX_COMPONENT_driver.cmsis_lpuart=y
@@ -130,44 +117,40 @@ CONFIG_MCUX_COMPONENT_driver.lpadc=y
 CONFIG_MCUX_COMPONENT_device.RTE=y
 ```
 
-De asemenea, `cfg_require.json` si `cfg_tools/board/RTE_Device.h` trebuie sa fie listate ca fisiere ale proiectului. Altfel Config Tools poate raporta "change, not in the project", chiar daca build-ul CMake inca poate compila.
+If Config Tools reports missing drivers or says files are not in the project, check `prj.conf`, `frdmmcxa153/prj.conf`, `cfg_tools/project_info.json`, `cfg_tools/cfg_require.json`, and CMake source lists.
 
-Pentru ceasul I2C, pastrati aceeasi sursa in cod si in Config Tools. Configuratia finala foloseste `FRO12M` pentru `LPI2C0`; driverul de shield nu trebuie sa mute LPI2C0 pe alta sursa de ceas dupa initializarea generata.
+## LCD over I2C
 
-## LCD pe I2C
+The LCD driver follows the DFRobot RGBLCD1602-style sequence:
 
-Driverul `dfrobot_rgb_lcd` implementeaza secventa compatibila cu biblioteca Arduino `DFRobot_RGBLCD1602`:
+1. initialize the LCD controller at `0x3E`;
+2. initialize the RGB controller at `0x60`;
+3. write text to the two rows;
+4. change the RGB backlight.
 
-1. initializeaza LCD-ul la adresa `0x3E`;
-2. initializeaza controllerul RGB la adresa `0x60`;
-3. trimite text pe cele doua randuri;
-4. modifica backlight-ul RGB.
-
-In `main.c`, demo-ul afiseaza:
+Initial demo text:
 
 ```text
 hello, world!
 Key: NONE
 ```
 
-Apoi linia a doua este actualizata cu butonul apasat.
+## Keypad over Raw ADC
 
-## Keypad pe ADC raw
+The buttons are connected through a resistor ladder to Arduino `A0`, which maps to `P1_10 / ADC0_A8`.
 
-Butoanele shield-ului sunt conectate printr-o scara rezistiva la Arduino `A0`. Pe FRDM-MCXA153, `A0` este `P1_10 / ADC0_A8`.
+Measured raw values for the tested board/shield:
 
-Implementarea citeste direct valoarea raw LPADC pe 16 biti. Pentru placa si shield-ul testate au fost masurate aceste valori:
-
-| Buton real | Valoare raw aproximativa |
+| Button | Approximate raw value |
 |---|---:|
 | RIGHT | `15` |
 | UP | `19500` |
 | DOWN | `38300` |
 | LEFT | `58500` |
-| SELECT | de masurat pe placa |
-| NONE | aproape de capatul superior / open circuit |
+| SELECT | measure on your board |
+| NONE | near upper end / open circuit |
 
-Pragurile curente sunt alese la mijloc intre valorile masurate:
+Current thresholds:
 
 ```c
 .right_max  = 9750U,
@@ -177,40 +160,22 @@ Pragurile curente sunt alese la mijloc intre valorile masurate:
 .select_max = 65000U,
 ```
 
-Astfel, decodarea este:
-
-```text
-raw <= 9750   -> RIGHT
-raw <= 28900  -> UP
-raw <= 48400  -> DOWN
-raw <= 62000  -> LEFT
-raw <= 65000  -> SELECT
-raw >  65000  -> NONE
-```
-
-Daca SELECT nu este detectat corect, cititi valoarea raw din consola seriala si ajustati `select_max` in `dfrobot_lcd_shield_keypad.c`.
+If SELECT is not detected correctly, print the raw value and adjust `select_max`.
 
 ## Debounce
 
-Citirea ADC poate oscila usor. De aceea driverul nu accepta imediat orice schimbare. El foloseste un filtru simplu:
+ADC values can wobble. The keypad driver accepts a new button only after the same candidate appears for three consecutive reads.
 
-1. citeste valoarea raw;
-2. decodeaza butonul candidat;
-3. cere acelasi candidat timp de `3` citiri consecutive;
-4. abia apoi actualizeaza butonul stabil.
+This is enough for a super-loop demo and prevents rapid wrong display updates.
 
-Aceasta abordare este suficienta pentru un demo in super-loop si evita afisari rapide gresite.
-
-## Build si rulare
-
-Din directorul proiectului:
+## Build and Run
 
 ```powershell
 cd C:\WORKSPACE\proiecte\ipcei-lab\src\lab_shield_lcd_keypad\main
 cmake --build --preset debug
 ```
 
-Dupa flash, deschideti consola seriala. Ar trebui sa vedeti mesaje similare:
+Expected serial output:
 
 ```text
 FRDM-MCXA153 DFRobot RGBLCD1602 I2C demo
@@ -222,51 +187,52 @@ ADC raw=... key=NONE
 Button: RIGHT raw=15
 ```
 
-Pe LCD trebuie sa apara `hello, world!` si linia `Key: ...`.
+The LCD should show `hello, world!` and the current key.
 
-## Exercitiu de laborator
+## Lab Exercise
 
-1. Deschideti `main.mex` si verificati pinii `P1_8`, `P1_9`, `P1_10`.
-2. Comparati `main.mex` cu `cfg_tools/board/pin_mux.c`.
-3. Rulati build-ul.
-4. Flash-uiti aplicatia pe FRDM-MCXA153.
-5. Confirmati cu scanarea I2C ca apar adresele `0x3E` si `0x60`.
-6. Apasati fiecare buton si notati valorile raw din consola.
-7. Ajustati pragul pentru SELECT daca este necesar.
-8. Modificati mesajul de pe LCD pentru a afisa initialele echipei.
+1. Open `main.mex` and verify `P1_8`, `P1_9`, `P1_10`.
+2. Compare `main.mex` with generated `cfg_tools/board/pin_mux.c`.
+3. Build and flash the project.
+4. Confirm the I2C scan shows `0x3E` and `0x60`.
+5. Press every button and record raw ADC values.
+6. Adjust SELECT threshold if needed.
+7. Modify the LCD text to show your team initials.
 
-## Probleme frecvente
+## Common Problems
 
-| Simptom | Cauza probabila | Verificare / remediere |
+| Symptom | Likely cause | Fix |
 |---|---|---|
-| Scanarea I2C listeaza toate adresele | SDA/SCL gresite sau linii flotante | Folositi `P1_8/P1_9`, nu `P3_28/P3_27` |
-| LCD-ul nu se aprinde | alimentare lipsa sau modul incompatibil | verificati VCC/GND si nivelurile I2C |
-| LCD-ul se aprinde dar nu afiseaza text | init I2C nu ajunge la modul sau contrast gresit | verificati scanarea `0x3E/0x60`; ajustati contrastul daca exista |
-| Butoanele sunt decalate | praguri ADC nepotrivite | folositi valorile raw din consola si recalculati pragurile |
-| SELECT apare ca NONE | pragul `select_max` este prea mic sau SELECT este aproape de open-circuit | masurati raw SELECT si actualizati `select_max` |
-| Config Tool creeaza fisiere in alt folder | `project_link` / metadata nealiniate | verificati `main.mex`, `cfg_tools/project_info.json`, `cfg_tools/cfg_require.json` |
-| Config Tool raporteaza drivere lipsa sau `cfg_require.json` ca "not in project" | metadata proiectului a fost rescrisa incomplet | restaurati componentele `cmsis_lpuart`, `lpi2c`, `lpadc`, `device.RTE` in `prj.conf`/`cfg_require.json`/`project_info.json` si includeti `cfg_require.json` in CMake |
+| I2C scan lists all addresses | wrong SDA/SCL or floating bus | use `P1_8/P1_9` |
+| LCD does not light | missing power or incompatible module | check VCC/GND and logic levels |
+| LCD lights but no text | I2C init or contrast issue | verify `0x3E/0x60` scan |
+| Wrong buttons | thresholds wrong | recalibrate using raw console values |
+| SELECT appears as NONE | `select_max` too low | measure SELECT raw value |
+| Config Tools creates files elsewhere | project metadata mismatch | check `.mex`, `project_info.json`, CMake |
+| Missing driver warnings | incomplete metadata | restore required components and include required config files |
 
-## Ce trebuie predat
+## Deliverable
 
-1. Proiectul compileaza fara erori.
-2. LCD-ul afiseaza text pe ambele randuri.
-3. Backlight-ul RGB se modifica.
-4. Consola seriala arata scanarea I2C si valorile raw ADC.
-5. Fiecare buton este detectat corect sau pragurile sunt documentate.
-6. `main.mex` contine pinii folositi de shield.
+Submit a project where:
 
-## Prompt util pentru asistent AI
+1. LCD shows text on both rows;
+2. RGB backlight changes;
+3. serial console shows I2C scan and raw ADC values;
+4. all buttons are detected or thresholds are documented;
+5. `main.mex` contains the shield pins.
+
+## Useful AI Prompt
 
 ```text
-Lucrez pe FRDM-MCXA153 cu un DFRobot RGB LCD Keypad Shield.
-LCD-ul este pe I2C: SDA=P1_8, SCL=P1_9, LPI2C0, adrese 0x3E si 0x60.
-Butoanele sunt pe Arduino A0 = P1_10 / ADC0_A8, citite cu LPADC raw 16-bit.
-Valorile masurate sunt RIGHT=15, UP=19500, DOWN=38300, LEFT=58500, SELECT inca de masurat.
-Te rog sa verifici driverul dfrobot_lcd_shield_keypad.c si sa ajustezi pragurile fara sa modifici partea de LCD.
-Pastreaza compatibilitatea cu MCUXpresso Config Tools si main.mex.
+I am working on FRDM-MCXA153 with a DFRobot RGB LCD Keypad Shield.
+LCD is on I2C: SDA=P1_8, SCL=P1_9, LPI2C0, addresses 0x3E and 0x60.
+Buttons are on Arduino A0 = P1_10 / ADC0_A8, read with LPADC raw 16-bit.
+Measured values: RIGHT=15, UP=19500, DOWN=38300, LEFT=58500, SELECT still to measure.
+Check dfrobot_lcd_shield_keypad.c and adjust thresholds without changing the LCD driver.
+Keep compatibility with MCUXpresso Config Tools and main.mex.
 ```
 
 ---
 
-[<- L5: LPADC](../l5-lpadc) · [L7: LPI2C - P3T1755](../l7-lpi2c-p3t1755)
+[<- L5: LPADC](../l5-lpadc) - [L7: LPI2C - P3T1755](../l7-lpi2c-p3t1755)
+

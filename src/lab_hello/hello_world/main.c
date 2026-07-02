@@ -5,11 +5,10 @@
 #include "peripherals.h"
 #include <stdio.h>
 
-#define USE_SYSTICK_FLAG 1
-
 volatile uint8_t flag = 0;
 char messageBuffer[100];
 uint32_t counter = 0;
+uint8_t use_systick_flag = 1;
 
 void LPUART0_SignalEvent(uint32_t event)
 {
@@ -88,22 +87,25 @@ int main(void)
     while (1)
     {
 
-#ifdef USE_SYSTICK_FLAG
-        if (flag)
+        if (use_systick_flag)
         {
-            flag = 0;
+            if (flag)
+            {
+                flag = 0;
+                toggle_leds();
+                sprintf(messageBuffer, "Hello from FRDM-MCXA153! (%ld)\r\n", counter);
+                counter += 1;
+                PRINTF("%s", messageBuffer);
+            }
+        }
+        else
+        {
             toggle_leds();
             sprintf(messageBuffer, "Hello from FRDM-MCXA153! (%ld)\r\n", counter);
             counter += 1;
             PRINTF("%s", messageBuffer);
-        }
-#else
-        toggle_leds();
-        sprintf(messageBuffer, "Hello from FRDM-MCXA153! (%ld)\r\n", counter);
-        counter += 1;
-        PRINTF("%s", messageBuffer);
 
-        SDK_DelayAtLeastUs(500000U, SystemCoreClock);
-#endif
+            SDK_DelayAtLeastUs(500000U, SystemCoreClock);
+        }
     }
 }

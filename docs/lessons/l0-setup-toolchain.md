@@ -1,208 +1,204 @@
 ---
-title: "L0 — Setup Toolchain & Prima Aplicație"
-description: "Hello World pe FRDM-MCXA153"
+title: "L0 - Toolchain Setup and First Application"
+description: "Hello World and first debug session on FRDM-MCXA153"
 nav_order: 1
-parent: Lecții FRDM-MCXA153
+parent: FRDM-MCXA153 Lessons
 layout: lesson
+source_url: https://github.com/alexp25/ipcei-lab/tree/main/src/lab_hello/hello_world
 ---
 
-# 🛠️ L0 — Setup Toolchain & Prima Aplicație
+# L0 - Toolchain Setup and First Application
 
-**Hello World pe FRDM-MCXA153**
+**Hello World on FRDM-MCXA153**
 
 ---
 
 | | |
 |---|---|
-| **Ziua / Sesiunea** | Ziua 1 — Setup Workshop |
-| **Periferic** | `Toolchain · Build System · Debug` |
-| **Durată** | ~3h |
-| **Hardware** | FRDM-MCXA153 + cablu USB Type-C · PC Windows/Linux/macOS |
+| **Session** | Setup workshop |
+| **Topic** | `Toolchain`, `Build System`, `Debug` |
+| **Hardware** | FRDM-MCXA153, USB Type-C cable, Windows/Linux/macOS PC |
 
-## 📌 Context și Motivație
+## Context and Motivation
 
-Pasul zero, livrat asincron înainte de ziua 1 fizică. Participanții primesc un repo GitHub template (`ipcei-upb/frdm-mcxa153-template`) cu structura CMake pre-configurată. Stefan este disponibil pe Discord pentru troubleshooting. Scopul: toată lumea vine în ziua 1 cu mediul de lucru funcțional.
+This first lab is the setup checkpoint for the course. Before doing peripheral work, every student must have a working MCUXpresso for VS Code environment, an imported MCUXpresso SDK repository, a buildable project, and a working debug session through the on-board MCU-Link probe.
 
-> **Board:** FRDM-MCXA153 · MCX A153 (Cortex-M33 @ 96 MHz) · SDK MCUXpresso 24.12 · VS Code + CMake
+> **Board:** FRDM-MCXA153, MCX A153 Cortex-M33, MCUXpresso SDK, VS Code, CMake, ARM GCC.
 
-## 🎯 Obiective
+## Objectives
 
-1. VS Code + extensii (C/C++, CMake Tools, Cortex-Debug) instalate și funcționale
-2. MCUXpresso SDK 24.12 descărcat, `NXP_SDK_ROOT` configurat în `CMakePresets.json`
-3. Prima aplicație (blink LED verde) compilată, flash-uită și rulând pe placă
-4. MCU-Link CMSIS-DAP debugging funcțional — breakpoint pe `main()` în VS Code
+By the end of this lab you should be able to:
 
-## 🕐 Planul Sesiunii
+1. Install MCUXpresso for VS Code and its required tools.
+2. Import the MCUXpresso SDK repository.
+3. Create or import a first FRDM-MCXA153 example project.
+4. Build the project with CMake presets.
+5. Flash and debug the board through MCU-Link.
+6. Use an AI assistant to inspect project structure and diagnose build issues.
 
-| Interval | Activitate | Detaliu | Cine |
-|---|---|---|---|
-| `Async` | **Instalare toolchain** | VS Code + extensii C/C++, CMake Tools, Cortex-Debug. ARM GNU Toolchain 13.x. OpenOCD pentru CMSIS-DAP. | student |
-| `Async` | **Clone repo template** | `git clone https://github.com/alexp25/ipcei-lab/`<br>Structura: `src/`, `boards/`, `CMakeLists.txt`, `CMakePresets.json` | student |
-| `Async` | **Config SDK** | Descărcare `SDK_24.12_FRDM-MCXA153` de pe mcuxpresso.nxp.com. Setare `NXP_SDK_ROOT` în `CMakePresets.json`. | student |
-| `Async` | **Build + flash** | `cmake --preset frdm-mcxa153-debug` → `cmake --build build/` → drag-drop `.bin` pe MCU-Link drive. | student |
-| `Async` | **Debug session** | F5 în VS Code → breakpoint pe `GPIO_PinWrite()` → step-over → LED schimbă starea. | student |
+## Session Plan
 
-## 🤖 Prompt-uri pentru un asistent AI
+| Step | Activity | Result |
+|---|---|---|
+| 1 | Install MCUXpresso for VS Code | VS Code can see the NXP extension and installer |
+| 2 | Install tool dependencies | ARM GCC, LinkServer, Config Tools are available |
+| 3 | Import SDK repository | Local `mcuxsdk` repository exists |
+| 4 | Import or create project | FRDM-MCXA153 project opens in VS Code |
+| 5 | Build | `.elf` and `.bin` files are generated |
+| 6 | Debug | Breakpoint at `main()` works |
 
-> **Regulă:** Copiați prompt-ul complet — contextul hardware este obligatoriu.
-> Puteți folosi orice asistent AI, de exemplu ChatGPT, Gemini, Claude, Copilot sau asistentul integrat în VS Code.
-> AI-ul va genera cod greșit (pentru alte familii NXP sau Arduino) fără informații precise despre placă, SDK și toolchain.
+## AI Assistant Prompts
 
-### Prompt: Setup CMake
+Copy full prompts. Embedded answers are only useful when the assistant receives board, SDK, and toolchain context.
 
-```text
-Context: FRDM-MCXA153, MCX A153 Cortex-M33, SDK MCUXpresso 24.12.
-Toolchain: ARM GNU Toolchain 13.x, CMake 3.27+, debugger MCU-Link OB (CMSIS-DAP).
-Problema: CMakePresets.json nu găsește NXP_SDK_ROOT pe Windows (PATH cu spații).
-Cum configurez variabila de mediu corect și cum evit path-uri cu spații în CMake?
-```
-
-### Prompt: Blink LED verde
+### Prompt: CMake Setup
 
 ```text
-Context hardware: FRDM-MCXA153, SDK MCUXpresso 24.12, VS Code + CMake.
-RGB LED D3: R=PIO1_7, G=PIO3_12, B=PIO3_13 — ANOD COMUN → LOW=aprins.
-Scrie codul complet pentru blink LED verde la 500ms.
-Include:
-  CLOCK_EnableClock(kCLOCK_Port3)
-  PORT_SetPinMux(PORT3, 12u, kPORT_MuxAsGpio)
-  GPIO_PinInit(), GPIO_PinWrite(), SDK_DelayAtLeastUs()
-Explică de ce GPIO LOW aprinde LED-ul (anod comun).
+Context: FRDM-MCXA153, MCX A153 Cortex-M33, MCUXpresso SDK, ARM GCC, CMake, MCU-Link/LinkServer.
+Problem: CMakePresets.json cannot find the SDK path on Windows. The path may contain spaces.
+Explain how to configure the SDK/toolchain paths correctly and how to avoid path issues in CMake presets.
 ```
 
-### Prompt: Analiză proiect și structură cod
+### Prompt: Blink the Green LED
 
 ```text
-Context: proiect embedded pentru FRDM-MCXA153, MCX A153 Cortex-M33, SDK MCUXpresso 24.12.
-Toolchain: MCUXpresso for VS Code, ARM GNU Toolchain 13.x, CMake, LinkServer/MCU-Link.
-
-Am deschis proiectul importat/generat în VS Code. Analizează structura proiectului și explică rolul fișierelor și directoarelor principale.
-
-Te rog să explici:
-1. Cum pornește execuția programului până ajunge în main().
-2. Rolul fișierelor CMakeLists.txt, CMakePresets.json și al fișierelor de startup/linker.
-3. Rolul fișierelor generate de MCUXpresso Config Tools, cum ar fi pin_mux.c, clock_config.c, board.c și fișierul .mex.
-4. Unde este codul aplicației și unde ar trebui modificat pentru logica de blink LED.
-5. Ce părți sunt generate automat și ar trebui editate cu atenție.
-6. Cum pot naviga proiectul în VS Code ca să găsesc definiția unei funcții SDK, de exemplu GPIO_PinWrite().
-
-Răspunde ca pentru un student care vede pentru prima dată un proiect embedded C pe NXP MCX.
-Nu rescrie codul; explică structura și fluxul de execuție.
+Context hardware: FRDM-MCXA153, MCX A153 Cortex-M33, MCUXpresso SDK, VS Code + CMake.
+RGB LED D3 is active-low/common-anode. Green LED is on GPIO3 pin 12.
+Write a minimal C example that configures the pin as GPIO output and blinks it every 500 ms.
+Use MCUXpresso SDK APIs: CLOCK_EnableClock, PORT_SetPinMux, GPIO_PinInit, GPIO_PinWrite, SDK_DelayAtLeastUs.
+Explain why GPIO LOW turns the LED on.
 ```
 
-## ⚠️ Capcane
+### Prompt: Explain the Project Structure
 
-> Ce GenAI **nu știe** fără context explicit — verificați înainte de upload pe placă.
+```text
+Context: embedded C project for FRDM-MCXA153, MCUXpresso SDK, VS Code, CMake, ARM GCC, LinkServer/MCU-Link.
+I opened an imported/generated project. Explain the project structure for a beginner:
+1. how execution reaches main();
+2. the role of CMakeLists.txt and CMakePresets.json;
+3. the role of startup/linker files;
+4. the role of generated files such as pin_mux.c, clock_config.c, board.c and .mex;
+5. where application logic should be changed;
+6. which generated files should be edited only through Config Tools;
+7. how to navigate to SDK definitions such as GPIO_PinWrite().
+Do not rewrite the code; explain the structure and execution flow.
+```
 
-- **Path SDK cu spații** → CMake eșuează; folosiți path fără spații (ex: `C:/NXP/SDK`)
-- **MCU-Link driver**: Windows necesită Zadig pentru OpenOCD; Linux necesită regulă udev
-- **LED RGB anod comun**: `GPIO LOW` = LED **APRINS** (opus intuiției Arduino standard)
+## Setup Steps
 
+### 1. Install MCUXpresso for VS Code
 
-## 🔧 Pași de Setup
+Install **MCUXpresso for VS Code** from the Extensions Marketplace. Open the extension view and run **Check Tool Dependencies**.
 
-### 1. Instalare extensie MCUXpresso pentru VS Code
+![MCUXpresso for VS Code - Check Tool Dependencies](../img/lab0/install_mcuxpresso_extension.png)
 
-Căutați **MCUXpresso for VS Code** în Extensions Marketplace și instalați-o. La prima deschidere apare pagina **Discover NXP MCUXpresso for VS Code** cu secțiunea **Check Tool Dependencies**.
+Click **Open Installer** to launch the MCUXpresso installer.
 
-![MCUXpresso for VS Code — Check Tool Dependencies](../img/lab0/install_mcuxpresso_extension.png)
+### 2. Install Required Components
 
-Apăsați **Open Installer** pentru a lansa MCUXpresso Installer.
+Install at least:
 
-### 2. Instalare componente prin MCUXpresso Installer
+- **Arm GNU Toolchain support**: compiler and libraries;
+- **LinkServer**: GDB server for the on-board MCU-Link probe;
+- **MCUXpresso Configuration Tools**: graphical Pins/Clocks/Peripherals configurator.
 
-Selectați și instalați cel puțin:
-- **NXP libraries and header files for Arm GNU Toolchain** — compilatorul ARM
-- **LinkServer** — server GDB pentru probe-ul MCU-Link de pe placă
-- **MCUXpresso Configuration Tools** — unealta grafică pentru configurare pini, clock, periferice
+![MCUXpresso Installer - LinkServer and Config Tools selected](../img/lab0/install_linkserver_before_debug.png)
 
-![MCUXpresso Installer — LinkServer și Config Tools selectate](../img/lab0/install_linkserver_before_debug.png)
+Wait until the installer reports that installation completed successfully.
 
-> Instalarea durează câteva minute. Urmăriți log-ul din partea de jos a ferestrei și așteptați `*** Installation completed successfully ***`.
+### 3. Import the SDK Repository
 
-### 3. Import SDK repository
+In **MCUXPRESSO FOR VS CODE -> QUICKSTART PANEL**, select **Import Repository**.
 
-În panoul **MCUXPRESSO FOR VS CODE → QUICKSTART PANEL**, apăsați **Import Repository**. Configurați:
-- **Repository:** MCUXpresso SDK (`https://github.com/nxp-mcuxpresso/mcuxsdk-manifests`)
-- **Name:** `mcuxsdk`
-- **Location:** un folder fără spații în cale (ex. `c:\WORKSPACE\proiecte\ipcei-lab\src\sdks`)
+Use a path without spaces, for example:
 
-![Import Repository — MCUXpresso SDK în progres](../img/lab0/import_mcuxpresso_repo_takes_a_long_time.png)
+```text
+C:\WORKSPACE\proiecte\ipcei-lab\src\sdks
+```
 
-> **Atenție:** Importul SDK durează mult (descarcă ~2 GB via west/git). Folosiți acest timp pentru a citi specificațiile plăcii FRDM-MCXA153.
+![Import Repository - MCUXpresso SDK in progress](../img/lab0/import_mcuxpresso_repo_takes_a_long_time.png)
 
-### 4. Import exemplu din repository
+The import can take a long time because it downloads the SDK repository and west/git dependencies.
 
-După ce SDK-ul este importat, apăsați **Import Example from Repository**. Selectați:
+### 4. Import an Example or Create a New Project
+
+After the SDK is available, use **Import Example from Repository** and choose:
+
 - **Board:** FRDM-MCXA153
-- **Template:** `demo_apps/hello_world`
+- **Template:** `demo_apps/hello_world` or `led_blinky`
 
-![Import Example from Repository — hello_world pe FRDM-MCXA153](../img/lab0/import_example.png)
+![Import Example from Repository - hello_world on FRDM-MCXA153](../img/lab0/import_example.png)
 
-Alternativ, puteți crea un proiect nou de la zero cu **New Project Wizard**:
+You can also create a project from scratch with **New Project Wizard**.
 
-![New Project Wizard — FRDM-MCXA153 selectat](../img/lab0/create_new_project.png)
+![New Project Wizard - FRDM-MCXA153 selected](../img/lab0/create_new_project.png)
 
-### 5. Build proiect
+### 5. Build the Project
 
-Apăsați **Build** din panoul proiectului (sau `Ctrl+Shift+B`). Prima compilare rulează CMake și generează fișierele de build.
+Use the VS Code build button or run:
 
-![led_blinky.c deschis — build cu succes în terminal](../img/lab0/new_project_wizard.png)
+```powershell
+cmake --preset debug
+cmake --build --preset debug
+```
 
-### 6. Rezolvare erori de build cu AI
+![led_blinky.c opened - successful build in terminal](../img/lab0/new_project_wizard.png)
 
-Dacă apar erori de build, folosiți asistentul AI integrat în VS Code pentru diagnoză și corectare.
+### 6. Fix Build Errors with AI Assistance
 
-**Eroare cale SDK în CMakePresets.json:**
+If the build fails, use the AI assistant with precise error messages and project context.
 
-![AI diagnostichează eroarea de cale SDK](../img/lab0/use_genai_to_fix_build_error_sdk_path.png)
+![AI diagnoses SDK path issue](../img/lab0/use_genai_to_fix_build_error_sdk_path.png)
 
-**Eroare include CMSIS lipsă:**
+![AI identifies missing CMSIS include](../img/lab0/use_genai_to_fix_build_error_cmsis.png)
 
-![AI identifică include-ul fsl_lpuart_cmsis.h lipsă](../img/lab0/use_genai_to_fix_build_error_cmsis.png)
+![CMakeLists.txt after adding the required CMSIS include](../img/lab0/use_genai_to_fix_build_error_cmsis_fixed.png)
 
-**CMakeLists.txt după corectare:**
+### 7. Open MCUXpresso Config Tools
 
-![CMakeLists.txt cu include-urile CMSIS adăugate corect](../img/lab0/use_genai_to_fix_build_error_cmsis_fixed.png)
+Peripheral configuration is stored in a `.mex` file. Open it from Windows Explorer or from VS Code with **Open with MCUXpresso Config Tools**.
 
-### 7. Deschidere MCUXpresso Config Tools
+![led_blinky.mex in Explorer](../img/lab0/configurator_open_mex_file.png)
 
-Configurația perifericelor (pini, clock, periferice) este stocată în fișierul `.mex`. Poate fi deschis în două moduri:
+![VS Code context menu - Open with Config Tools](../img/lab0/open_with_config.png)
 
-**Din Windows Explorer** — fișierul `led_blinky.mex` are tipul *MCUXpresso Config Tools Settings File*:
+### 8. Debug on the Board
 
-![led_blinky.mex în Explorer — tip MCUXpresso Config Tools Settings File](../img/lab0/configurator_open_mex_file.png)
+Connect the FRDM-MCXA153 through the MCU-Link USB port and press **F5** or **Run and Debug**.
 
-**Din VS Code** — click dreapta pe orice fișier din proiect → **Open with MCUXpresso Config Tools**:
+![Active debug session](../img/lab0/run_debug.png)
 
-![Meniu contextual VS Code — Open with MCUXpresso Config Tools](../img/lab0/open_with_config.png)
+Set a breakpoint and step through the program.
 
-### 8. Debug pe placă
+![Breakpoint active in debug session](../img/lab0/run_debug_breakpoint.png)
 
-Conectați placa FRDM-MCXA153 prin USB Type-C (portul J6 — MCU-Link) și apăsați **F5** sau butonul **Run and Debug**.
+If you see `No probe detected`, check that LinkServer is installed and that the board is connected to the correct USB port.
 
-![Debug session activă — led_blinky rulând pe placă](../img/lab0/run_debug.png)
+![No probe detected error](../img/lab0/run_error_no_probe_detected.png)
 
-Setați un breakpoint în cod și observați execuția pas cu pas:
+### 9. Ask AI to Explain Generated Code
 
-![Breakpoint activ în debug session](../img/lab0/run_debug_breakpoint.png)
+Use the assistant to understand generated SDK files and the application entry point.
 
-> **Eroare frecventă `No probe detected`:** apare dacă LinkServer nu este instalat sau placa nu e conectată la portul corect. Verificați că LED-ul verde de pe MCU-Link este aprins.
+![AI explains led_blinky.c](../img/lab0/codex_explain_code.png)
 
-![Eroare — No probe detected](../img/lab0/run_error_no_probe_detected.png)
+## Common Pitfalls
 
-### 9. AI explică codul generat
+- Avoid SDK paths with spaces.
+- On Windows, install the MCU-Link/LinkServer drivers.
+- On Linux, add the required udev rules for debug probes.
+- The FRDM RGB LEDs are active-low: `GPIO LOW` means LED on.
+- Do not edit generated files casually; prefer Config Tools for `pin_mux.c`, `clock_config.c`, and `peripherals.c`.
 
-Folosiți orice asistent AI disponibil, de exemplu ChatGPT, Gemini, Claude, Copilot sau asistentul integrat în VS Code, pentru a înțelege codul SDK generat automat:
+## Deliverable
 
-![AI explică structura led_blinky.c](../img/lab0/codex_explain_code.png)
+Submit a personal repository or archive containing:
+
+1. a buildable first FRDM-MCXA153 project;
+2. a screenshot of a successful debug session with a breakpoint at `main()`;
+3. a short note describing one setup issue and how you solved it.
 
 ---
 
-## ✅ Deliverable
+[L1: GPIO - Digital Control and Buttons ->](../l1-gpio)
 
-> Repo GitHub personal cu blink funcțional + screenshot debug session cu breakpoint activ
-
----
-
-[L1: GPIO — Control Digital & Butoane →](../l1-gpio)

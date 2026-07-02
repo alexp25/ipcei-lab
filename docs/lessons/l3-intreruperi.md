@@ -1,87 +1,69 @@
 ---
-title: "L3 - Intreruperi Externe & NVIC"
-description: "Polling GPIO, debounce, conversie la GPIO IRQ"
+title: "L3 - External Interrupts and NVIC"
+description: "GPIO polling, debounce, and conversion to GPIO interrupts"
 nav_order: 4
-parent: Lectii FRDM-MCXA153
+parent: FRDM-MCXA153 Lessons
 layout: lesson
+source_url: https://github.com/alexp25/ipcei-lab/tree/main/src/lab_interrupts/main
 ---
 
-# L3 - Intreruperi Externe & NVIC
+# L3 - External Interrupts and NVIC
 
-**De la polling pentru butonul SW3 la intreruperi GPIO/NVIC**
+**From SW3 polling to GPIO/NVIC interrupts**
 
 ---
 
 | | |
 |---|---|
-| **Ziua / Sesiunea** | Ziua 2, 23 iunie - dimineata |
-| **Periferic** | `GPIO` - `GPIO IRQ` - `NVIC` |
-| **Durata** | 2h (09:00-11:00) |
-| **Responsabil** | Cadru didactic UPB |
-| **Hardware** | FRDM-MCXA153 - SW3 (`GPIO1`, pin 7 / `P1_7`) - LED RGB |
-| **Proiect** | `src/lab_interrupts/main` |
+| **Session** | GPIO + NVIC |
+| **Peripheral** | `GPIO`, `GPIO IRQ`, `NVIC` |
+| **Hardware** | FRDM-MCXA153, SW3 on `GPIO1` pin `7` / `P1_7`, RGB LED |
+| **Project** | `src/lab_interrupts/main` |
 
-## Context si Motivatie
+## Context and Motivation
 
-Inainte sa folosim intreruperi, pornim de la o implementare simpla cu polling: programul citeste periodic starea butonului SW3 si comuta LED-urile RGB cand detecteaza o apasare noua.
+Before using interrupts, the project starts from a simple polling implementation. The program periodically reads SW3 and toggles the RGB LEDs when it detects a new press.
 
-Codul curent separa clar cele doua idei importante:
+The starter code separates three useful ideas:
 
-- `check_button_pressed()` verifica butonul fara debounce.
-- `check_button_pressed_debounce()` verifica butonul cu debounce software.
-- `on_button_pressed()` contine actiunea comuna: toggle pentru LED-urile RGB si mesaj pe Serial Monitor.
+- `check_button_pressed()` reads the button without debounce.
+- `check_button_pressed_debounce()` reads the button with software debounce.
+- `on_button_pressed()` contains the shared action: toggle LEDs and print a message.
 
-La final, transformati detectia prin polling intr-o solutie cu intreruperi GPIO si NVIC (**Nested Vectored Interrupt Controller**), folosind GenAI ca asistent de conversie si verificand configuratia in MCUXpresso Config Tools.
+The goal is to convert button detection from polling to a GPIO interrupt handled through the NVIC.
 
-> **Board:** FRDM-MCXA153 - MCX A153 (Cortex-M33) - SDK MCUXpresso - VS Code + CMake
+## Objectives
 
-## Obiective
+By the end of the lab you should be able to:
 
-1. Compilarea si rularea proiectului `src/lab_interrupts/main`.
-2. Observarea diferentei dintre polling fara debounce si polling cu debounce.
-3. Intelegerea comportamentului unui buton mecanic prin mesajele din Serial Monitor.
-4. Conversia gestionarii butonului SW3 din polling in intrerupere GPIO/NVIC.
-5. Actualizarea fisierului `.mex` astfel incat configuratia SW3/IRQ sa fie vizibila in Config Tools.
+1. Build and run `src/lab_interrupts/main`.
+2. Observe the difference between polling without debounce and polling with debounce.
+3. Explain why mechanical buttons bounce.
+4. Configure SW3 as a GPIO interrupt on falling edge.
+5. Enable the correct NVIC IRQ.
+6. Clear the interrupt flag in the ISR.
+7. Update the `.mex` file so the SW3/IRQ configuration is visible in Config Tools.
 
-## Planul Sesiunii
+## Exercises
 
-| Interval | Activitate | Detaliu | Cine |
-|---|---|---|---|
-| `09:00-09:20` | **Ex 0: Compile and run** | Deschideti proiectul, compilati, rulati pe placa si verificati Serial Monitor. | student + mentor |
-| `09:20-10:00` | **Ex 1: Polling si debounce** | Observati cate mesaje apar la o singura apasare SW3, apoi testati functia cu debounce. | student |
-| `10:00-11:00` | **Ex 2: Conversie la intreruperi** | Folositi GenAI pentru a converti apasarea SW3 la GPIO IRQ/NVIC si actualizati `.mex`. | student + mentor |
+### Exercise 0 - Compile and Run
 
-## Exercitii
+```powershell
+cd src/lab_interrupts/main
+cmake --preset debug
+cmake --build --preset debug
+```
 
-### Ex 0 - Compile and Run
-
-1. Deschideti proiectul:
-
-   ```text
-   src/lab_interrupts/main
-   ```
-
-2. Compilati proiectul cu presetul `debug`:
-
-   ```powershell
-   cmake --preset debug
-   cmake --build --preset debug
-   ```
-
-3. Incarcati aplicatia pe placa FRDM-MCXA153.
-4. Deschideti Serial Monitor la `115200` baud.
-5. Apasati SW3 si verificati ca LED-urile RGB se comuta.
-
-La pornire, aplicatia face un scurt self-test pe LED-uri. Dupa aceea, fiecare apasare SW3 ar trebui sa produca mesaje de forma:
+Flash the board, open Serial Monitor at `115200`, press SW3, and verify messages such as:
 
 ```text
 SW3 pressed: toggled LEDs (0)
 SW3 pressed: toggled LEDs (1)
 ```
 
-### Ex 1 - Observati Comportamentul Butonului
+### Exercise 1 - Observe Button Bounce
 
-Proiectul porneste cu functia fara debounce activa in `main.c`:
+Start with the non-debounced function enabled:
 
 ```c
 while (1)
@@ -92,18 +74,7 @@ while (1)
 }
 ```
 
-1. Rulati proiectul cu `check_button_pressed()`.
-2. Apasati SW3 o singura data.
-3. Urmariti Serial Monitor.
-4. Notati cate mesaje apar pentru o singura apasare de buton.
-
-Intrebare de observatie:
-
-```text
-La o singura apasare fizica SW3, apar unul sau mai multe mesaje in Serial Monitor?
-```
-
-Apoi testati varianta cu debounce:
+Press SW3 once and count how many messages appear. Then switch to the debounced version:
 
 ```c
 while (1)
@@ -114,32 +85,22 @@ while (1)
 }
 ```
 
-5. Recompilati si rulati proiectul.
-6. Apasati SW3 de mai multe ori, cate o apasare scurta pe rand.
-7. Verificati Serial Monitor.
+Expected result: with debounce, one physical press should produce one message and one LED toggle.
 
-Rezultatul asteptat: cu functia `check_button_pressed_debounce()`, o apasare fizica produce un singur mesaj si o singura comutare a LED-urilor.
+### Exercise 2 - Convert SW3 to Interrupts
 
-### Ex 2 - Convertiti SW3 la Intreruperi
+Minimum requirements:
 
-Pornind de la varianta cu polling, modificati proiectul astfel incat apasarea butonului SW3 sa fie tratata prin intrerupere GPIO/NVIC.
+1. Configure SW3 as GPIO input on `GPIO1`, pin `7` (`P1_7`).
+2. Enable interrupt on falling edge.
+3. Enable `GPIO1_IRQn`.
+4. Implement `GPIO1_IRQHandler` or the board macro `BOARD_SW3_IRQ_HANDLER`.
+5. Check that the interrupt flag belongs to SW3.
+6. Clear the interrupt flag before leaving the ISR.
+7. Call `on_button_pressed()` for each valid press.
+8. Remove polling calls from `while (1)`.
 
-Cerintele minime:
-
-1. Configurati SW3 ca input GPIO pe `GPIO1`, pin `7` (`P1_7`).
-2. Activati intreruperea pentru apasare pe falling edge.
-3. Activati IRQ-ul `GPIO1_IRQn`.
-4. Implementati handler-ul `GPIO1_IRQHandler` sau macro-ul deja definit in `board.h`: `BOARD_SW3_IRQ_HANDLER`.
-5. In handler, verificati flag-ul de intrerupere pentru pinul SW3.
-6. Stergeti flag-ul de intrerupere inainte de iesirea din handler.
-7. Apelati `on_button_pressed()` la fiecare apasare valida.
-8. Scoateti apelurile de polling din `while (1)`.
-
-#### Cum ar trebui sa arate codul cu intreruperi
-
-Varianta cu intreruperi trebuie sa pastreze ideea buna din codul initial: actiunea la apasarea butonului ramane in `on_button_pressed()`. Se schimba doar mecanismul prin care detectam apasarea.
-
-In initializare, puteti fie sa extindeti `init_sw3_gpio()`, fie sa creati o functie noua, de exemplu `init_sw3_interrupt()`. Pe langa configurarea GPIO deja existenta, functia trebuie sa activeze intreruperea pentru pinul SW3:
+Example initialization:
 
 ```c
 void init_sw3_interrupt(void)
@@ -156,7 +117,7 @@ void init_sw3_interrupt(void)
 }
 ```
 
-Handler-ul trebuie sa verifice ca intreruperea vine de la pinul SW3, sa stearga flag-ul, apoi sa execute actiunea:
+Example ISR:
 
 ```c
 void BOARD_SW3_IRQ_HANDLER(void)
@@ -169,7 +130,7 @@ void BOARD_SW3_IRQ_HANDLER(void)
 }
 ```
 
-Dupa conversie, `main()` nu mai trebuie sa apeleze `check_button_pressed()` sau `check_button_pressed_debounce()`. Bucla principala poate ramane simpla:
+The main loop can then wait for interrupts:
 
 ```c
 init_pins();
@@ -181,76 +142,67 @@ while (1)
 }
 ```
 
-`__WFI()` inseamna "wait for interrupt": procesorul asteapta urmatoarea intrerupere. Pentru laborator, este acceptabil ca handler-ul sa apeleze `on_button_pressed()` direct. In proiecte reale, un ISR ar trebui sa fie cat mai scurt: de obicei seteaza un `volatile bool` sau incrementeaza un contor, iar procesarea mai lenta se face in `while (1)`.
+For this lab, calling `on_button_pressed()` directly in the ISR is acceptable. In production firmware, ISRs should normally be short and should set a `volatile` flag that is processed in the main loop.
 
-#### Actualizati si fisierul `.mex`
+## Update the `.mex` File
 
-Dupa modificarea codului, actualizati configuratia proiectului in MCUXpresso Config Tools:
+After changing code, update the project configuration:
 
-1. Deschideti fisierul `.mex` al proiectului.
-2. Adaugati/confirmati pinul SW3 (`P1_7`) in sectiunea Pins.
-3. Configurati pinul ca GPIO input cu pull-up.
-4. Configurati intreruperea pe falling edge pentru SW3.
-5. Confirmati ca setarea este vizibila in Config Tools, nu doar scrisa manual in cod.
-6. Salvati `.mex` si regenerati fisierele de configurare daca este nevoie.
-7. Recompilati proiectul.
+1. Open the active `.mex` file.
+2. Confirm SW3 (`P1_7`) in the Pins tool.
+3. Configure it as GPIO input with pull-up.
+4. Configure falling-edge interrupt for SW3.
+5. Save and regenerate generated files if needed.
+6. Rebuild the project.
 
-## Prompt-uri Pentru GenAI
+## AI Assistant Prompts
 
-### Prompt: Conversie polling la intrerupere SW3
-
-```text
-Context hardware: FRDM-MCXA153, MCX A153 Cortex-M33, SDK MCUXpresso.
-Proiect: src/lab_interrupts/main.
-Buton SW3: GPIO1, pin 7 (P1_7), activ low, pull-up intern.
-LED-uri RGB: definite in board.h ca BOARD_LED_RED/GREEN/BLUE.
-
-Codul curent foloseste polling si separa actiunea de detectie:
-- init_sw3_gpio() configureaza SW3 ca input GPIO
-- check_button_pressed() verifica o apasare fara debounce
-- check_button_pressed_debounce() verifica o apasare cu debounce software
-- on_button_pressed() contine actiunea comuna: toggle LED-uri + mesaj serial
-
-Sarcina: converteste detectia apasarii SW3 din polling in intrerupere GPIO/NVIC.
-Include:
-- configurarea SW3 ca input GPIO cu pull-up
-- falling edge interrupt pentru SW3
-- EnableIRQ(GPIO1_IRQn)
-- handler pentru BOARD_SW3_IRQ_HANDLER sau GPIO1_IRQHandler
-- verificarea flag-ului pentru pinul SW3
-- stergerea flag-ului de intrerupere
-- apelarea on_button_pressed() in handler
-- eliminarea apelurilor check_button_pressed() din while (1)
-Explica si ce trebuie actualizat in fisierul .mex ca setarea sa fie vizibila in Config Tools.
-```
-
-### Prompt: Debug ISR care se apeleaza continuu
+### Prompt: Convert Polling to SW3 Interrupt
 
 ```text
-FRDM-MCXA153, SW3 pe GPIO1 pin 7, intrerupere pe falling edge.
-Problema: dupa prima apasare, handler-ul GPIO1_IRQHandler se apeleaza continuu.
-Verifica daca flag-ul de intrerupere pentru pinul SW3 este sters corect.
-Explica de ce un flag nesters face ca NVIC sa reintre imediat in ISR.
+Context hardware: FRDM-MCXA153, MCX A153 Cortex-M33, MCUXpresso SDK.
+Project: src/lab_interrupts/main.
+SW3: GPIO1 pin 7 (P1_7), active-low, internal pull-up.
+The current code uses polling and has:
+- init_sw3_gpio();
+- check_button_pressed();
+- check_button_pressed_debounce();
+- on_button_pressed();
+Convert SW3 detection from polling to GPIO/NVIC interrupt.
+Include falling-edge configuration, EnableIRQ(GPIO1_IRQn), ISR flag check, flag clear, and removal of polling from while(1).
+Also explain what must be updated in the .mex file.
 ```
 
-## Capcane Critice
+### Prompt: ISR Re-enters Continuously
 
-- SW3 este activ low: apasat inseamna `GPIO_PinRead(...) == 0U`.
-- Fara debounce, o singura apasare poate produce mai multe mesaje in Serial Monitor.
-- In varianta cu intreruperi, flag-ul de intrerupere trebuie sters; altfel handler-ul se poate reapela continuu.
-- Dupa conversia la intreruperi, `while (1)` nu mai trebuie sa faca polling pentru SW3.
-- Verificati pinul exact pentru acest proiect: SW3 este `GPIO1`, pin `7` (`P1_7`).
-- Dupa conversia la intreruperi, actualizati `.mex`; nu lasati configuratia doar in cod.
-- GenAI poate propune API-uri pentru alta familie NXP sau pentru Arduino. Verificati mereu impotriva SDK-ului si a `board.h`.
+```text
+FRDM-MCXA153, SW3 on GPIO1 pin 7, falling-edge interrupt.
+Problem: after the first press, GPIO1_IRQHandler is called continuously.
+Check whether the interrupt flag for SW3 is cleared correctly.
+Explain why an uncleared peripheral interrupt flag makes the NVIC re-enter the ISR immediately.
+```
+
+## Common Pitfalls
+
+- SW3 is active-low: pressed means `GPIO_PinRead(...) == 0U`.
+- Without debounce, one press can produce several messages.
+- In interrupt mode, clear the GPIO interrupt flag; otherwise the ISR can run forever.
+- After converting to interrupts, the main loop should not keep polling SW3.
+- Verify the exact SW3 pin for this project: `GPIO1`, pin `7` (`P1_7`).
+- Update `.mex`; do not leave the configuration only in handwritten code.
+- AI may suggest APIs from another NXP family or Arduino. Verify against the SDK headers.
 
 ## Deliverable
 
-1. Proiect compilabil si functional cu polling fara debounce.
-2. Observatii in Serial Monitor pentru polling fara debounce vs polling cu debounce.
-3. Proiect modificat astfel incat SW3 sa fie gestionat prin intrerupere.
-4. Fisier `.mex` actualizat, cu SW3/IRQ vizibil in Config Tools.
-5. Scurta explicatie: de ce trebuie sters flag-ul de intrerupere in ISR.
+Submit:
+
+1. the polling version without debounce;
+2. observations comparing no debounce vs debounce;
+3. the interrupt-based version;
+4. an updated `.mex` file showing SW3/IRQ configuration;
+5. a short explanation of why the ISR must clear the interrupt flag.
 
 ---
 
-[<- L2: LPUART - Comunicatie Seriala](../l2-lpuart) - [L4: Timer & PWM - SCTimer si CTIMER ->](../l4-timer-pwm)
+[<- L2: LPUART - Serial Communication](../l2-lpuart) - [L4: Timer and PWM ->](../l4-timer-pwm)
+

@@ -1,92 +1,140 @@
 ---
-title: "L8 — Integrare — Sistem Complet cu FSM"
-description: "Toate perifericele, super-loop, Show & Tell"
+title: "Test LP1 - Integration System with FSM"
+description: "All peripherals, super-loop architecture, and final show-and-tell"
 nav_order: 9
-parent: Lecții FRDM-MCXA153
+parent: FRDM-MCXA153 Lessons
 layout: lesson
+source_url: https://github.com/alexp25/ipcei-lab/tree/main/src/lab_shield_7segment/main
 ---
 
-# 🔧 L8 — Integrare — Sistem Complet cu FSM
+# Test LP1 - Integration System with FSM
 
-**Toate perifericele, super-loop, Show & Tell**
+**All peripherals, super-loop, and final demonstration**
 
 ---
 
 | | |
 |---|---|
-| **Ziua / Sesiunea** | Ziua 4, 25 iunie — după-amiază + Ziua 5 |
-| **Periferic** | `Toate perifericele · FSM · Super-loop` |
-| **Durată** | 3h (13:00–16:00) |
-| **Responsabil** | Echipe + Mentori UPB & NXP |
-| **Hardware** | FRDM-MCXA153 cu toate conexiunile din lecțiile L1–L7 |
+| **Session** | Integration |
+| **Topic** | `GPIO`, `UART`, `IRQ`, `Timer/PWM`, `ADC`, `LPI2C`, `FSM` |
+| **Hardware** | FRDM-MCXA153 with connections from previous labs |
 
-## 📌 Context și Motivație
+## Context and Motivation
 
-Sesiunea de integrare testează dacă perifericele învățate separat funcționează împreună — cel mai realist exercițiu din perspectivă industrială. Problemele de integrare sunt specifice hardware-ului și nu pot fi detectate de GenAI fără context. AI-ul va genera FSM corect conceptual dar va omite protecția variabilelor partajate.
+The integration session tests whether the peripherals learned separately can run together in one firmware project. This is close to real embedded work: integration problems are often caused by timing, shared state, blocking I/O, and peripheral ownership.
 
-> **Board:** FRDM-MCXA153 · MCX A153 (Cortex-M33 @ 96 MHz) · SDK MCUXpresso 24.12 · VS Code + CMake
+An AI assistant can generate a plausible FSM, but it may miss embedded details such as shared variables between ISRs and the main loop.
 
-## 🎯 Obiective
+## Objectives
 
-1. Sistem integrat funcțional: GPIO + UART + IRQ + Timer/PWM + ADC + LPI2C simultan
-2. Mașină de stări (FSM) care coordonează toate perifericele fără RTOS
-3. Identificarea și rezolvarea conflictelor de integrare (UART blocking vs IRQ latency)
-4. Show & Tell intern: 5 min demo live + reflecție GenAI
+By the end of the lab you should be able to:
 
-## 🕐 Planul Sesiunii
+1. Combine GPIO, UART, interrupts, PWM, ADC, and I2C in one project.
+2. Coordinate behavior with a finite-state machine.
+3. Use a super-loop architecture without an RTOS.
+4. Identify integration conflicts such as blocking UART vs ISR latency.
+5. Present a short live demo and explain one AI mistake you found.
 
-| Interval | Activitate | Detaliu | Cine |
-|---|---|---|---|
-| `13:00–13:20` | **Arhitectura FSM** | State machine pe embedded: de ce e mai robustă decât if-else cascadat. Super-loop cu flag-uri volatile vs RTOS task. Schelet FSM cu GenAI. | cadru UPB |
-| `13:20–15:00` | **Lab: sistem integrat** | Temperatura I2C 1Hz + UART log + PWM LED funcție de temperatură + alertă ISR buton + ADC potențiometru pentru prag variabil. | echipă + mentor |
-| `15:00–16:00` | **Show & Tell intern** | 5 min/echipă: demo live + ce a greșit AI + cum s-a corectat. Agentul AI evaluează calitatea reflecției. | panel intern UPB+NXP |
+## Suggested Integrated System
 
-## 🤖 Prompt-uri pentru Asistentul AI
+Build a small monitoring application:
 
-> **Regulă:** Copiați prompt-ul complet — contextul hardware este obligatoriu.
-> AI-ul va genera cod greșit (pentru alte familii NXP sau Arduino) fără aceste informații.
+- read P3T1755 temperature through `LPI2C0` once per second;
+- log status over `LPUART0`;
+- drive an RGB LED with PWM according to temperature;
+- use `SW3` as an interrupt-driven alert/acknowledge button;
+- read an analog threshold from LPADC;
+- run a finite-state machine in the super-loop.
 
-### Prompt: Schelet FSM integrat
+Example states:
+
+```c
+typedef enum
+{
+    STATE_IDLE,
+    STATE_MONITORING,
+    STATE_ALERT,
+    STATE_COOLING
+} app_state_t;
+```
+
+## Super-Loop Pattern
+
+ISRs should set flags. The main loop should process them:
+
+```c
+volatile bool g_buttonPressed;
+volatile bool g_timerTick;
+
+while (1)
+{
+    if (g_timerTick)
+    {
+        g_timerTick = false;
+        sample_sensors();
+    }
+
+    if (g_buttonPressed)
+    {
+        g_buttonPressed = false;
+        handle_button_event();
+    }
+
+    process_fsm(&state);
+}
+```
+
+For shared variables modified by ISRs and read in `main()`, use `volatile` and protect multi-byte or multi-field updates when needed.
+
+## AI Assistant Prompt: FSM Skeleton
 
 ```text
-FRDM-MCXA153, toate perifericele active simultan:
-  LPI2C0 (P3T1755 1Hz), LPUART0 (../log), SCTimer PWM (../lED), LPADC0 (prag), GPIO IRQ SW3.
-Sarcina: schelet FSM în C — DOAR structura, nu implementarea completă.
+FRDM-MCXA153, all peripherals active together:
+LPI2C0 P3T1755 at 1 Hz, LPUART0 logging, PWM LED, LPADC threshold input, GPIO IRQ SW3.
+Task: generate only the C skeleton for a finite-state machine, not the full implementation.
+Use:
 typedef enum { STATE_IDLE, STATE_MONITORING, STATE_ALERT, STATE_COOLING } app_state_t;
-Arhitectura: super-loop cu flag-uri volatile setate din ISR-uri, fără RTOS.
-Generează:
-  - header-ele necesare
-  - structura de date globale
-  - funcția void process_fsm(app_state_t *state)
-  - comentarii despre ce trebuie protejat cu DisableIRQ/EnableIRQ.
+Architecture: super-loop with volatile flags set from ISRs, no RTOS.
+Generate:
+- required headers;
+- global data structure;
+- void process_fsm(app_state_t *state);
+- comments about what must be protected with DisableIRQ/EnableIRQ.
 ```
 
-### Prompt: Conflict UART blocking + ISR
+## AI Assistant Prompt: UART Blocking vs ISR Latency
 
 ```text
-FRDM-MCXA153, sistem integrat.
-Problema: LPUART_WriteBlocking() blochează CPU ~1ms la 115200 baud.
-Impact: ISR-ul butonului SW3 nu poate răspunde în timp real în timpul transmisiei UART.
-Soluții evaluate:
-1. Buffer circular UART + transmisie în background (ISR LPUART TX empty)
-2. LPUART DMA mode — CPU liber în timp ce DMA trimite
-3. Printf mai rar (nu la fiecare ciclu)
-Care e soluția optimă pentru un sistem fără RTOS pe MCX A153?
-Explică tradeoff-urile.
+FRDM-MCXA153 integrated system.
+Problem: LPUART_WriteBlocking() can block the CPU while sending text at 115200 baud.
+Impact: SW3 ISR responsiveness and timing-sensitive work may suffer during long logs.
+Compare:
+1. UART ring buffer + TX-empty interrupt;
+2. LPUART DMA;
+3. logging less often.
+Which solution is best for a no-RTOS MCX A153 project and why?
 ```
 
-## ⚠️ Capcane Critice
+## Common Pitfalls
 
-> Ce GenAI **nu știe** fără context explicit — verificați înainte de upload pe placă.
+- `LPUART_WriteBlocking()` can stall the CPU during long messages.
+- AI may forget atomic protection for variables shared between ISR and `main()`.
+- Do not do slow I2C, ADC, or printing work directly inside an ISR.
+- Keep a clear owner for each peripheral clock and generated configuration.
+- If using DMA, check channel conflicts between peripherals.
+- Log less frequently than the main loop runs.
 
-- `LPUART_WriteBlocking` blochează CPU complet — incompatibil cu ISR time-critical; folosiți buffer circular + TX IRQ sau LPUART DMA
-- **GenAI va omite ATOMIC_BLOCK** pentru variabile partajate ISR/main — adăugați `DisableIRQ`/`EnableIRQ` manual
-- ADC și I2C pot folosi același bus DMA — verificați conflictele de canal DMA dacă folosiți DMA pentru ambele
+## Deliverable
 
-## ✅ Deliverable
+Submit:
 
-> Sistem integrat funcțional + FSM documentat cu diagrama stărilor + Show & Tell 5 min + reflecție GenAI (ce a greșit, cum s-a corectat)
+1. a working integrated firmware project;
+2. FSM diagram or state table;
+3. short live demo plan;
+4. explanation of one integration problem you solved;
+5. reflection on what AI suggested incorrectly and how you verified/fixed it.
 
 ---
 
-[← L7: LPI2C — Senzorul P3T1755 On-Board](../l7-lpi2c-p3t1755) · [L9: Testing, Documentare & Prezentare Finală →](../l9-testing-docs)
+[<- L7: LPI2C - P3T1755 Temperature Sensor](../l7-lpi2c-p3t1755)
+

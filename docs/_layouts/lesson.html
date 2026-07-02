@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ page.title }} — IPCEI NXP</title>
+  <title>{{ page.title }} - IPCEI NXP</title>
 
   <link rel="stylesheet" href="{{ '/assets/css/syntax.css' | relative_url }}" />
 
@@ -48,6 +48,18 @@
       margin-bottom: .75rem; transition: color .15s, border-color .15s;
     }
     .back-btn:hover { color: var(--white); border-color: var(--sky); }
+    .lesson-actions {
+      display: flex; flex-wrap: wrap; gap: .75rem;
+      margin-bottom: 1.25rem;
+    }
+    .source-btn {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-size: .86rem; font-weight: 700; color: var(--navy);
+      background: var(--ice); border: 1px solid var(--border);
+      border-radius: 6px; padding: .55rem .9rem;
+      text-decoration: none; transition: color .15s, background .15s, border-color .15s;
+    }
+    .source-btn:hover { color: var(--white); background: var(--blue); border-color: var(--blue); }
 
     /* ── Body layout: sidebar + content ── */
     .page-body {
@@ -174,19 +186,19 @@
 <body>
 
 <header class="page-header">
-  <a class="back-btn" href="{{ '/' | relative_url }}">&#8592; Lecții</a>
+  <a class="back-btn" href="{{ '/' | relative_url }}">&#8592; Lessons</a>
   <h1>{{ page.title }}</h1>
   {% if page.description %}
   <div class="meta">
     <span>{{ page.description }}</span>
-    <span>FRDM-MCXA153 · MCUXpresso SDK 24.12</span>
+    <span>FRDM-MCXA153 - MCUXpresso SDK</span>
   </div>
   {% endif %}
 </header>
 
 <div class="page-body">
-  <nav class="toc-sidebar" aria-label="Cuprins">
-    <p class="toc-title">Cuprins</p>
+  <nav class="toc-sidebar" aria-label="Contents">
+    <p class="toc-title">Contents</p>
     <ul id="toc-list"></ul>
   </nav>
 
@@ -194,12 +206,17 @@
     <div class="content">
       <div id="lesson-content">
         {{ content }}
+        {% if page.source_url %}
+        <div class="lesson-actions">
+          <a class="source-btn" href="{{ page.source_url }}">Source code &#8594;</a>
+        </div>
+        {% endif %}
       </div>
     </div>
   </main>
 </div>
 
-<footer>IPCEI NXP · Lecții FRDM-MCXA153 · UPB–NXP Semiconductors · 2026</footer>
+<footer>IPCEI NXP - FRDM-MCXA153 Lessons - UPB-NXP Semiconductors - 2026</footer>
 
 <script>
 function buildTOC() {
@@ -257,3 +274,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+

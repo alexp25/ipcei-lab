@@ -1,94 +1,158 @@
 ---
-title: "L9 — Testing, Documentare & Prezentare Finală"
-description: "Unity, Doxygen, CI/CD, Show & Tell NXP"
+title: "L9 - Testing, Documentation and Final Presentation"
+description: "Unity, Doxygen, CI/CD, and final NXP-style show-and-tell"
 nav_order: 10
-parent: Lecții FRDM-MCXA153
+parent: FRDM-MCXA153 Lessons
 layout: lesson
+source_url: https://github.com/alexp25/ipcei-lab/tree/main/src
 ---
 
-# ✅ L9 — Testing, Documentare & Prezentare Finală
+# L9 - Testing, Documentation and Final Presentation
 
-**Unity, Doxygen, CI/CD, Show & Tell NXP**
+**Unity tests, Doxygen documentation, CI, and final demo preparation**
 
 ---
 
 | | |
 |---|---|
-| **Ziua / Sesiunea** | Ziua 5 + Săptămâna 2 online |
-| **Periferic** | `Unity · Doxygen · GitHub Actions · Show & Tell` |
-| **Durată** | 2h sesiune + async |
-| **Responsabil** | Cadru UPB + Mariana Mocanu |
-| **Hardware** | FRDM-MCXA153 (pentru demo final) · PC (pentru CI/CD și documentare) |
+| **Session** | Testing and presentation |
+| **Topics** | `Unity`, `Doxygen`, `GitHub Actions`, `Show & Tell` |
+| **Hardware** | FRDM-MCXA153 for final demo, PC for CI and documentation |
 
-## 📌 Context și Motivație
+## Context and Motivation
 
-Ultima sesiune de conținut este despre calitatea codului și comunicare — competențe direct valorificate la NXP. Testing pentru embedded fără hardware: Unity compilat pentru host (x86) cu funcții mock pentru SDK. Documentarea cu Doxygen respectă convențiile interne NXP. Prezentarea finală în format **Show & Tell NXP** este evaluată de panelul UPB-NXP pe 2–3 septembrie.
+The final content session focuses on code quality and communication. These skills matter in real embedded teams: code must be testable, documented, reproducible, and explainable.
 
-> **Board:** FRDM-MCXA153 · MCX A153 (Cortex-M33 @ 96 MHz) · SDK MCUXpresso 24.12 · VS Code + CMake
+The target workflow is:
 
-## 🎯 Obiective
+1. unit-test pure logic on the host;
+2. document public APIs with Doxygen;
+3. run build/tests in CI;
+4. prepare a concise final presentation with a live demo and AI reflection.
 
-1. Cel puțin 5 unit tests scrise cu Unity pentru funcțiile pure (conversii, decodare registre)
-2. Documentație Doxygen generată automat din comentarii — HTML vizibil în browser
-3. CI GitHub Actions: build + test la fiecare push (cross-compile pentru host, mock SDK)
-4. Draft prezentare finală structurat: problemă → arhitectura → demo → comparativ AI → reflecție
+## Objectives
 
-## 🕐 Planul Sesiunii
+By the end of the lab you should be able to:
 
-| Interval | Activitate | Detaliu | Cine |
-|---|---|---|---|
-| `10:00–10:45` | **Unity testing embedded** | Mock-uri pentru SDK NXP. Testare funcții pure: `p3t1755_raw_to_celsius()`, `adc_raw_to_mv()`. CI GitHub Actions cu ARM GCC cross-compile pentru host. | cadru UPB + Stefan |
-| `10:45–11:30` | **Doxygen cu GenAI** | Generare comentarii Doxygen cu AI pentru funcțiile proprii. Configurare Doxyfile. GitHub Pages pentru doc HTML. Stil: NXP SDK conventions. | cadru UPB |
-| `11:30–12:00` | **Template prezentare finală** | 10 slide-uri max: problemă → arhitectura → demo live → comparativ baseline vs AI → reflecție GenAI → concluzii. | Mariana Mocanu |
-| `12:00–13:00` | **Rehearsal per echipă** | 5 min prezentare draft + feedback rapid. Agentul AI evaluează calitatea secțiunii de reflecție GenAI. | panel online |
+1. Write at least five Unity unit tests for pure functions.
+2. Generate Doxygen HTML documentation from C comments.
+3. Configure GitHub Actions for build and tests.
+4. Mock SDK/hardware functions when testing on the host.
+5. Prepare a final presentation: problem, architecture, demo, AI comparison, reflection.
 
-## 🤖 Prompt-uri pentru Asistentul AI
+## What to Test
 
-> **Regulă:** Copiați prompt-ul complet — contextul hardware este obligatoriu.
-> AI-ul va genera cod greșit (pentru alte familii NXP sau Arduino) fără aceste informații.
+Prefer pure functions that do not touch hardware directly:
 
-### Prompt: Unity tests conversii
+- P3T1755 raw-to-Celsius conversion;
+- ADC raw-to-millivolt conversion;
+- ADC raw-to-threshold mapping;
+- button threshold decoder;
+- FSM transition function;
+- RGB duty-cycle mapping.
 
-```text
-FRDM-MCXA153, SDK MCUXpresso 24.12, Unity test framework compilat pentru host (x86).
-Sarcina: test suite pentru float p3t1755_raw_to_celsius(int16_t raw).
-Test cases (raw = valoarea registrului înainte de shift >> 5):
-  0x0000 →   0.000°C
-  0x00C8 →  25.000°C
-  0x0190 →  50.000°C
-  0xFF38 → -25.000°C  (negativ, complementul față de 2, 11 biți)
-Include: UnityBegin, RUN_TEST, TEST_ASSERT_FLOAT_WITHIN (toleranță ±0.125°C).
-IMPORTANT: funcția testată este PURĂ — mock-ul LPI2C nu este necesar.
+Example test targets:
+
+```c
+float p3t1755_raw_to_celsius(uint8_t msb, uint8_t lsb);
+uint32_t adc_raw_to_mv(uint16_t raw);
+app_state_t process_fsm_step(app_state_t state, const app_inputs_t *inputs);
 ```
 
-### Prompt: Comentarii Doxygen NXP style
+## Unity Test Prompt
 
 ```text
-Generează comentarii Doxygen complete, stil NXP SDK, pentru funcțiile:
-  float p3t1755_read_temp_celsius(void)
-  void p3t1755_set_threshold(float temp_c)
-  status_t p3t1755_init(../lPI2C_Type *base, uint32_t src_clock_hz)
-Include per funcție:
-  @brief   — 1 linie
-  @param   — tip + descriere
-  @return  — valori posibile
-  @note    — limitări hardware, VREF, thread safety
-  @warning — dacă aplicabil
-Format: doxygen C style ( /** ... */ ), fără markdown.
+FRDM-MCXA153 project, MCUXpresso SDK, Unity test framework compiled for host x86.
+Task: write a Unity test suite for pure conversion functions.
+Test p3t1755_raw_to_celsius(msb, lsb) using:
+- 0x19 0x00 -> 25.0 C
+- 0x00 0x00 -> 0.0 C
+- 0xE7 0x00 -> -25.0 C
+Use TEST_ASSERT_FLOAT_WITHIN with a small tolerance.
+The function is pure; do not mock LPI2C.
+Include UnityBegin, RUN_TEST, and UnityEnd.
 ```
 
-## ⚠️ Capcane Critice
+## Doxygen Prompt
 
-> Ce GenAI **nu știe** fără context explicit — verificați înainte de upload pe placă.
+```text
+Generate Doxygen comments in NXP SDK style for these functions:
+- status_t p3t1755_init(...)
+- status_t p3t1755_read_celsius(...)
+- uint32_t adc_raw_to_mv(uint16_t raw)
+For each function include:
+@brief, @param, @return, @note, and @warning if needed.
+Use C Doxygen comment style /** ... */.
+Do not use Markdown tables inside the comments.
+```
 
-- **Unity pe host (x86)**: compilați pentru host cu mock-uri pentru funcțiile SDK — **NU** cross-compile în Unity mode pe Cortex-M33
-- Doxygen cu `INPUT` recursiv prinde header-ele SDK NXP (mii de fișiere) — filtrați cu `EXCLUDE_PATTERNS`
-- **Secțiunea reflecție GenAI** (ce a greșit AI, ce ați corectat) diferențiază o prezentare bună de una excelentă
+## Host Testing Pattern
 
-## ✅ Deliverable
+Separate pure logic from hardware access. For example:
 
-> 5+ unit tests trecute (toate verde) + Doxygen HTML generat + CI verde pe GitHub + draft prezentare V1 pe Moodle
+```text
+p3t1755.c        pure decode/conversion + protocol-level API
+onboard_temp.c   board-specific LPI2C adapter
+test_p3t1755.c   host tests for pure conversion
+```
+
+Hardware-facing code can be mocked or excluded from host tests. Do not try to run board peripheral initialization on the host.
+
+## CI Checklist
+
+A minimal CI flow should:
+
+1. install build dependencies;
+2. configure the host/unit-test build;
+3. compile tests;
+4. run tests;
+5. optionally build firmware;
+6. upload Doxygen or test reports as artifacts.
+
+Keep host tests independent from connected hardware.
+
+## Doxygen Checklist
+
+- Document public headers first.
+- Do not recursively include the whole MCUXpresso SDK in Doxygen input.
+- Use `EXCLUDE_PATTERNS` to avoid thousands of SDK files.
+- Document ownership and thread/ISR restrictions.
+- Explain units and ranges: Celsius, millivolts, raw ADC range, I2C address format.
+
+## Final Presentation Structure
+
+Keep the final talk short and concrete:
+
+1. Problem and hardware context.
+2. System architecture diagram.
+3. Peripheral map.
+4. Live demo.
+5. One important debugging story.
+6. Baseline vs AI-assisted workflow.
+7. What AI got wrong.
+8. How the team verified and corrected it.
+9. Tests and documentation status.
+10. Final conclusion.
+
+## Common Pitfalls
+
+- Do not compile Unity tests for Cortex-M when the goal is host testing.
+- Do not include the whole SDK in Doxygen input.
+- Do not test hardware drivers by running board initialization on the host.
+- Do not accept AI-generated tests without checking expected values.
+- The AI reflection is part of the engineering result, not decoration.
+
+## Deliverable
+
+Submit:
+
+1. at least five passing Unity tests;
+2. generated Doxygen HTML;
+3. green CI or documented CI attempt;
+4. final presentation draft;
+5. short AI reflection: wrong suggestion, verification method, final fix.
 
 ---
 
-[← L8: Integrare — Sistem Complet cu FSM](../l8-integrare)
+[<- L8: Integration - Complete FSM System](../l8-integrare)
+
