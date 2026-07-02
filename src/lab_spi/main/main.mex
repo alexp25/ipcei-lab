@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding= "UTF-8" ?>
+<?xml version="1.0" encoding= "UTF-8" ?>
 <configuration name="MCXA153" xsi:schemaLocation="http://mcuxpresso.nxp.com/XSD/mex_configuration_19 http://mcuxpresso.nxp.com/XSD/mex_configuration_19.xsd" uuid="9a7fa702-eda5-4ae9-ad2a-f89b53410c1d" version="19" xmlns="http://mcuxpresso.nxp.com/XSD/mex_configuration_19" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
    <common>
       <processor>MCXA153</processor>
@@ -22,8 +22,8 @@
    <tools>
       <pins name="Pins" version="17.0" enabled="true" update_project_code="true">
          <generated_project_files>
-            <file path="../frdmmcxa153/main/pin_mux.c" update_enabled="true"/>
-            <file path="../frdmmcxa153/main/pin_mux.h" update_enabled="true"/>
+            <file path="frdmmcxa153/board/pin_mux.c" update_enabled="true"/>
+            <file path="frdmmcxa153/board/pin_mux.h" update_enabled="true"/>
          </generated_project_files>
          <pins_profile>
             <processor_version>26.03.20</processor_version>
@@ -361,8 +361,8 @@
          </dependencies>
          <generated_project_files>
             <file path="../frdmmcxa153/board/RTE_Device.h" update_enabled="true"/>
-            <file path="../main/peripherals.c" update_enabled="true"/>
-            <file path="../main/peripherals.h" update_enabled="true"/>
+            <file path="frdmmcxa153/board/peripherals.c" update_enabled="true"/>
+            <file path="frdmmcxa153/board/peripherals.h" update_enabled="true"/>
          </generated_project_files>
          <peripherals_profile>
             <processor_version>26.03.20</processor_version>

@@ -1,4 +1,4 @@
-﻿
+
 # Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -29,14 +29,9 @@ mcux_add_source(
             ili9341_demo.h
 )
 
-mcux_add_source(
-    SOURCES cfg_tools/board/RTE_Device.h
-)
 
-mcux_add_source(
-    SOURCES cfg_tools/board/peripherals.c
-            cfg_tools/board/peripherals.h
-)
+
+
 
 mcux_add_source(
     BASE_PATH ${SdkRootDirPath}
@@ -60,4 +55,4 @@ mcux_add_include(
 
 mcux_convert_binary(BINARY ${APPLICATION_BINARY_DIR}/${MCUX_SDK_PROJECT_NAME}.bin)
 mcux_add_config_mex_path( PATH . )
-mcux_add_include(INCLUDES cfg_tools/board main .)
+mcux_add_include(INCLUDES frdmmcxa153/board .)

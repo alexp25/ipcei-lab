@@ -20,10 +20,7 @@ mcux_add_source(
     SOURCES pwm_control.c
 )
 
-mcux_add_source(
-    SOURCES pwm_control/peripherals.c
-            pwm_control/peripherals.h
-)
+
 
 mcux_add_source(
     BASE_PATH ${SdkRootDirPath}
@@ -43,5 +40,5 @@ mcux_add_include(
 )
 
 mcux_convert_binary(BINARY ${APPLICATION_BINARY_DIR}/${MCUX_SDK_PROJECT_NAME}.bin)
-mcux_add_config_mex_path( PATH . )
-mcux_add_include(INCLUDES pwm_control .)
+mcux_add_config_mex_path( PATH frdmmcxa153 )
+mcux_add_include(INCLUDES .)

@@ -13,7 +13,7 @@ project(main LANGUAGES C CXX ASM PROJECT_BOARD_PORT_PATH ${board_root}/${board}/
 
 
 include(${board}/board_files.cmake)
-mcux_add_include(INCLUDES main .)
+mcux_add_include(INCLUDES .)
 include(${SdkRootDirPath}/CMakeLists.txt)
 
 
@@ -21,10 +21,7 @@ mcux_add_source(
     SOURCES main.c
 )
 
-mcux_add_source(
-    SOURCES main/peripherals.c
-            main/peripherals.h
-)
+
 
 mcux_convert_binary(BINARY ${APPLICATION_BINARY_DIR}/${MCUX_SDK_PROJECT_NAME}.bin)
 mcux_add_config_mex_path( PATH . )

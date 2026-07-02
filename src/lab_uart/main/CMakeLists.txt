@@ -1,4 +1,4 @@
-﻿
+
 # Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -21,9 +21,9 @@ mcux_add_source(
 )
 
 mcux_add_source(
-    SOURCES cfg_tools/board/RTE_Device.h
-            cfg_tools/board/peripherals.c
-            cfg_tools/board/peripherals.h
+    SOURCES frdmmcxa153/board/RTE_Device.h
+            frdmmcxa153/board/peripherals.c
+            frdmmcxa153/board/peripherals.h
 )
 
 mcux_add_source(
@@ -40,9 +40,9 @@ mcux_add_include(
 )
 
 mcux_add_include(
-    INCLUDES cfg_tools/board
+    INCLUDES frdmmcxa153/board
 )
 
 mcux_convert_binary(BINARY ${APPLICATION_BINARY_DIR}/${MCUX_SDK_PROJECT_NAME}.bin)
 mcux_add_config_mex_path( PATH . )
-mcux_add_include(INCLUDES cfg_tools/board main .)
+mcux_add_include(INCLUDES frdmmcxa153/board .)

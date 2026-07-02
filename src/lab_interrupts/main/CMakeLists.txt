@@ -1,4 +1,4 @@
-﻿
+
 # Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -10,9 +10,6 @@ set(CONF_FILE ${conf_file_path} ${CONF_FILE})
 include(${SdkRootDirPath}/cmake/extension/mcux.cmake)
 
 project(main LANGUAGES C CXX ASM PROJECT_BOARD_PORT_PATH ${board_root}/${board}/main)
-
-target_include_directories(${MCUX_SDK_PROJECT_NAME} BEFORE PUBLIC ${CMAKE_CURRENT_LIST_DIR}/cfg_tools/board)
-
 include(${board}/board_files.cmake)
 include(${SdkRootDirPath}/CMakeLists.txt)
 
@@ -22,7 +19,7 @@ mcux_add_source(
 )
 
 mcux_add_source(
-    SOURCES cfg_tools/board/RTE_Device.h
+    SOURCES frdmmcxa153/board/RTE_Device.h
             cfg_tools/cfg_require.json
 )
 
@@ -40,9 +37,9 @@ mcux_add_include(
 )
 
 mcux_add_include(
-    INCLUDES cfg_tools/board
+    INCLUDES frdmmcxa153/board
 )
 
 mcux_convert_binary(BINARY ${APPLICATION_BINARY_DIR}/${MCUX_SDK_PROJECT_NAME}.bin)
 mcux_add_config_mex_path( PATH . )
-mcux_add_include(INCLUDES main .)
+mcux_add_include(INCLUDES .)

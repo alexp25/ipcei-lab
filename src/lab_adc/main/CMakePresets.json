@@ -23,7 +23,7 @@
         "CMAKE_LIBRARY_OUTPUT_DIRECTORY": "$env{binaryDir}",
         "CMAKE_ARCHIVE_OUTPUT_DIRECTORY": "$env{binaryDir}",
         "WEST": "TRUE",
-        "board": ""
+        "board": "frdmmcxa153"
       }
     },
     {
@@ -45,7 +45,7 @@
         "CMAKE_LIBRARY_OUTPUT_DIRECTORY": "$env{binaryDir}",
         "CMAKE_ARCHIVE_OUTPUT_DIRECTORY": "$env{binaryDir}",
         "WEST": "TRUE",
-        "board": ""
+        "board": "frdmmcxa153"
       }
     }
   ],

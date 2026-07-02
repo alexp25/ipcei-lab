@@ -9,7 +9,7 @@
       "displayName": "debug",
       "generator": "Ninja",
       "binaryDir": "${fileDir}//${presetName}",
-      "toolchainFile": "$env{SdkRootDirPath}/mcuxsdk/cmake/toolchain/armgcc.cmake",
+      "toolchainFile": "$env{SdkRootDirPath}/cmake/toolchain/armgcc.cmake",
       "inherits": "debug-env",
       "cacheVariables": {
         "APP_DIR": {
@@ -17,7 +17,7 @@
           "type": "PATH"
         },
         "CMAKE_BUILD_TYPE": "debug",
-        "SdkRootDirPath": "$env{SdkRootDirPath}/mcuxsdk",
+        "SdkRootDirPath": "$env{SdkRootDirPath}",
         "CONFIG_TOOLCHAIN": "armgcc",
         "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "$env{binaryDir}",
         "CMAKE_LIBRARY_OUTPUT_DIRECTORY": "$env{binaryDir}",
@@ -32,7 +32,7 @@
       "displayName": "release",
       "generator": "Ninja",
       "binaryDir": "${fileDir}//${presetName}",
-      "toolchainFile": "$env{SdkRootDirPath}/mcuxsdk/cmake/toolchain/armgcc.cmake",
+      "toolchainFile": "$env{SdkRootDirPath}/cmake/toolchain/armgcc.cmake",
       "inherits": "release-env",
       "cacheVariables": {
         "APP_DIR": {
@@ -40,7 +40,7 @@
           "type": "PATH"
         },
         "CMAKE_BUILD_TYPE": "release",
-        "SdkRootDirPath": "$env{SdkRootDirPath}/mcuxsdk",
+        "SdkRootDirPath": "$env{SdkRootDirPath}",
         "CONFIG_TOOLCHAIN": "armgcc",
         "CMAKE_RUNTIME_OUTPUT_DIRECTORY": "$env{binaryDir}",
         "CMAKE_LIBRARY_OUTPUT_DIRECTORY": "$env{binaryDir}",

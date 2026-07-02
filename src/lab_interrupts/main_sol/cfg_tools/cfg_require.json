@@ -1,4 +1,4 @@
-﻿{
+{
   "projects": [{
     "core": "cm33_core0",
     "addComponents": [{
@@ -7,10 +7,10 @@
       "version": "2.8.0"
     }],
     "device_package": "MCXA153VLH",
-    "addIncludes": ["c:/WORKSPACE/proiecte/ipcei-lab/src/lab_interrupts/main_sol/frdmmcxa153/board"],
+    "addIncludes": ["C:/WORKSPACE/proiecte/ipcei-lab/src/lab_interrupts/main_sol/frdmmcxa153/board"],
     "projectBoardFolder": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_interrupts/main_sol/frdmmcxa153",
     "source_generated_cmake_file_path": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_interrupts/main_sol/frdmmcxa153/cfg_tools_generated.cmake",
-    "addFiles": ["c:/WORKSPACE/proiecte/ipcei-lab/src/lab_interrupts/main_sol/frdmmcxa153/board/RTE_Device.h"],
+    "addFiles": ["C:/WORKSPACE/proiecte/ipcei-lab/src/lab_interrupts/main_sol/frdmmcxa153/board/RTE_Device.h"],
     "name": "main",
     "removeFiles": [],
     "projectRootPath": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_interrupts/main_sol",

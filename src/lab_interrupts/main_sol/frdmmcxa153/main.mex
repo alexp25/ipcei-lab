@@ -16,14 +16,14 @@
       <enable_parallel_routing>true</enable_parallel_routing>
       <generate_registers_defines>false</generate_registers_defines>
       <project_links>
-               <project_link path="C:/WORKSPACE/proiecte/ipcei-lab/src/lab_usb/main/cfg_tools"/>
-</project_links>
+         <project_link path="C:/WORKSPACE/proiecte/ipcei-lab/src/lab_interrupts/main_sol/cfg_tools"/>
+      </project_links>
    </preferences>
    <tools>
       <pins name="Pins" version="17.0" enabled="true" update_project_code="true">
          <generated_project_files>
-            <file path="frdmmcxa153/board/pin_mux.c" update_enabled="true"/>
-            <file path="frdmmcxa153/board/pin_mux.h" update_enabled="true"/>
+            <file path="../frdmmcxa153/board/pin_mux.c" update_enabled="true"/>
+            <file path="../frdmmcxa153/board/pin_mux.h" update_enabled="true"/>
          </generated_project_files>
          <pins_profile>
             <processor_version>26.03.20</processor_version>
@@ -99,8 +99,8 @@
       </pins>
       <clocks name="Clocks" version="20.0" enabled="true" update_project_code="true">
          <generated_project_files>
-            <file path="../frdmmcxa153/frdmmcxa153/clock_config.c" update_enabled="true"/>
-            <file path="../frdmmcxa153/frdmmcxa153/clock_config.h" update_enabled="true"/>
+            <file path="../frdmmcxa153/board/clock_config.c" update_enabled="true"/>
+            <file path="../frdmmcxa153/board/clock_config.h" update_enabled="true"/>
          </generated_project_files>
          <clocks_profile>
             <processor_version>26.03.20</processor_version>
@@ -361,8 +361,8 @@
          </dependencies>
          <generated_project_files>
             <file path="../frdmmcxa153/board/RTE_Device.h" update_enabled="true"/>
-            <file path="frdmmcxa153/board/peripherals.c" update_enabled="true"/>
-            <file path="frdmmcxa153/board/peripherals.h" update_enabled="true"/>
+            <file path="../frdmmcxa153/board/peripherals.c" update_enabled="true"/>
+            <file path="../frdmmcxa153/board/peripherals.h" update_enabled="true"/>
          </generated_project_files>
          <peripherals_profile>
             <processor_version>26.03.20</processor_version>

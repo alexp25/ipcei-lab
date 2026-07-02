@@ -34,7 +34,7 @@
                          "projectBoardFolder":  "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_shield_lcd_keypad/main/cfg_tools",
                          "source_generated_cmake_file_path":  "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_shield_lcd_keypad/main/frdmmcxa153/cfg_tools_generated.cmake",
                          "addFiles":  [
-                                          "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_shield_lcd_keypad/main/cfg_tools/board/RTE_Device.h",
+                                          "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_shield_lcd_keypad/main/frdmmcxa153/board/RTE_Device.h",
                                           "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_shield_lcd_keypad/main/cfg_tools/cfg_require.json",
                                           "C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/drivers/lpi2c/fsl_lpi2c.h",
                                           "C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/drivers/lpi2c/fsl_lpi2c.c",

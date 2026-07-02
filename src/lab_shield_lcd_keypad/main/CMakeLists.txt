@@ -21,7 +21,7 @@ mcux_add_source(
             dfrobot_lcd_shield.h
             dfrobot_lcd_shield_keypad.c
             dfrobot_lcd_shield_keypad.h
-            cfg_tools/board/RTE_Device.h
+            frdmmcxa153/board/RTE_Device.h
             cfg_tools/cfg_require.json
 )
 
@@ -39,9 +39,9 @@ mcux_add_include(
 )
 
 mcux_add_include(
-    INCLUDES cfg_tools/board
+    INCLUDES frdmmcxa153/board
 )
 
 mcux_convert_binary(BINARY ${APPLICATION_BINARY_DIR}/${MCUX_SDK_PROJECT_NAME}.bin)
 mcux_add_config_mex_path(PATH .)
-mcux_add_include(INCLUDES frdmmcxa153/main .)
+mcux_add_include(INCLUDES frdmmcxa153/app .)

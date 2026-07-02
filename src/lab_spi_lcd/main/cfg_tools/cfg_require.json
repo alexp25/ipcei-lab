@@ -1,4 +1,4 @@
-﻿{
+{
   "projects": [{
     "core": "cm33_core0",
     "addComponents": [{
@@ -7,10 +7,10 @@
       "version": "2.8.0"
     }],
     "device_package": "MCXA153VLH",
-    "addIncludes": ["c:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main/cfg_tools/board"],
+    "addIncludes": ["c:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main/frdmmcxa153/board"],
     "projectBoardFolder": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main",
     "source_generated_cmake_file_path": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main/frdmmcxa153/cfg_tools_generated.cmake",
-    "addFiles": ["c:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main/cfg_tools/board/RTE_Device.h"],
+    "addFiles": ["c:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main/frdmmcxa153/board/RTE_Device.h"],
     "name": "main",
     "removeFiles": [],
     "projectRootPath": "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main",

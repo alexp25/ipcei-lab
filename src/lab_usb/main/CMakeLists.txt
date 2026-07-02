@@ -1,4 +1,4 @@
-﻿
+
 # Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -35,7 +35,7 @@ mcux_add_include(
 
 mcux_convert_binary(BINARY ${APPLICATION_BINARY_DIR}/${MCUX_SDK_PROJECT_NAME}.bin)
 mcux_add_config_mex_path( PATH . )
-mcux_add_include(INCLUDES main .)
+mcux_add_include(INCLUDES .)
 
 mcux_add_macro(
     CC "-DUSB_STACK_BM"

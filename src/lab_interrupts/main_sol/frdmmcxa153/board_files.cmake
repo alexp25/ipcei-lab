@@ -1,4 +1,3 @@
-﻿
 # Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -8,39 +7,51 @@ mcux_add_configuration(
     CX "-DSDK_DEBUGCONSOLE=1"
 )
 
-
 mcux_add_source(
-    SOURCES frdmmcxa153/board.c
-            frdmmcxa153/board.h
+    SOURCES board/board.c
+            board/board.h
+            board/FreeRTOSConfigBoard.h
+            board/se_board_config.h
 )
 
 mcux_add_include(
-    INCLUDES frdmmcxa153
+    INCLUDES board
 )
 
 mcux_add_source(
-    SOURCES frdmmcxa153/clock_config.c
-            frdmmcxa153/clock_config.h
+    SOURCES board/clock_config.c
+            board/clock_config.h
 )
 
 mcux_add_include(
-    INCLUDES frdmmcxa153
+    INCLUDES board
 )
 
 mcux_add_source(
-    SOURCES main/pin_mux.c
-            main/pin_mux.h
+    SOURCES board/pin_mux.c
+            board/pin_mux.h
 )
 
 mcux_add_include(
-    INCLUDES main
+    INCLUDES board
 )
 
 mcux_add_source(
-    SOURCES main/app.h
-            main/hardware_init.c
+    SOURCES board/peripherals.c
+            board/peripherals.h
+            board/RTE_Device.h
 )
 
 mcux_add_include(
-    INCLUDES main
+    INCLUDES board
 )
+
+mcux_add_source(
+    SOURCES app/app.h
+            app/hardware_init.c
+)
+
+mcux_add_include(
+    INCLUDES app
+)
+

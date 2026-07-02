@@ -1,4 +1,4 @@
-﻿
+
 # Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
@@ -39,9 +39,9 @@ mcux_add_include(
 
 mcux_add_include(
     INCLUDES frdmmcxa153/board
-             cfg_tools/board
+             frdmmcxa153/board
 )
 
 mcux_convert_binary(BINARY ${APPLICATION_BINARY_DIR}/${MCUX_SDK_PROJECT_NAME}.bin)
 mcux_add_config_mex_path(PATH .)
-mcux_add_include(INCLUDES frdmmcxa153/main .)
+mcux_add_include(INCLUDES frdmmcxa153/app .)

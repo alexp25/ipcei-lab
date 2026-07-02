@@ -1,4 +1,4 @@
-﻿{
+{
     "$schema": "https://mcuxpresso.nxp.com/staticdata/mcux/schema/project_info/project_info_schema_3.0.json",
     "projects": [
         {
@@ -21,8 +21,8 @@
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/drivers/mcx_spc",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/drivers/common",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/arch/arm/CMSIS/Core/Include/m-profile",
-                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/cfg_tools/board",
-                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/frdmmcxa153/main",
+                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/frdmmcxa153/board",
+                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/frdmmcxa153/app",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/components/debug_console_lite",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/drivers/gpio",
@@ -36,13 +36,13 @@
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/cfg_tools/tmp_build/mcuxsdk_version.h",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/frdmmcxa153/frdmmcxa153/board.c",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/frdmmcxa153/frdmmcxa153/board.h",
-                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/cfg_tools/board/clock_config.c",
-                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/cfg_tools/board/clock_config.h",
-                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/cfg_tools/board/pin_mux.c",
-                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/cfg_tools/board/pin_mux.h",
-                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/cfg_tools/board/RTE_Device.h",
-                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/frdmmcxa153/main/app.h",
-                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/frdmmcxa153/main/hardware_init.c",
+                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/frdmmcxa153/board/clock_config.c",
+                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/frdmmcxa153/board/clock_config.h",
+                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/frdmmcxa153/board/pin_mux.c",
+                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/frdmmcxa153/board/pin_mux.h",
+                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/frdmmcxa153/board/RTE_Device.h",
+                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/frdmmcxa153/app/app.h",
+                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/frdmmcxa153/app/hardware_init.c",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/devices/MCX/MCXA/MCXA153/fsl_device_registers.h",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/devices/MCX/MCXA/MCXA153/MCXA153.h",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/devices/MCX/MCXA/MCXA153/MCXA153_features.h",
@@ -123,8 +123,8 @@
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/components/uart/fsl_adapter_uart.h",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/components/uart/fsl_adapter_lpuart.c",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/main.c",
-                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/cfg_tools/board/peripherals.c",
-                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/cfg_tools/board/peripherals.h",
+                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/frdmmcxa153/board/peripherals.c",
+                "C:/WORKSPACE/proiecte/ipcei-lab/src/lab_spi_lcd/main_sol/frdmmcxa153/board/peripherals.h",
                 "C:/WORKSPACE/proiecte/ipcei-lab/src/sdks/mcuxsdk/devices/MCX/MCXA/MCXA153/gcc/MCXA153_flash.ld"
             ],
             "components": [

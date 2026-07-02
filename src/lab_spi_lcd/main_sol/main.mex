@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding= "UTF-8" ?>
+<?xml version="1.0" encoding= "UTF-8" ?>
 <configuration name="MCXA153" xsi:schemaLocation="http://mcuxpresso.nxp.com/XSD/mex_configuration_19 http://mcuxpresso.nxp.com/XSD/mex_configuration_19.xsd" uuid="9a7fa702-eda5-4ae9-ad2a-f89b53410c1d" version="19" xmlns="http://mcuxpresso.nxp.com/XSD/mex_configuration_19" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
    <common>
       <processor>MCXA153</processor>

@@ -48,4 +48,4 @@ mcux_add_include(
 
 mcux_convert_binary(BINARY ${APPLICATION_BINARY_DIR}/${MCUX_SDK_PROJECT_NAME}.bin)
 mcux_add_config_mex_path( PATH . )
-mcux_add_include(INCLUDES main .)
+mcux_add_include(INCLUDES .)
