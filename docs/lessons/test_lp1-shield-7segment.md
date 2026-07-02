@@ -41,7 +41,7 @@ Sesiunea de integrare testează dacă perifericele învățate separat funcțion
 | `13:20–15:00` | **Lab: sistem integrat** | Temperatura I2C 1Hz + UART log + PWM LED funcție de temperatură + alertă ISR buton + ADC potențiometru pentru prag variabil. | echipă + mentor |
 | `15:00–16:00` | **Show & Tell intern** | 5 min/echipă: demo live + ce a greșit AI + cum s-a corectat. Agentul AI evaluează calitatea reflecției. | panel intern UPB+NXP |
 
-## 🤖 Prompte pentru Asistentul AI UPB
+## 🤖 Prompt-uri pentru Asistentul AI
 
 > **Regulă:** Copiați prompt-ul complet — contextul hardware este obligatoriu.
 > AI-ul va genera cod greșit (pentru alte familii NXP sau Arduino) fără aceste informații.

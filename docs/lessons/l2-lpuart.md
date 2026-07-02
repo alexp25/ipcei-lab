@@ -41,7 +41,7 @@ LPUART0 pe FRDM-MCXA153 este conectat la MCU-Link care oferă un VCOM port pe US
 | `13:30–14:15` | **Demo: Hello World UART** | `LPUART_GetDefaultConfig()`, `LPUART_Init()`, `LPUART_WriteBlocking()`. Retarget printf. Terminal la 115200. | cadru UPB |
 | `14:15–15:00` | **Lab + GenAI session** | Studenții: UART echo RX→TX + meniu (1=LED roșu, 2=LED verde, 3=all OFF). Prompt cu clock source explicit. | student + mentor |
 
-## 🤖 Prompte pentru Asistentul AI UPB
+## 🤖 Prompt-uri pentru Asistentul AI
 
 > **Regulă:** Copiați prompt-ul complet — contextul hardware este obligatoriu.
 > AI-ul va genera cod greșit (pentru alte familii NXP sau Arduino) fără aceste informații.

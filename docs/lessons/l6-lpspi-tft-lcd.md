@@ -351,7 +351,7 @@ Pentru depanare, începeți cu semnale simple:
 
 Această secvență izolează problema: dacă `fill_screen()` merge, SPI și inițializarea LCD sunt în mare parte corecte.
 
-## Prompte Pentru Asistentul AI UPB
+## Prompt-uri Pentru Asistentul AI
 
 > Copiați promptul complet. Pentru embedded, contextul hardware este obligatoriu.
 

@@ -158,7 +158,7 @@ while (1) {
 }
 ```
 
-## 🤖 Prompte pentru Asistentul AI UPB
+## 🤖 Prompt-uri pentru Asistentul AI
 
 > **Regulă:** Copiați prompt-ul complet — contextul hardware este obligatoriu.
 > AI-ul va genera cod greșit (pentru alte familii NXP sau Arduino) fără aceste informații.

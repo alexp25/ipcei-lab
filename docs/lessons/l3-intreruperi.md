@@ -195,7 +195,7 @@ Dupa modificarea codului, actualizati configuratia proiectului in MCUXpresso Con
 6. Salvati `.mex` si regenerati fisierele de configurare daca este nevoie.
 7. Recompilati proiectul.
 
-## Prompte Pentru GenAI
+## Prompt-uri Pentru GenAI
 
 ### Prompt: Conversie polling la intrerupere SW3
 

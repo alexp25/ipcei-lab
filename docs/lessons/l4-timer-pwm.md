@@ -52,7 +52,7 @@ Vom porni de la un starter în care roșu și verde fac fade cu PWM. Extensia Ge
 | `14:05–14:30` | **Debugging PWM** | Pin mux, `kPWM_PwmX`, `DISMAP`, Serial Monitor. | cadru UPB |
 | `14:30–15:00` | **GenAI extension** | Studenții cer AI-ului să facă blue PWM și color wheel RGB. Verificare cod + `.mex` în Config Tools. | student + mentor |
 
-## 🤖 Prompte Pentru Asistentul AI UPB
+## 🤖 Prompt-uri Pentru Asistentul AI
 
 > **Regulă:** Copiați prompt-ul complet. Contextul hardware este obligatoriu.
 > În acest laborator cereți explicit `FlexPWM0`; nu cereți SCTimer, CTIMER sau cod Arduino.

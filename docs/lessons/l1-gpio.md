@@ -41,7 +41,7 @@ Prima lecție de periferic introduce arhitectura GPIO pe Cortex-M33/MCX A — fu
 | `09:30–10:15` | **Demo SDK: RGB LED** | `CLOCK_EnableClock(kCLOCK_Port3)`, `PORT_SetPinMux(PORT3,12,kPORT_MuxAsGpio)`, `GPIO_PinInit()`, `GPIO_PinWrite()`. Demonstrație anod comun. | cadru UPB |
 | `10:15–11:00` | **Lab + GenAI session** | Studenții: semafor FSM (RED 2s → YELLOW 1s → GREEN 2s) + reset buton SW3. Prompt structurat cu context complet. Identificare erori AI. | student + mentor |
 
-## 🤖 Prompte pentru Asistentul AI UPB
+## 🤖 Prompt-uri pentru Asistentul AI
 
 > **Regulă:** Copiați prompt-ul complet — contextul hardware este obligatoriu.
 > AI-ul va genera cod greșit (pentru alte familii NXP sau Arduino) fără aceste informații.

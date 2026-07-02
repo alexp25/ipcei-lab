@@ -42,7 +42,7 @@ Ultima sesiune de conținut este despre calitatea codului și comunicare — com
 | `11:30–12:00` | **Template prezentare finală** | 10 slide-uri max: problemă → arhitectura → demo live → comparativ baseline vs AI → reflecție GenAI → concluzii. | Mariana Mocanu |
 | `12:00–13:00` | **Rehearsal per echipă** | 5 min prezentare draft + feedback rapid. Agentul AI evaluează calitatea secțiunii de reflecție GenAI. | panel online |
 
-## 🤖 Prompte pentru Asistentul AI UPB
+## 🤖 Prompt-uri pentru Asistentul AI
 
 > **Regulă:** Copiați prompt-ul complet — contextul hardware este obligatoriu.
 > AI-ul va genera cod greșit (pentru alte familii NXP sau Arduino) fără aceste informații.
