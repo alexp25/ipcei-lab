@@ -7,7 +7,7 @@ layout: lesson
 source_url: https://github.com/alexp25/ipcei-lab/tree/main/src/lab_shield_lcd_keypad/main
 ---
 
-# LP2 - DFRobot RGB LCD + Keypad Shield
+# LP2 - LPI2C. DFRobot RGB LCD + Keypad Shield
 
 **I2C 16x2 LCD, RGB backlight, and ADC keypad buttons**
 

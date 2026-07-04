@@ -26,6 +26,8 @@ extern "C" {
 void BOARD_InitBootPins(void);
 
 #define PCR_IBE_ibe1 0x01u /*!<@brief Input Buffer Enable: Enables */
+#define PCR_PE_pe1 0x01u   /*!<@brief Pull Enable: Enables */
+#define PCR_PS_ps1 0x01u   /*!<@brief Pull Select: Enables internal pullup resistor */
 
 /*! @name PORT3_0 (number 46), LED_BLUE
   @{ */
@@ -36,23 +38,19 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_LED_BLUE_PIN_MASK (1U << 0U)      /*!<@brief PORT pin mask */
                                                          /* @} */
 
-/*! @name PORT3_12 (number 38), LED_RED
+/*! @name PORT1_7 (number 1), SW3
   @{ */
 
-/* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_LED_RED_PORT PORT3                /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_LED_RED_PIN 12U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_LED_RED_PIN_MASK (1U << 12U)      /*!<@brief PORT pin mask */
-                                                         /* @} */
-
-/*! @name PORT3_13 (number 37), LED_GREEN
-  @{ */
+/* Symbols to be used with GPIO driver */
+#define BOARD_INITPINS_SW3_GPIO GPIO1               /*!<@brief GPIO peripheral base pointer */
+#define BOARD_INITPINS_SW3_GPIO_PIN 7U              /*!<@brief GPIO pin number */
+#define BOARD_INITPINS_SW3_GPIO_PIN_MASK (1U << 7U) /*!<@brief GPIO pin mask */
 
 /* Symbols to be used with PORT driver */
-#define BOARD_INITPINS_LED_GREEN_PORT PORT3                /*!<@brief PORT peripheral base pointer */
-#define BOARD_INITPINS_LED_GREEN_PIN 13U                   /*!<@brief PORT pin number */
-#define BOARD_INITPINS_LED_GREEN_PIN_MASK (1U << 13U)      /*!<@brief PORT pin mask */
-                                                           /* @} */
+#define BOARD_INITPINS_SW3_PORT PORT1               /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_SW3_PIN 7U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_SW3_PIN_MASK (1U << 7U)      /*!<@brief PORT pin mask */
+                                                    /* @} */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.

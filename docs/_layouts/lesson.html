@@ -166,6 +166,77 @@
 
     #lesson-content hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
     #lesson-content img { max-width: 100%; border-radius: 6px; margin: .5rem 0; }
+    /* Expandable code panels shared by all lessons */
+    #lesson-content details.prompt-code {
+      margin: 0.6rem 0 1rem;
+      border: 1px solid #3f4b5f;
+      border-radius: 6px;
+      background: #0f172a;
+      color: #d8dee9;
+      overflow: hidden;
+    }
+
+    #lesson-content details.prompt-code summary {
+      padding: 0.45rem 0.7rem;
+      cursor: pointer;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      color: #d8dee9;
+      background: #0f172a;
+      border-bottom: 1px solid #3f4b5f;
+    }
+
+    #lesson-content details.prompt-code summary,
+    #lesson-content details.prompt-code summary * {
+      color: #d8dee9 !important;
+    }
+
+    #lesson-content details.prompt-code:not([open]) summary {
+      border-bottom: 0;
+    }
+
+    #lesson-content div.highlighter-rouge {
+      background: #0f172a;
+      border: 0;
+      border-radius: 6px;
+      margin: 0.6rem 0;
+      padding: 0;
+      box-shadow: none;
+      overflow: hidden;
+    }
+
+    #lesson-content details.prompt-code pre,
+    #lesson-content details.prompt-code .highlight,
+    #lesson-content details.prompt-code div.highlighter-rouge,
+    #lesson-content pre.highlight,
+    #lesson-content div.highlighter-rouge pre {
+      margin: 0;
+      border: 0;
+      border-radius: 6px;
+      box-shadow: none;
+      background: #0f172a;
+      color: #d8dee9;
+      line-height: 1.35;
+    }
+
+    #lesson-content div.highlighter-rouge pre {
+      padding: 0.35rem 0.55rem;
+      line-height: 1.35;
+    }
+
+    #lesson-content details.prompt-code code,
+    #lesson-content pre.highlight code,
+    #lesson-content div.highlighter-rouge code,
+    #lesson-content div.highlighter-rouge .highlight,
+    #lesson-content div.highlighter-rouge .highlight code,
+    #lesson-content div.highlighter-rouge .highlight pre {
+      color: #d8dee9;
+      background: #0f172a;
+      line-height: 1.35;
+    }
+
+    #lesson-content details.prompt-code > div {
+      padding: 0;
+    }
 
     /* ── Footer ── */
     footer {

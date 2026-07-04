@@ -1,5 +1,5 @@
 ---
-title: "LP1 - New Project Template"
+title: "LP0 - New Project Template"
 description: "How the FRDM-MCXA153 project template was created, normalized, and made compatible with MCUXpresso Config Tools"
 nav_order: 1
 parent: Additional Demos
@@ -7,7 +7,7 @@ layout: lesson
 source_url: https://github.com/alexp25/ipcei-lab/tree/main/src/lab_new_project/new
 ---
 
-# LP1 - New Project Template
+# LP0 - New Project Template
 
 **Creating an intuitive FRDM-MCXA153 project template that still works with MCUXpresso Config Tools**
 
@@ -473,19 +473,23 @@ This folder is intentionally a complete, buildable FRDM-MCXA153 project. It alre
 
 To start a new lab or demo, copy only the source/configuration files from the template. Do not copy build outputs or local SDK helper folders.
 
-From Git Bash, WSL, or another Bash shell, use `tar` with excludes. This works without `rsync`:
+Run from Git Bash, WSL, or another Bash shell after changing the destination folder from `my_new_project` to your new folder name:
 
 ```bash
 cd /c/WORKSPACE/proiecte/ipcei-lab/src
 pwd
+
 ls lab_new_project/new
 
-if [ -e my_new_lab ]; then
+dest=my_new_project
+
+if [ -e "$dest" ]; then
   echo "my_new_lab already exists; choose a new name or delete the old failed copy first"
+  read -p "Press enter to continue"
   exit 1
 fi
 
-dest=my_new_lab
+
 mkdir "$dest"
 tar \
   --exclude='./debug' \
@@ -518,6 +522,7 @@ find cfg_tools frdmmcxa153 -type f \( -name '*.json' -o -name '*.mex' \) -print0
       -e "s#${old_root_lc}#${new_root}#g"
 
 grep -RIn "lab_new_project/new" cfg_tools frdmmcxa153 || true
+
 ```
 
 Use a short folder name without spaces. This avoids path quoting problems in CMake, Ninja, the ARM GCC toolchain, and MCUXpresso Config Tools.
