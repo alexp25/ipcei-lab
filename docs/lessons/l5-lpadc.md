@@ -27,7 +27,7 @@ source_url: https://github.com/alexp25/ipcei-lab/tree/main/src/lab_new_project_c
 
 The MCXA153 LPADC is configured from several pieces that must agree with each other: the ADC peripheral instance, its clock source, the pin mux, the generated board files, the SDK driver component, and the application code that starts conversions.
 
-In this lab, treat MCUXpresso Config Tools as the source of truth for hardware setup. First configure `ADC0`, its clock, and the SW2 pin. Then use the agent workflow from **LP2 - From Vibe Coding to Coding Agent** to generate and review the application code.
+In this lab, treat MCUXpresso Config Tools as the source of truth for hardware setup. First configure `ADC0`, its clock, and the SW2 pin. Then use the agent workflow from [LP2 - From Vibe Coding to Coding Agent](../lp2-from-vibe-coding-to-coding-agent) to generate and review the application code.
 
 > Use `fsl_lpadc.h`. The `ADC16` driver used on other NXP families is not compatible with this project.
 
@@ -138,7 +138,7 @@ If Config Tools reports that the ADC driver is missing from the toolchain or IDE
 
 ## Write the Application with Agents
 
-Use the same specification-first flow from **LP2 - From Vibe Coding to Coding Agent**. The idea is to ask one agent to inspect the generated configuration and produce a specification, then ask a second agent to implement only the application source changes.
+Use the same specification-first flow from [LP2 - From Vibe Coding to Coding Agent](../lp2-from-vibe-coding-to-coding-agent). The idea is to ask one agent to inspect the generated configuration and produce a specification, then ask a second agent to implement only the application source changes.
 
 ### First Agent: Planning
 
@@ -318,13 +318,15 @@ The exact value depends on the board state and the SW2 circuit. Press and releas
 
 Submit an application that:
 
-- configures `ADC0` in the Peripherals tool;
-- configures the `ADC0` clock in the Clocks tool;
-- configures `P1_29` / `ADC0_A14` in the Pins tool;
-- builds with the LPADC driver enabled;
-- reads SW2 through LPADC;
-- converts raw values to voltage;
-- prints raw `ADC0_A14` values and voltage on the serial console.
+1. configures `ADC0` in the Peripherals tool;
+2. configures the `ADC0` clock in the Clocks tool;
+3. configures `P1_29` / `ADC0_A14` in the Pins tool;
+4. builds with the LPADC driver enabled;
+5. reads SW2 through LPADC;
+6. converts raw values to voltage;
+7. prints raw `ADC0_A14` values and voltage on the serial console.
+
+**Task: upload the Gen AI chat to the evaluation platform**
 
 ---
 

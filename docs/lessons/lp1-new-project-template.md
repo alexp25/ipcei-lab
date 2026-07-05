@@ -520,8 +520,6 @@ tar \
   --exclude='./__repo__/*' \
   --exclude='./.git' \
   --exclude='./.git/*' \
-  --exclude='./.agents' \
-  --exclude='./.agents/*' \
   --exclude='*.elf' \
   --exclude='*.bin' \
   --exclude='*.map' \
