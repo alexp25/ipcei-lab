@@ -7,21 +7,27 @@
   <title>Lecții FRDM-MCXA153 - IPCEI NXP</title>
 
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     :root {
-      --navy:   #0D1B3E;
-      --blue:   #1565C0;
-      --sky:    #1E88E5;
-      --ice:    #E3F2FD;
-      --white:  #FFFFFF;
-      --off:    #F5F7FA;
-      --muted:  #78909C;
-      --gray:   #455A64;
+      --navy: #0D1B3E;
+      --blue: #1565C0;
+      --sky: #1E88E5;
+      --ice: #E3F2FD;
+      --white: #FFFFFF;
+      --off: #F5F7FA;
+      --muted: #78909C;
+      --gray: #455A64;
       --border: #D0D8E8;
-      --green:  #2E7D32;
-      --font:   'Segoe UI', system-ui, sans-serif;
-      --mono:   'Consolas', 'Fira Mono', monospace;
+      --green: #2E7D32;
+      --font: 'Segoe UI', system-ui, sans-serif;
+      --mono: 'Consolas', 'Fira Mono', monospace;
     }
 
     body {
@@ -82,6 +88,7 @@
       color: var(--muted);
       margin-bottom: 1.25rem;
       padding-bottom: .4rem;
+      margin-top: .4rem;
       border-bottom: 1px solid var(--border);
     }
 
@@ -107,7 +114,9 @@
     .lab-card::before {
       content: '';
       position: absolute;
-      left: 0; top: 0; bottom: 0;
+      left: 0;
+      top: 0;
+      bottom: 0;
       width: 4px;
       background: var(--sky);
       border-radius: 10px 0 0 10px;
@@ -180,17 +189,71 @@
       font-family: var(--mono);
     }
 
-    .tag.c       { color: #1565C0; background: #E3F2FD; border-color: #BBDEFB; }
-    .tag.setup   { color: #37474F; background: #ECEFF1; border-color: #CFD8DC; }
-    .tag.gpio    { color: #2E7D32; background: #E8F5E9; border-color: #C8E6C9; }
-    .tag.uart    { color: #E65100; background: #FFF3E0; border-color: #FFE0B2; }
-    .tag.irq     { color: #B71C1C; background: #FFEBEE; border-color: #FFCDD2; }
-    .tag.timer   { color: #6A1B9A; background: #F3E5F5; border-color: #E1BEE7; }
-    .tag.pwm     { color: #4A148C; background: #F3E5F5; border-color: #CE93D8; }
-    .tag.adc     { color: #00695C; background: #E0F2F1; border-color: #B2DFDB; }
-    .tag.spi     { color: #283593; background: #E8EAF6; border-color: #C5CAE9; }
-    .tag.i2c     { color: #006064; background: #E0F7FA; border-color: #B2EBF2; }
-    .tag.fsm     { color: #1A237E; background: #E8EAF6; border-color: #9FA8DA; }
+    .tag.c {
+      color: #1565C0;
+      background: #E3F2FD;
+      border-color: #BBDEFB;
+    }
+
+    .tag.setup {
+      color: #37474F;
+      background: #ECEFF1;
+      border-color: #CFD8DC;
+    }
+
+    .tag.gpio {
+      color: #2E7D32;
+      background: #E8F5E9;
+      border-color: #C8E6C9;
+    }
+
+    .tag.uart {
+      color: #E65100;
+      background: #FFF3E0;
+      border-color: #FFE0B2;
+    }
+
+    .tag.irq {
+      color: #B71C1C;
+      background: #FFEBEE;
+      border-color: #FFCDD2;
+    }
+
+    .tag.timer {
+      color: #6A1B9A;
+      background: #F3E5F5;
+      border-color: #E1BEE7;
+    }
+
+    .tag.pwm {
+      color: #4A148C;
+      background: #F3E5F5;
+      border-color: #CE93D8;
+    }
+
+    .tag.adc {
+      color: #00695C;
+      background: #E0F2F1;
+      border-color: #B2DFDB;
+    }
+
+    .tag.spi {
+      color: #283593;
+      background: #E8EAF6;
+      border-color: #C5CAE9;
+    }
+
+    .tag.i2c {
+      color: #006064;
+      background: #E0F7FA;
+      border-color: #B2EBF2;
+    }
+
+    .tag.fsm {
+      color: #1A237E;
+      background: #E8EAF6;
+      border-color: #9FA8DA;
+    }
 
     .open-btn {
       display: inline-flex;
@@ -207,7 +270,9 @@
       transition: background .15s;
     }
 
-    .open-btn:hover { background: var(--sky); }
+    .open-btn:hover {
+      background: var(--sky);
+    }
 
     .src-btn {
       display: inline-flex;
@@ -223,9 +288,16 @@
       text-decoration: none;
       transition: background .15s, color .15s;
     }
-    .src-btn:hover { background: var(--ice); }
 
-    .card-actions { display: flex; gap: .5rem; flex-shrink: 0; }
+    .src-btn:hover {
+      background: var(--ice);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: .5rem;
+      flex-shrink: 0;
+    }
 
     footer {
       text-align: center;
@@ -236,8 +308,13 @@
     }
 
     @media (max-width: 600px) {
-      .lab-grid { grid-template-columns: 1fr; }
-      .page-header h1 { font-size: 1.5rem; }
+      .lab-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .page-header h1 {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
@@ -247,11 +324,13 @@
   <header class="page-header">
     <div class="course-tag">GenAI &amp; Embedded Engineering · NXP FRDM-MCXA153</div>
     <h1>Lecții FRDM-MCXA153</h1>
-    <p>Materiale de laborator pentru Școala de Vară IPCEI UPB–NXP 2026 &mdash; Cortex-M33 · SDK 24.12 · VS Code + CMake</p>
+    <p>Materiale de laborator pentru Școala de Vară IPCEI UPB–NXP 2026 &mdash; Cortex-M33 · SDK 24.12 · VS Code + CMake
+    </p>
   </header>
 
   <main class="page-content">
-    <p class="section-label">Lecții (L0 – L9)</p>
+
+    <p class="section-label" style="margin-top: 3rem;">Setup & Workflow</p>
 
     <div class="lab-grid">
 
@@ -262,7 +341,8 @@
             <h2>Setup Toolchain &amp; Prima Aplicație</h2>
           </div>
         </div>
-        <p class="card-desc">Instalare mediu de lucru VS Code + CMake + ARM GNU Toolchain, compilare și flash al primei aplicații Hello World pe FRDM-MCXA153.</p>
+        <p class="card-desc">Instalare mediu de lucru VS Code + CMake + ARM GNU Toolchain, compilare și flash al primei
+          aplicații Hello World pe FRDM-MCXA153.</p>
         <div class="card-footer">
           <div class="tags">
             <span class="tag setup">Toolchain</span>
@@ -270,178 +350,12 @@
             <span class="tag setup">Debug</span>
           </div>
           <div class="card-actions">
-            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_hello/hello_world">Cod &#8594;</a>
+            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_hello/hello_world">Cod
+              &#8594;</a>
             <a class="open-btn" href="./lessons/l0-setup-toolchain/">Deschide &#8594;</a>
           </div>
         </div>
       </div>
-
-      <div class="lab-card">
-        <div class="card-top">
-          <div class="lab-num">L1</div>
-          <div class="card-titles">
-            <h2>GPIO - Control Digital &amp; Butoane</h2>
-          </div>
-        </div>
-        <p class="card-desc">Configurare pini PORT/GPIO pe Cortex-M33, control independent al LED-urilor RGB, citire butoane cu debounce software.</p>
-        <div class="card-footer">
-          <div class="tags">
-            <span class="tag c">C</span>
-            <span class="tag gpio">GPIO</span>
-          </div>
-          <div class="card-actions">
-            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_hello/hello_world">Cod &#8594;</a>
-            <a class="open-btn" href="./lessons/l1-gpio/">Deschide &#8594;</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="lab-card">
-        <div class="card-top">
-          <div class="lab-num">L2</div>
-          <div class="card-titles">
-            <h2>LPUART - Comunicație Serială</h2>
-          </div>
-        </div>
-        <p class="card-desc">Transmisie și recepție UART prin MCU-Link VCOM, formatare și parsare mesaje, integrare cu terminal serial.</p>
-        <div class="card-footer">
-          <div class="tags">
-            <span class="tag c">C</span>
-            <span class="tag uart">LPUART</span>
-          </div>
-          <div class="card-actions">
-            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_uart/main">Cod &#8594;</a>
-            <a class="open-btn" href="./lessons/l2-lpuart/">Deschide &#8594;</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="lab-card">
-        <div class="card-top">
-          <div class="lab-num">L3</div>
-          <div class="card-titles">
-            <h2>Întreruperi Externe &amp; NVIC</h2>
-          </div>
-        </div>
-        <p class="card-desc">GPIO IRQ cu NVIC, SysTick pentru temporizare, debounce prin întreruperi, configurare priorități NVIC.</p>
-        <div class="card-footer">
-          <div class="tags">
-            <span class="tag c">C</span>
-            <span class="tag irq">IRQ</span>
-            <span class="tag irq">NVIC</span>
-          </div>
-          <div class="card-actions">
-            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_interrupts/main">Cod &#8594;</a>
-            <a class="open-btn" href="./lessons/l3-intreruperi/">Deschide &#8594;</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="lab-card">
-        <div class="card-top">
-          <div class="lab-num">L4</div>
-          <div class="card-titles">
-            <h2>Timer &amp; PWM cu FlexPWM</h2>
-          </div>
-        </div>
-        <p class="card-desc">Generare semnal PWM pentru control luminozitate LED, configurare perioadă și duty cycle cu FlexPWM.</p>
-        <div class="card-footer">
-          <div class="tags">
-            <span class="tag c">C</span>
-            <span class="tag timer">Timer</span>
-            <span class="tag timer">PWM</span>
-          </div>
-          <div class="card-actions">
-            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_pwm/pwm_control">Cod &#8594;</a>
-            <a class="open-btn" href="./lessons/l4-timer-pwm/">Deschide &#8594;</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="lab-card">
-        <div class="card-top">
-          <div class="lab-num">L5</div>
-          <div class="card-titles">
-            <h2>LPADC - Conversie Analogică 12 biți</h2>
-          </div>
-        </div>
-        <p class="card-desc">Configurare LPADC0, citire tensiune pe pinii Arduino A0–A5, conversie în unități fizice, command queue și trigger hardware.</p>
-        <div class="card-footer">
-          <div class="tags">
-            <span class="tag c">C</span>
-            <span class="tag adc">LPADC</span>
-          </div>
-          <div class="card-actions">
-            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_adc/main">Cod &#8594;</a>
-            <a class="open-btn" href="./lessons/l5-lpadc/">Deschide &#8594;</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="lab-card">
-        <!-- <div class="card-top">
-          <div class="lab-num">L6</div>
-          <div class="card-titles">
-            <h2>LPSPI - Comunicație SPI</h2>
-          </div>
-        </div>
-        <p class="card-desc">Transfer full-duplex SPI cu dispozitiv extern prin Arduino header, configurare FIFO, gestionare CS hardware și software.</p>
-        <div class="card-footer">
-          <div class="tags">
-            <span class="tag c">C</span>
-            <span class="tag spi">LPSPI</span>
-          </div>
-          <a class="open-btn" href="./lessons/l6-lpspi/">Deschide &#8594;</a>
-        </div> -->
-
-        <div class="card-top">
-          <div class="lab-num">L6</div>
-          <div class="card-titles">
-            <h2>LPSPI - LCD grafic</h2>
-          </div>
-        </div>
-        <p class="card-desc">Integrare LCD grafic</p>
-        <div class="card-footer">
-          <div class="tags">
-            <span class="tag c">C</span>
-            <span class="tag gpio">GPIO</span>
-            <span class="tag spi">SPI</span>
-          </div>
-          <div class="card-actions">
-            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_shield_tft_lcd/main">Cod &#8594;</a>
-            <a class="open-btn" href="./lessons/l6-lpspi-tft-lcd/">Deschide &#8594;</a>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="lab-card">
-        <div class="card-top">
-          <div class="lab-num">L7</div>
-          <div class="card-titles">
-            <h2>LPI2C - Senzorul P3T1755 On-Board</h2>
-          </div>
-        </div>
-        <p class="card-desc">Citire temperatură de pe senzorul P3T1755DPJ prin LPI2C0 în Fast Mode (400 kHz), decodare format Q8.4 și alertă termică.</p>
-        <div class="card-footer">
-          <div class="tags">
-            <span class="tag c">C</span>
-            <span class="tag i2c">LPI2C</span>
-            <span class="tag i2c">P3T1755</span>
-          </div>
-          <div class="card-actions">
-            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_i2c/main">Cod &#8594;</a>
-            <a class="open-btn" href="./lessons/l7-lpi2c-p3t1755/">Deschide &#8594;</a>
-          </div>
-        </div>
-      </div>     
-
-    </div>
-
-    <p class="section-label" style="margin-top: 3rem;">Demo-uri suplimentare</p>
-
-    <div class="lab-grid">
-
 
       <div class="lab-card">
         <div class="card-top">
@@ -450,14 +364,16 @@
             <h2>New Project Setup</h2>
           </div>
         </div>
-        <p class="card-desc">Cum a fost creat template-ul de project nou compatibil cu ultima versiune de Config Tools pornind de la wizard-ul din MCUXpresso.</p>
+        <p class="card-desc">Cum a fost creat template-ul de project nou compatibil cu ultima versiune de Config Tools
+          pornind de la wizard-ul din MCUXpresso.</p>
         <div class="card-footer">
           <div class="tags">
             <span class="tag setup">Setup</span>
             <span class="tag gpio">GPIO</span>
           </div>
           <div class="card-actions">
-            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_new_project/main">Cod &#8594;</a>
+            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_new_project/main">Cod
+              &#8594;</a>
             <a class="open-btn" href="./lessons/lp1-new-project-template/">Deschide &#8594;</a>
           </div>
         </div>
@@ -470,7 +386,8 @@
             <h2>Configure New Project</h2>
           </div>
         </div>
-        <p class="card-desc">Fluxul de lucru în MCUXpresso Config Tools pentru configurarea pinilor, perifericelor, ceasurilor și codului generat într-un proiect FRDM-MCXA153 nou.</p>
+        <p class="card-desc">Fluxul de lucru în MCUXpresso Config Tools pentru configurarea pinilor, perifericelor,
+          ceasurilor și codului generat într-un proiect FRDM-MCXA153 nou.</p>
         <div class="card-footer">
           <div class="tags">
             <span class="tag setup">Setup</span>
@@ -478,7 +395,8 @@
             <span class="tag pwm">PWM</span>
           </div>
           <div class="card-actions">
-            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_new_project/main">Cod &#8594;</a>
+            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_new_project/main">Cod
+              &#8594;</a>
             <a class="open-btn" href="./lessons/lp0-configure-new-project/">Deschide &#8594;</a>
           </div>
         </div>
@@ -499,59 +417,249 @@
             <span class="tag config">Config</span>
           </div>
           <div class="card-actions">
-            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_new_project/configured">Cod &#8594;</a>
+            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_new_project/configured">Cod
+              &#8594;</a>
             <a class="open-btn" href="./lessons/lp2-from-vibe-coding-to-coding-agent/">Deschide &#8594;</a>
-          </div>
-        </div>
-      </div>     
-
-
-      <div class="lab-card">
-        <div class="card-top">
-          <div class="lab-num">LP2</div>
-          <div class="card-titles">
-            <h2>LPI2C - Shield DFRobot RGB LCD + Keypad</h2>
-          </div>
-        </div>
-        <p class="card-desc">LCD 16×2 HD44780-compatible controlat prin LPI2C0 (adrese 0x3E / 0x60), backlight RGB și cinci butoane citite pe o scară rezistivă via LPADC0 canal A8 (Arduino A0).</p>
-        <div class="card-footer">
-          <div class="tags">
-            <span class="tag i2c">LPI2C</span>
-            <span class="tag adc">LPADC</span>
-            <span class="tag gpio">Shield</span>
-          </div>
-          <div class="card-actions">
-            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_shield_lcd_keypad/main">Cod &#8594;</a>
-            <a class="open-btn" href="./lessons/lp2-shield-dfrobot-lcd/">Deschide &#8594;</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="lab-card">
-        <div class="card-top">
-          <div class="lab-num">LP3</div>
-          <div class="card-titles">
-            <h2>USB HID Mouse Jiggler</h2>
-          </div>
-        </div>
-        <p class="card-desc">Placa se enumeră ca mouse USB HID și mișcă periodic cursorul (jiggler); SW3 activează/dezactivează mișcarea, LED-ul roșu indică starea activă. Bazat pe exemplul SDK <code>usb_device_hid_mouse_lite</code>.</p>
-        <div class="card-footer">
-          <div class="tags">
-            <span class="tag uart">USB HID</span>
-            <span class="tag gpio">GPIO</span>
-            <span class="tag setup">SDK</span>
-          </div>
-          <div class="card-actions">
-            <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_usb_hid/usb_device_hid_mouse_lite/bm">Cod &#8594;</a>
-            <a class="open-btn" href="./lessons/lp3-usb-hid-mouse/">Deschide &#8594;</a>
           </div>
         </div>
       </div>
 
     </div>
+
+      <p class="section-label">Quick Start Examples</p>
+
+      <div class="lab-grid">
+
+        <div class="lab-card">
+          <div class="card-top">
+            <div class="lab-num">L1</div>
+            <div class="card-titles">
+              <h2>GPIO - Control Digital &amp; Butoane</h2>
+            </div>
+          </div>
+          <p class="card-desc">Configurare pini PORT/GPIO pe Cortex-M33, control independent al LED-urilor RGB, citire
+            butoane cu debounce software.</p>
+          <div class="card-footer">
+            <div class="tags">
+              <span class="tag c">C</span>
+              <span class="tag gpio">GPIO</span>
+            </div>
+            <div class="card-actions">
+              <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_hello/hello_world">Cod
+                &#8594;</a>
+              <a class="open-btn" href="./lessons/l1-gpio/">Deschide &#8594;</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-card">
+          <div class="card-top">
+            <div class="lab-num">L2</div>
+            <div class="card-titles">
+              <h2>LPUART - Comunicație Serială</h2>
+            </div>
+          </div>
+          <p class="card-desc">Transmisie și recepție UART prin MCU-Link VCOM, formatare și parsare mesaje, integrare cu
+            terminal serial.</p>
+          <div class="card-footer">
+            <div class="tags">
+              <span class="tag c">C</span>
+              <span class="tag uart">LPUART</span>
+            </div>
+            <div class="card-actions">
+              <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_uart/main">Cod &#8594;</a>
+              <a class="open-btn" href="./lessons/l2-lpuart/">Deschide &#8594;</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-card">
+          <div class="card-top">
+            <div class="lab-num">L3</div>
+            <div class="card-titles">
+              <h2>Întreruperi Externe &amp; NVIC</h2>
+            </div>
+          </div>
+          <p class="card-desc">GPIO IRQ cu NVIC, SysTick pentru temporizare, debounce prin întreruperi, configurare
+            priorități NVIC.</p>
+          <div class="card-footer">
+            <div class="tags">
+              <span class="tag c">C</span>
+              <span class="tag irq">IRQ</span>
+              <span class="tag irq">NVIC</span>
+            </div>
+            <div class="card-actions">
+              <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_interrupts/main">Cod
+                &#8594;</a>
+              <a class="open-btn" href="./lessons/l3-intreruperi/">Deschide &#8594;</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-card">
+          <div class="card-top">
+            <div class="lab-num">L4</div>
+            <div class="card-titles">
+              <h2>Timer &amp; PWM cu FlexPWM</h2>
+            </div>
+          </div>
+          <p class="card-desc">Generare semnal PWM pentru control luminozitate LED, configurare perioadă și duty cycle
+            cu FlexPWM.</p>
+          <div class="card-footer">
+            <div class="tags">
+              <span class="tag c">C</span>
+              <span class="tag timer">Timer</span>
+              <span class="tag timer">PWM</span>
+            </div>
+            <div class="card-actions">
+              <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_pwm/pwm_control">Cod
+                &#8594;</a>
+              <a class="open-btn" href="./lessons/l4-timer-pwm/">Deschide &#8594;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="section-label">Advanced Examples, Agentic Workflows & Add-On Peripherals</p>
+
+      <div class="lab-grid">
+  
+        <div class="lab-card">
+          <div class="card-top">
+            <div class="lab-num">L5</div>
+            <div class="card-titles">
+              <h2>LPADC - Conversie Analogică 12 biți</h2>
+            </div>
+          </div>
+          <p class="card-desc">Configurare LPADC0, citire tensiune pe pinii Arduino A0–A5, conversie în unități fizice,
+            command queue și trigger hardware.</p>
+          <div class="card-footer">
+            <div class="tags">
+              <span class="tag c">C</span>
+              <span class="tag adc">LPADC</span>
+            </div>
+            <div class="card-actions">
+              <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_adc/main">Cod &#8594;</a>
+              <a class="open-btn" href="./lessons/l5-lpadc/">Deschide &#8594;</a>
+            </div>
+          </div>
+        </div>
+  
+        <div class="lab-card">
+          <!-- <div class="card-top">
+              <div class="lab-num">L6</div>
+              <div class="card-titles">
+                <h2>LPSPI - Comunicație SPI</h2>
+              </div>
+            </div>
+            <p class="card-desc">Transfer full-duplex SPI cu dispozitiv extern prin Arduino header, configurare FIFO, gestionare CS hardware și software.</p>
+            <div class="card-footer">
+              <div class="tags">
+                <span class="tag c">C</span>
+                <span class="tag spi">LPSPI</span>
+              </div>
+              <a class="open-btn" href="./lessons/l6-lpspi/">Deschide &#8594;</a>
+            </div> -->
+  
+          <div class="card-top">
+            <div class="lab-num">L6</div>
+            <div class="card-titles">
+              <h2>LPSPI - LCD grafic</h2>
+            </div>
+          </div>
+          <p class="card-desc">Integrare LCD grafic</p>
+          <div class="card-footer">
+            <div class="tags">
+              <span class="tag c">C</span>
+              <span class="tag gpio">GPIO</span>
+              <span class="tag spi">SPI</span>
+            </div>
+            <div class="card-actions">
+              <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_shield_tft_lcd/main">Cod
+                &#8594;</a>
+              <a class="open-btn" href="./lessons/l6-lpspi-tft-lcd/">Deschide &#8594;</a>
+            </div>
+          </div>
+  
+        </div>
+  
+        <div class="lab-card">
+          <div class="card-top">
+            <div class="lab-num">L7</div>
+            <div class="card-titles">
+              <h2>LPI2C - Senzorul P3T1755 On-Board</h2>
+            </div>
+          </div>
+          <p class="card-desc">Citire temperatură de pe senzorul P3T1755DPJ prin LPI2C0 în Fast Mode (400 kHz), decodare
+            format Q8.4 și alertă termică.</p>
+          <div class="card-footer">
+            <div class="tags">
+              <span class="tag c">C</span>
+              <span class="tag i2c">LPI2C</span>
+              <span class="tag i2c">P3T1755</span>
+            </div>
+            <div class="card-actions">
+              <a class="src-btn" href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_i2c/main">Cod &#8594;</a>
+              <a class="open-btn" href="./lessons/l7-lpi2c-p3t1755/">Deschide &#8594;</a>
+            </div>
+          </div>
+        </div>
+  
+          <div class="lab-card">
+            <div class="card-top">
+              <div class="lab-num">LP2</div>
+              <div class="card-titles">
+                <h2>LPI2C - Shield DFRobot RGB LCD + Keypad</h2>
+              </div>
+            </div>
+            <p class="card-desc">LCD 16×2 HD44780-compatible controlat prin LPI2C0 (adrese 0x3E / 0x60), backlight RGB și
+              cinci butoane citite pe o scară rezistivă via LPADC0 canal A8 (Arduino A0).</p>
+            <div class="card-footer">
+              <div class="tags">
+                <span class="tag i2c">LPI2C</span>
+                <span class="tag adc">LPADC</span>
+                <span class="tag gpio">Shield</span>
+              </div>
+              <div class="card-actions">
+                <a class="src-btn"
+                  href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_shield_lcd_keypad/main">Cod &#8594;</a>
+                <a class="open-btn" href="./lessons/lp2-shield-dfrobot-lcd/">Deschide &#8594;</a>
+              </div>
+            </div>
+          </div>
+  
+          <div class="lab-card">
+            <div class="card-top">
+              <div class="lab-num">LP3</div>
+              <div class="card-titles">
+                <h2>USB HID Mouse Jiggler</h2>
+              </div>
+            </div>
+            <p class="card-desc">Placa se enumeră ca mouse USB HID și mișcă periodic cursorul (jiggler); SW3
+              activează/dezactivează mișcarea, LED-ul roșu indică starea activă. Bazat pe exemplul SDK
+              <code>usb_device_hid_mouse_lite</code>.</p>
+            <div class="card-footer">
+              <div class="tags">
+                <span class="tag uart">USB HID</span>
+                <span class="tag gpio">GPIO</span>
+                <span class="tag setup">SDK</span>
+              </div>
+              <div class="card-actions">
+                <a class="src-btn"
+                  href="https://github.com/alexp25/ipcei-lab/tree/main/src/lab_usb_hid/usb_device_hid_mouse_lite/bm">Cod
+                  &#8594;</a>
+                <a class="open-btn" href="./lessons/lp3-usb-hid-mouse/">Deschide &#8594;</a>
+              </div>
+            </div>
+          </div>
+  
+        </div>
+
+
   </main>
 
   <footer>IPCEI NXP · Lecții FRDM-MCXA153 · UPB–NXP Semiconductors · 2026</footer>
 
 </body>
+
 </html>

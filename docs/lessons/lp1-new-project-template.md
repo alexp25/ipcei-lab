@@ -476,21 +476,43 @@ To start a new lab or demo, copy only the source/configuration files from the te
 Run from Git Bash, WSL, or another Bash shell after changing the destination folder from `my_new_project` to your new folder name:
 
 ```bash
-cd /c/WORKSPACE/proiecte/ipcei-lab/src
+#!/usr/bin/env bash
+set -e
+
+# =========================
+# Configuration
+# =========================
+
+workspace_src_root="/c/WORKSPACE/proiecte/ipcei-lab/src"
+
+src="lab_new_project/new"
+dest="lab_new_project_configured/configured2"
+
+# =========================
+# Script
+# =========================
+
+cd "$workspace_src_root"
 pwd
 
-ls lab_new_project/new
+echo "Source:      $src"
+echo "Destination: $dest"
 
-dest=my_new_project
-
-if [ -e "$dest" ]; then
-  echo "my_new_lab already exists; choose a new name or delete the old failed copy first"
+if [ ! -d "$src" ]; then
+  echo "Source project does not exist: $src"
   read -p "Press enter to continue"
   exit 1
 fi
 
+if [ -e "$dest" ]; then
+  echo "Destination already exists: $dest"
+  echo "Choose a new name or delete the old failed copy first."
+  read -p "Press enter to continue"
+  exit 1
+fi
 
-mkdir "$dest"
+mkdir -p "$dest"
+
 tar \
   --exclude='./debug' \
   --exclude='./debug/*' \
@@ -507,21 +529,42 @@ tar \
   --exclude='*.o' \
   --exclude='*.obj' \
   --exclude='*.d' \
-  -cf - -C lab_new_project/new . | tar -xf - -C "$dest"
+  -cf - -C "$src" . | tar -xf - -C "$dest"
 
 ls "$dest"
+
+old_root="$(
+  cd "$src"
+  pwd -W 2>/dev/null || pwd
+)"
+
+old_root_lc="$(echo "$old_root" | tr '[:upper:]' '[:lower:]')"
+
 cd "$dest"
 
-old_root='C:/WORKSPACE/proiecte/ipcei-lab/src/lab_new_project/new'
-old_root_lc='c:/WORKSPACE/proiecte/ipcei-lab/src/lab_new_project/new'
 new_root="$(pwd -W 2>/dev/null || pwd)"
 
-find cfg_tools frdmmcxa153 -type f \( -name '*.json' -o -name '*.mex' \) -print0 \
-  | xargs -0 sed -i \
-      -e "s#${old_root}#${new_root}#g" \
-      -e "s#${old_root_lc}#${new_root}#g"
+echo "Replacing:"
+echo "  $old_root"
+echo "  $old_root_lc"
+echo "with:"
+echo "  $new_root"
 
-grep -RIn "lab_new_project/new" cfg_tools frdmmcxa153 || true
+find cfg_tools frdmmcxa153 -type f \( -name '*.json' -o -name '*.mex' \) -print0 2>/dev/null \
+  | while IFS= read -r -d '' file; do
+      sed -i \
+        -e "s#${old_root}#${new_root}#g" \
+        -e "s#${old_root_lc}#${new_root}#g" \
+        "$file"
+    done
+
+echo
+echo "Checking for leftover references to source path:"
+grep -RIn "$src" cfg_tools frdmmcxa153 || true
+
+echo
+echo "Done. New project created at:"
+echo "$new_root"
 
 ```
 

@@ -1,0 +1,10 @@
+C:/WORKSPACE/proiecte/ipcei-lab/src/examples/lab_usb_hid/usb_device_hid_mouse_lite/bm/mouse.c:91:21:USB_DeviceHidMouseAction	8	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/examples/lab_usb_hid/usb_device_hid_mouse_lite/bm/mouse.c:113:21:USB_DeviceHidInterruptIn	24	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/examples/lab_usb_hid/usb_device_hid_mouse_lite/bm/mouse.c:131:14:USB_DeviceCallback	56	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/examples/lab_usb_hid/usb_device_hid_mouse_lite/bm/mouse.c:294:14:USB_DeviceGetSetupBuffer	16	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/examples/lab_usb_hid/usb_device_hid_mouse_lite/bm/mouse.c:307:14:USB_DeviceConfigureRemoteWakeup	16	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/examples/lab_usb_hid/usb_device_hid_mouse_lite/bm/mouse.c:313:14:USB_DeviceConfigureEndpointStatus	16	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/examples/lab_usb_hid/usb_device_hid_mouse_lite/bm/mouse.c:341:14:USB_DeviceGetClassReceiveBuffer	24	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/examples/lab_usb_hid/usb_device_hid_mouse_lite/bm/mouse.c:355:14:USB_DeviceProcessClassRequest	32	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/examples/lab_usb_hid/usb_device_hid_mouse_lite/bm/mouse.c:388:13:USB_DeviceApplicationInit	8	static
+C:/WORKSPACE/proiecte/ipcei-lab/src/examples/lab_usb_hid/usb_device_hid_mouse_lite/bm/mouse.c:543:5:main	8	static

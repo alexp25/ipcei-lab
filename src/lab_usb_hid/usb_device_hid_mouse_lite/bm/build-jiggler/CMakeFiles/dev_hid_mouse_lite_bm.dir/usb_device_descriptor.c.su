@@ -1,6 +1,0 @@
-C:/WORKSPACE/proiecte/ipcei-lab/src/lab_usb_hid/usb_device_hid_mouse_lite/bm/usb_device_descriptor.c:266:14:USB_DeviceGetDescriptor	32	static
-C:/WORKSPACE/proiecte/ipcei-lab/src/lab_usb_hid/usb_device_hid_mouse_lite/bm/usb_device_descriptor.c:352:14:USB_DeviceSetConfigure	16	static
-C:/WORKSPACE/proiecte/ipcei-lab/src/lab_usb_hid/usb_device_hid_mouse_lite/bm/usb_device_descriptor.c:363:14:USB_DeviceGetConfigure	16	static
-C:/WORKSPACE/proiecte/ipcei-lab/src/lab_usb_hid/usb_device_hid_mouse_lite/bm/usb_device_descriptor.c:370:14:USB_DeviceSetInterface	16	static
-C:/WORKSPACE/proiecte/ipcei-lab/src/lab_usb_hid/usb_device_hid_mouse_lite/bm/usb_device_descriptor.c:381:14:USB_DeviceGetInterface	24	static
-C:/WORKSPACE/proiecte/ipcei-lab/src/lab_usb_hid/usb_device_hid_mouse_lite/bm/usb_device_descriptor.c:397:14:USB_DeviceSetSpeed	24	static
