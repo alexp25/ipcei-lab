@@ -1,145 +1,138 @@
 ---
 title: "LP2 - DFRobot RGB LCD + Keypad Shield"
-description: "Integrating the DFRobot RGBLCD1602 shield on FRDM-MCXA153: LPI2C0 for LCD and LPADC0 for buttons"
+description: "Use the DFRobot RGBLCD1602 keypad shield to build a small LCD dinosaur game"
 nav_order: 2
 parent: Additional Demos
 layout: lesson
 source_url: https://github.com/alexp25/ipcei-lab/tree/main/src/lab_shield_lcd_keypad/main
 ---
 
-# LP2 - LPI2C. DFRobot RGB LCD + Keypad Shield
+# LP2 - DFRobot RGB LCD + Keypad Shield
 
-**I2C 16x2 LCD, RGB backlight, and ADC keypad buttons**
+**Configure the shield pins, verify the LCD and keypad, then build a small dinosaur runner game on the 16x2 display.**
 
 ---
 
 | | |
 |---|---|
-| **Peripherals** | `LPI2C0`, `LPADC0`, `GPIO/pin mux`, serial console |
-| **Duration** | 2 h |
+| **Session** | Shield bring-up / LPI2C / LPADC |
+| **Peripherals** | `LPI2C0`, `ADC0`, `FlexPWM0`, `LPUART0` |
 | **Hardware** | FRDM-MCXA153 + DFRobot RGB LCD Keypad Shield / compatible RGBLCD1602 |
-| **Project** | `src/lab_shield_lcd_keypad/main` |
-| **Result** | LCD shows text and the current button: RIGHT, UP, DOWN, LEFT, SELECT, or NONE |
+| **Console** | `LPUART0`, 115200 baud |
+| **Main deliverable** | LCD dinosaur game with obstacles and jump control |
 
 ## Context
 
-This lab adds an Arduino-style shield to FRDM-MCXA153. The shield has two independent parts:
+The DFRobot LCD keypad shield has two useful parts for this lab:
 
-1. a 16x2 HD44780-compatible LCD controlled through a DFRobot RGBLCD1602 I2C expander;
-2. five buttons connected through a resistor ladder read on Arduino `A0`.
+1. a 16x2 RGB LCD controlled over I2C;
+2. five keypad buttons connected to Arduino `A0` through a resistor ladder.
 
-The important detail is that the shield uses the Arduino headers on the FRDM board. In this project, the LCD uses `LPI2C0`, and the buttons use `LPADC0`.
+The basic shield demo proves the LCD and keypad work. The final task is to turn that demo into a simple runner game, similar to the Google Chrome no-internet dinosaur animation.
+
+## Pinout
+
+Route the shield pins in MCUXpresso Config Tools as shown below.
+
+| Shield signal | Arduino header | MCU pin | Function |
+|---|---|---|---|
+| LCD SDA | SDA | `P1_8` | `LPI2C0_SDA`, `Alt3` |
+| LCD SCL | SCL | `P1_9` | `LPI2C0_SCL`, `Alt3` |
+| Buttons | A0 | `P1_10` | `ADC0_A8` |
+| Blue LED PWM | on-board LED | `P3_0` | `PWM0_A0` |
+| Red LED GPIO | on-board LED | `P3_12` | GPIO output |
+
+Use this Config Tools screenshot as the routing reference:
+
+![MCUXpresso Config Tools pinout for the DFRobot LCD shield](../img/lab_shield_dfrobot_lcd/pin_config.png)
+
+The reference screenshot should show `LPI2C0_SDA` on pin `2`, `LPI2C0_SCL` on pin `3`, `ADC0_A8` on pin `4`, `PWM0_A0` on pin `46`, and `ADC0_A14` on pin `32` if the older SW2 ADC route is still present.
 
 ## Objectives
 
-By the end of the lab you should be able to:
+By the end of this lab you should be able to:
 
-1. Identify the correct Arduino header pins on FRDM-MCXA153.
-2. Configure `LPI2C0` for the DFRobot RGBLCD1602 LCD.
-3. Configure `ADC0_A8` for the keypad resistor ladder.
-4. Keep generated Config Tools files aligned with CMake.
-5. Display button names on the LCD and in the serial console.
-6. Calibrate ADC thresholds from measured raw values.
-
-## Hardware and Pinout
-
-| Shield function | Arduino header | MCXA153 pin | Peripheral |
-|---|---:|---|---|
-| LCD SDA | SDA | `P1_8` | `LPI2C0_SDA` |
-| LCD SCL | SCL | `P1_9` | `LPI2C0_SCL` |
-| Buttons | A0 | `P1_10` | `ADC0_A8` |
-| Power | 3.3 V / 5 V depending on module | - | check levels |
-| GND | GND | - | common ground |
-
-DFRobot addresses:
-
-```text
-LCD controller: 0x3E
-RGB controller: 0x60
-```
-
-Some Arduino documentation says SDA/SCL are `A4/A5`. On FRDM-MCXA153, use the Arduino SDA/SCL header pins mapped to `P1_8` and `P1_9`.
-
-## Electrical Note
-
-FRDM-MCXA153 uses 3.3 V logic. Before connecting the shield:
-
-- check whether I2C pull-ups go to 3.3 V or 5 V;
-- do not apply 5 V directly to MCXA153 GPIO/ADC pins;
-- use a level shifter if the shield forces I2C to 5 V;
-- keep A0 within the board's ADC range relative to `VDDA`.
-
-## Code Structure
-
-```text
-src/lab_shield_lcd_keypad/main/
-  main.c
-  dfrobot_rgb_lcd.c/.h
-  dfrobot_lcd_shield.c/.h
-  dfrobot_lcd_shield_keypad.c/.h
-  cfg_tools/board/pin_mux.c/.h
-  main.mex
-```
-
-| File | Role |
-|---|---|
-| `dfrobot_rgb_lcd.c/.h` | DFRobot RGBLCD1602 protocol: init, clear, cursor, text, RGB backlight |
-| `dfrobot_lcd_shield.c/.h` | FRDM board adapter: `LPI2C0` init, I2C write, address scan |
-| `dfrobot_lcd_shield_keypad.c/.h` | `LPADC0` init, `ADC0_A8` read, debounce, raw-to-button mapping |
-| `main.c` | Demo: initialize LCD, scan I2C, display current button |
-| `main.mex` | Config Tools pin configuration |
+1. configure `LPI2C0` for the LCD shield;
+2. configure `ADC0_A8` for the keypad resistor ladder;
+3. use generated peripheral macros such as `LPI2C0_PERIPHERAL` and `ADC0_PERIPHERAL`;
+4. display text and custom game characters on a 16x2 LCD;
+5. use a keypad button as a jump control;
+6. implement a small obstacle-and-collision game loop.
 
 ## Config Tools Setup
 
-In `main.mex`, verify:
+Open the project `.mex` file and configure these items.
 
-```text
-P1_8  -> LPI2C0_SDA  -> RGBLCD1602_ARDUINO_SDA
-P1_9  -> LPI2C0_SCL  -> RGBLCD1602_ARDUINO_SCL
-P1_10 -> ADC0_A8     -> LCD_KEYPAD_ARDUINO_A0
+### LPI2C0
+
+| Setting | Value |
+|---|---|
+| Peripheral | `LPI2C0` |
+| Mode | Master |
+| Baud rate | `100000` Hz |
+| Pin config | 2-pin open-drain |
+| SDA | `P1_8 / LPI2C0_SDA` |
+| SCL | `P1_9 / LPI2C0_SCL` |
+
+The LCD controller normally uses address `0x3E`. The RGB controller often uses `0x60`, but compatible modules may use `0x30`, `0x6B`, or `0x2D`.
+
+### ADC0
+
+Route `P1_10` as `ADC0_A8`. Use analog input mode. Do not enable digital pull-ups or pull-downs on the keypad pin.
+
+### Update Code
+
+After the pin, peripheral, and clock settings are correct, use **Update Code**. The startup should still call generated initialization once:
+
+```c
+void BOARD_InitHardware(void)
+{
+    BOARD_InitPins();
+    BOARD_BootClockFRO12M();
+    BOARD_InitBootPeripherals();
+
+    LED_RED_INIT(LOGIC_LED_OFF);
+}
 ```
 
-Generated files should be in:
+Do not manually edit generated files as the permanent solution.
 
-```text
-cfg_tools/board/pin_mux.c
-cfg_tools/board/pin_mux.h
+## I2C Usage Pattern
+
+Use the same SDK style as the P3T1755 I2C lesson: Config Tools initializes `LPI2C0`, and application/driver code only performs transfers.
+
+```c
+static bool LCD_I2C_Write(uint8_t address, const uint8_t *data, size_t length)
+{
+    lpi2c_master_transfer_t transfer = {0};
+
+    transfer.flags = kLPI2C_TransferDefaultFlag;
+    transfer.slaveAddress = address;
+    transfer.direction = kLPI2C_Write;
+    transfer.subaddress = 0U;
+    transfer.subaddressSize = 0U;
+    transfer.data = (uint8_t *)data;
+    transfer.dataSize = length;
+
+    return LPI2C_MasterTransferBlocking(LPI2C0_PERIPHERAL, &transfer) == kStatus_Success;
+}
 ```
 
-If Config Tools generates files elsewhere, align CMake so it compiles the same generated files that the tool updates.
+Do not reinitialize `LPI2C0` inside the LCD driver after `BOARD_InitHardware()`.
 
-Required components include:
+## Keypad Usage Pattern
 
-```text
-CONFIG_MCUX_COMPONENT_driver.cmsis_lpuart=y
-CONFIG_MCUX_COMPONENT_driver.lpi2c=y
-CONFIG_MCUX_COMPONENT_driver.lpadc=y
-CONFIG_MCUX_COMPONENT_device.RTE=y
+Configure a software-triggered ADC command for channel `8`.
+
+```c
+#define KEYPAD_ADC_CHANNEL    8U
+#define KEYPAD_ADC_COMMAND_ID 1U
+#define KEYPAD_ADC_TRIGGER_ID 0U
 ```
 
-If Config Tools reports missing drivers or says files are not in the project, check `prj.conf`, `frdmmcxa153/prj.conf`, `cfg_tools/project_info.json`, `cfg_tools/cfg_require.json`, and CMake source lists.
+Read the raw keypad value from the main loop, then map ranges to buttons.
 
-## LCD over I2C
-
-The LCD driver follows the DFRobot RGBLCD1602-style sequence:
-
-1. initialize the LCD controller at `0x3E`;
-2. initialize the RGB controller at `0x60`;
-3. write text to the two rows;
-4. change the RGB backlight.
-
-Initial demo text:
-
-```text
-hello, world!
-Key: NONE
-```
-
-## Keypad over Raw ADC
-
-The buttons are connected through a resistor ladder to Arduino `A0`, which maps to `P1_10 / ADC0_A8`.
-
-Measured raw values for the tested board/shield:
+Example measured values:
 
 | Button | Approximate raw value |
 |---|---:|
@@ -150,89 +143,110 @@ Measured raw values for the tested board/shield:
 | SELECT | measure on your board |
 | NONE | near upper end / open circuit |
 
-Current thresholds:
+Use serial output to calibrate thresholds for your shield.
 
-```c
-.right_max  = 9750U,
-.up_max     = 28900U,
-.down_max   = 48400U,
-.left_max   = 62000U,
-.select_max = 65000U,
-```
+## Basic Bring-Up
 
-If SELECT is not detected correctly, print the raw value and adjust `select_max`.
+Before writing the game, verify the shield:
 
-## Debounce
-
-ADC values can wobble. The keypad driver accepts a new button only after the same candidate appears for three consecutive reads.
-
-This is enough for a super-loop demo and prevents rapid wrong display updates.
-
-## Build and Run
-
-```powershell
-cd C:\WORKSPACE\proiecte\ipcei-lab\src\lab_shield_lcd_keypad\main
-cmake --build --preset debug
-```
+1. LCD initializes at `0x3E`.
+2. RGB backlight changes color.
+3. row 0 shows `hello, world!`.
+4. row 1 shows `Key: NONE`.
+5. pressing buttons updates row 1 and prints raw ADC values on serial.
 
 Expected serial output:
 
 ```text
 FRDM-MCXA153 DFRobot RGBLCD1602 I2C demo
-Using LPI2C0 on Arduino header SDA=P1_8 and SCL=P1_9
-LCD address 0x3E, RGB address 0x60
-I2C scan: 0x3E 0x60
+LCD probe 0x3E: OK
+Selected RGB address 0x60
 RGBLCD1602 init sequence sent
 ADC raw=... key=NONE
 Button: RIGHT raw=15
 ```
 
-The LCD should show `hello, world!` and the current key.
+## Main Task: LCD Dinosaur Game
 
-## Lab Exercise
+Build a small dinosaur runner game on the 16x2 LCD.
 
-1. Open `main.mex` and verify `P1_8`, `P1_9`, `P1_10`.
-2. Compare `main.mex` with generated `cfg_tools/board/pin_mux.c`.
-3. Build and flash the project.
-4. Confirm the I2C scan shows `0x3E` and `0x60`.
-5. Press every button and record raw ADC values.
-6. Adjust SELECT threshold if needed.
-7. Modify the LCD text to show your team initials.
+Required behavior:
 
-## Common Problems
+1. show a player/dinosaur character near the left side of the LCD;
+2. move obstacles from right to left;
+3. use one keypad button, such as UP or SELECT, to jump;
+4. make the dinosaur return to the ground after the jump;
+5. detect collision when an obstacle reaches the dinosaur while it is on the ground;
+6. show score, distance, or survival time;
+7. show a game-over state;
+8. restart after a keypad button press.
+
+Implementation hints:
+
+- Use LCD custom glyphs for the dinosaur and obstacle if your driver supports them.
+- A first version can use plain character cells such as `D`, `|`, and spaces.
+- Keep game state in the main loop: player row, obstacle column, score, and game-over flag.
+- Use a tick counter or delay to control game speed.
+- Do not perform I2C LCD writes from interrupt handlers.
+
+A simple display layout could be:
+
+```text
+Score: 0012
+  D        |
+```
+
+When jumping:
+
+```text
+  D
+           |
+```
+
+## Build And Run
+
+Build the project with the existing CMake preset or MCUXpresso workflow:
+
+```powershell
+cmake --build --preset debug --clean-first
+```
+
+Flash the board and test in this order:
+
+1. LCD text appears.
+2. keypad raw values print on serial.
+3. jump button works.
+4. obstacles move.
+5. collisions end the game.
+6. restart works.
+
+## Bring-Up Checklist
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| I2C scan lists all addresses | wrong SDA/SCL or floating bus | use `P1_8/P1_9` |
-| LCD does not light | missing power or incompatible module | check VCC/GND and logic levels |
-| LCD lights but no text | I2C init or contrast issue | verify `0x3E/0x60` scan |
-| Wrong buttons | thresholds wrong | recalibrate using raw console values |
-| SELECT appears as NONE | `select_max` too low | measure SELECT raw value |
-| Config Tools creates files elsewhere | project metadata mismatch | check `.mex`, `project_info.json`, CMake |
-| Missing driver warnings | incomplete metadata | restore required components and include required config files |
+| `LCD probe 0x3E: missing` | wrong SDA/SCL route or wiring | route `P1_8/P1_9`; check power and pull-ups |
+| LCD backlight works but no text | LCD controller init or address issue | verify `0x3E`; check LCD writes |
+| LCD text works but RGB does not | different RGB address | try `0x60`, `0x30`, `0x6B`, or `0x2D` |
+| `kStatus_LPI2C_Busy` | SDA or SCL is not idle-high | check pull-ups/open-drain and shield voltage |
+| ADC always reads NONE | wrong ADC pin/channel | route `P1_10` to `ADC0_A8`; use channel `8` |
+| Wrong buttons | thresholds wrong | record raw values and recalibrate |
+| Game flickers too much | too many LCD writes | update only changed cells or slow the game tick |
+| Jump feels unresponsive | polling too slow or debounce too strict | tune loop timing and button detection |
 
 ## Deliverable
 
 Submit a project where:
 
-1. LCD shows text on both rows;
-2. RGB backlight changes;
-3. serial console shows I2C scan and raw ADC values;
-4. all buttons are detected or thresholds are documented;
-5. `main.mex` contains the shield pins.
+1. Config Tools routes `P1_8`, `P1_9`, and `P1_10` as shown in the pinout reference;
+2. the LCD and keypad pass the basic bring-up test;
+3. the final application is the LCD dinosaur game;
+4. the dinosaur can jump over moving obstacles;
+5. collisions produce a game-over state;
+6. the game can restart from the keypad;
+7. the serial console prints useful debug information such as raw ADC values or score.
 
-## Useful AI Prompt
-
-```text
-I am working on FRDM-MCXA153 with a DFRobot RGB LCD Keypad Shield.
-LCD is on I2C: SDA=P1_8, SCL=P1_9, LPI2C0, addresses 0x3E and 0x60.
-Buttons are on Arduino A0 = P1_10 / ADC0_A8, read with LPADC raw 16-bit.
-Measured values: RIGHT=15, UP=19500, DOWN=38300, LEFT=58500, SELECT still to measure.
-Check dfrobot_lcd_shield_keypad.c and adjust thresholds without changing the LCD driver.
-Keep compatibility with MCUXpresso Config Tools and main.mex.
-```
+**Task: upload the Gen AI chat to the evaluation platform**
 
 ---
 
 [<- L5: LPADC](../l5-lpadc) - [L7: LPI2C - P3T1755](../l7-lpi2c-p3t1755)
-

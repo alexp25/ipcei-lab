@@ -4,20 +4,30 @@
 #include "fsl_lpi2c.h"
 #include "peripherals.h"
 
+#include <string.h>
+
 #define DFROBOT_LCD_SHIELD_TRANSFER_TIMEOUT_LOOPS (1000000U)
+
+static const uint8_t s_supportedRgbAddresses[] = {
+    DFROBOT_LCD_SHIELD_RGB_ADDRESS,
+    0x30U,
+    0x6BU,
+    0x2DU,
+};
 
 typedef struct
 {
     LPI2C_Type *base;
-    bool initialized;
 } dfrobot_rgb_lcd_bus_t;
 
-static dfrobot_rgb_lcd_bus_t s_bus;
+static dfrobot_rgb_lcd_bus_t s_bus = {
+    .base = LPI2C0_PERIPHERAL,
+};
 
 static bool dfrobot_rgb_lcd_i2c_write(void *context, uint8_t address, const uint8_t *data, size_t length, uint32_t timeout)
 {
     dfrobot_rgb_lcd_bus_t *bus = (dfrobot_rgb_lcd_bus_t *)context;
-    lpi2c_master_transfer_t transfer = {0};
+    lpi2c_master_transfer_t transfer;
 
     (void)timeout;
 
@@ -26,13 +36,14 @@ static bool dfrobot_rgb_lcd_i2c_write(void *context, uint8_t address, const uint
         return false;
     }
 
-    transfer.flags = kLPI2C_TransferDefaultFlag;
+    (void)memset(&transfer, 0, sizeof(transfer));
     transfer.slaveAddress = address;
     transfer.direction = kLPI2C_Write;
     transfer.subaddress = 0U;
     transfer.subaddressSize = 0U;
     transfer.data = (uint8_t *)data;
     transfer.dataSize = length;
+    transfer.flags = kLPI2C_TransferDefaultFlag;
 
     return LPI2C_MasterTransferBlocking(bus->base, &transfer) == kStatus_Success;
 }
@@ -45,19 +56,12 @@ static void dfrobot_rgb_lcd_delay_us(void *context, uint32_t delayUs)
 
 void DFRobot_LcdShieldBusInit(void)
 {
-    if (s_bus.initialized)
-    {
-        return;
-    }
-
     s_bus.base = LPI2C0_PERIPHERAL;
-    s_bus.initialized = true;
 }
 
 bool DFRobot_LcdShieldProbeAddress(uint8_t address)
 {
     lpi2c_master_transfer_t transfer = {0};
-    status_t status;
 
     DFRobot_LcdShieldBusInit();
 
@@ -69,14 +73,13 @@ bool DFRobot_LcdShieldProbeAddress(uint8_t address)
     transfer.data = NULL;
     transfer.dataSize = 0U;
 
-    status = LPI2C_MasterTransferBlocking(s_bus.base, &transfer);
-
-    return status == kStatus_Success;
+    return LPI2C_MasterTransferBlocking(s_bus.base, &transfer) == kStatus_Success;
 }
 
 bool DFRobot_LcdShieldInit(dfrobot_lcd_shield_t *shield)
 {
     dfrobot_rgb_lcd_config_t lcdConfig;
+    uint8_t rgbAddress = DFROBOT_LCD_SHIELD_RGB_ADDRESS;
 
     if (shield == NULL)
     {
@@ -89,7 +92,15 @@ bool DFRobot_LcdShieldInit(dfrobot_lcd_shield_t *shield)
     lcdConfig.busContext = &s_bus;
     lcdConfig.write = dfrobot_rgb_lcd_i2c_write;
     lcdConfig.delayUs = dfrobot_rgb_lcd_delay_us;
-    lcdConfig.rgbAddress = DFROBOT_LCD_SHIELD_RGB_ADDRESS;
+    for (uint32_t i = 0U; i < (sizeof(s_supportedRgbAddresses) / sizeof(s_supportedRgbAddresses[0])); ++i)
+    {
+        if (DFRobot_LcdShieldProbeAddress(s_supportedRgbAddresses[i]))
+        {
+            rgbAddress = s_supportedRgbAddresses[i];
+            break;
+        }
+    }
+    lcdConfig.rgbAddress = rgbAddress;
     lcdConfig.timeout = DFROBOT_LCD_SHIELD_TRANSFER_TIMEOUT_LOOPS;
 
     return DFRobot_RgbLcd_Init(&shield->lcd, &lcdConfig);
