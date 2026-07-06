@@ -142,9 +142,9 @@ Use the same specification-first flow from [LP2 - From Vibe Coding to Coding Age
 
 ### First Agent: Planning
 
+```text
 Use `.agents/mcux-config-to-main-spec.prompt.md`.
 
-```text
 APPLICATION_TASK: read the raw ADC sample on SW2 pin (ADC0_A14) using the ADC configured in the project, convert it to voltage, and print both values on the console.
 
 Use the current working directory as PROJECT_ROOT.
@@ -156,9 +156,9 @@ Review the returned specification. Check that it found the active project root, 
 
 ### Second Agent: Coding
 
+```text
 Use `.agents/mcux-main-codegen-from-spec.prompt.md` with the validated specification from the first agent.
 
-```text
 Use the current working directory as PROJECT_ROOT.
 
 Apply the code changes only to the active root C file.
@@ -169,9 +169,11 @@ The generated code should initialize the board, configure the ADC command/trigge
 
 ### Third Agent: Review and Debug
 
-If the code does not build or the behavior does not match the specification, use `.agents/mcux-feedback-to-change-spec.prompt.md`.
+If the code does not build or the behavior does not match the specification:
 
 ```text
+Use `.agents/mcux-feedback-to-change-spec.prompt.md` with the change specification above.
+
 FEEDBACK: <your observations>.
 
 INTENDED_BEHAVIOR: <specification>.
