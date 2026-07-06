@@ -25,8 +25,10 @@ extern "C" {
  */
 void BOARD_InitBootPins(void);
 
-#define PCR_IBE_ibe1 0x01u /*!<@brief Input Buffer Enable: Enables */
-#define PCR_PS_ps1 0x01u   /*!<@brief Pull Select: Enables internal pullup resistor */
+#define PCR_IBE_ibe0 0x00u          /*!<@brief Input Buffer Enable: Disables */
+#define PCR_IBE_ibe1 0x01u          /*!<@brief Input Buffer Enable: Enables */
+#define PCR_PS_ps1 0x01u            /*!<@brief Pull Select: Enables internal pullup resistor */
+#define PORT3_PCR29_MUX_mux00 0x00u /*!<@brief Pin Multiplex Control: Alternative 0 (GPIO) */
 
 /*! @name PORT3_12 (number 38), LED_RED
   @{ */
@@ -65,6 +67,15 @@ void BOARD_InitBootPins(void);
 #define BOARD_INITPINS_LED_BLUE_PWM_PIN 0U                   /*!<@brief PORT pin number */
 #define BOARD_INITPINS_LED_BLUE_PWM_PIN_MASK (1U << 0U)      /*!<@brief PORT pin mask */
                                                              /* @} */
+
+/*! @name PORT3_29 (number 32), SW2_ADC
+  @{ */
+
+/* Symbols to be used with PORT driver */
+#define BOARD_INITPINS_SW2_ADC_PORT PORT3                /*!<@brief PORT peripheral base pointer */
+#define BOARD_INITPINS_SW2_ADC_PIN 29U                   /*!<@brief PORT pin number */
+#define BOARD_INITPINS_SW2_ADC_PIN_MASK (1U << 29U)      /*!<@brief PORT pin mask */
+                                                         /* @} */
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.

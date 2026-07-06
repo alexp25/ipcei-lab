@@ -52,6 +52,8 @@ BOARD_InitPins:
   - {pin_num: '52', peripheral: LPUART0, signal: TX, pin_signal: P0_3/TDI/LPUART0_TXD/LPSPI0_SDO/CT0_MAT1/UTICK_CAP1/CMP0_OUT/CMP1_IN1}
   - {pin_num: '46', peripheral: FlexPWM0, signal: 'A, 0', pin_signal: P3_0/WUU0_IN22/TRIG_IN0/CT_INP16/PWM0_A0, direction: OUTPUT}
   - {pin_num: '32', peripheral: ADC0, signal: 'A, 14', pin_signal: P3_29/WUU0_IN27/ISPMODE_N/CT_INP3/ADC0_A14}
+  - {pin_num: '54', peripheral: LPI2C0, signal: SDA, pin_signal: P0_16/WUU0_IN2/LPI2C0_SDA/LPSPI0_PCS2/CT0_MAT0/UTICK_CAP2/I3C0_SDA, pull_select: up, pull_enable: enable}
+  - {pin_num: '55', peripheral: LPI2C0, signal: SCL, pin_signal: P0_17/LPI2C0_SCL/LPSPI0_PCS3/CT0_MAT1/UTICK_CAP3/I3C0_SCL, pull_select: up, pull_enable: enable}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
  */
 /* clang-format on */
@@ -74,10 +76,12 @@ void BOARD_InitPins(void)
     CLOCK_EnableClock(kCLOCK_GateGPIO1);
     /* Write to GPIO3: Peripheral clock is enabled */
     CLOCK_EnableClock(kCLOCK_GateGPIO3);
-    /* LPUART0 peripheral is released from reset */
-    RESET_ReleasePeripheralReset(kLPUART0_RST_SHIFT_RSTn);
+    /* LPI2C0 peripheral is released from reset */
+    RESET_ReleasePeripheralReset(kLPI2C0_RST_SHIFT_RSTn);
     /* PORT0 peripheral is released from reset */
     RESET_ReleasePeripheralReset(kPORT0_RST_SHIFT_RSTn);
+    /* LPUART0 peripheral is released from reset */
+    RESET_ReleasePeripheralReset(kLPUART0_RST_SHIFT_RSTn);
     /* GPIO1 peripheral is released from reset */
     RESET_ReleasePeripheralReset(kGPIO1_RST_SHIFT_RSTn);
     /* PORT1 peripheral is released from reset */
@@ -90,6 +94,38 @@ void BOARD_InitPins(void)
     RESET_ReleasePeripheralReset(kGPIO3_RST_SHIFT_RSTn);
     /* ADC0 peripheral is released from reset */
     RESET_ReleasePeripheralReset(kADC0_RST_SHIFT_RSTn);
+
+    /* PORT0_16 (pin 54) is configured as LPI2C0_SDA */
+    PORT_SetPinMux(PORT0, 16U, kPORT_MuxAlt2);
+
+    PORT0->PCR[16] = ((PORT0->PCR[16] &
+                       /* Mask bits to zero which are setting */
+                       (~(PORT_PCR_PS_MASK | PORT_PCR_PE_MASK | PORT_PCR_IBE_MASK)))
+
+                      /* Pull Select: Enables internal pullup resistor. */
+                      | PORT_PCR_PS(PCR_PS_ps1)
+
+                      /* Pull Enable: Enables. */
+                      | PORT_PCR_PE(PCR_PE_pe1)
+
+                      /* Input Buffer Enable: Enables. */
+                      | PORT_PCR_IBE(PCR_IBE_ibe1));
+
+    /* PORT0_17 (pin 55) is configured as LPI2C0_SCL */
+    PORT_SetPinMux(PORT0, 17U, kPORT_MuxAlt2);
+
+    PORT0->PCR[17] = ((PORT0->PCR[17] &
+                       /* Mask bits to zero which are setting */
+                       (~(PORT_PCR_PS_MASK | PORT_PCR_PE_MASK | PORT_PCR_IBE_MASK)))
+
+                      /* Pull Select: Enables internal pullup resistor. */
+                      | PORT_PCR_PS(PCR_PS_ps1)
+
+                      /* Pull Enable: Enables. */
+                      | PORT_PCR_PE(PCR_PE_pe1)
+
+                      /* Input Buffer Enable: Enables. */
+                      | PORT_PCR_IBE(PCR_IBE_ibe1));
 
     /* PORT0_2 (pin 51) is configured as LPUART0_RXD */
     PORT_SetPinMux(PORT0, 2U, kPORT_MuxAlt2);

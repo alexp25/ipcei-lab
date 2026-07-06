@@ -409,7 +409,7 @@ instance:
       - 0:
         - matchChannelPrefixId: 'Match_0'
         - matchChannel: 'kCTIMER_Match_0'
-        - matchValueStr: '1'
+        - matchValueStr: '1 Hz'
         - enableCounterReset: 'true'
         - enableCounterStop: 'false'
         - outControl: 'kCTIMER_Output_NoAction'

@@ -27,6 +27,7 @@ void BOARD_InitBootPins(void);
 
 #define PCR_IBE_ibe0 0x00u          /*!<@brief Input Buffer Enable: Disables */
 #define PCR_IBE_ibe1 0x01u          /*!<@brief Input Buffer Enable: Enables */
+#define PCR_PE_pe1 0x01u            /*!<@brief Pull Enable: Enables */
 #define PCR_PS_ps1 0x01u            /*!<@brief Pull Select: Enables internal pullup resistor */
 #define PORT3_PCR29_MUX_mux00 0x00u /*!<@brief Pin Multiplex Control: Alternative 0 (GPIO) */
 

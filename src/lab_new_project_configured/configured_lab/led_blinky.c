@@ -21,6 +21,9 @@
  #define APP_ADC_TRIGGER_MASK (1UL << APP_ADC_TRIGGER_ID)
  #define APP_ADC_FULL_SCALE  65535U
  #define APP_ADC_VREF_MV     3300U
+ #define APP_P3T1755_I2C_ADDRESS 0x48U
+ #define APP_P3T1755_TEMP_REG    0x00U
+ #define APP_P3T1755_TEMP_BYTES  2U
  
  /*******************************************************************************
   * Prototypes
@@ -30,7 +33,10 @@
  static void ADC0_SW2_InitConversion(void);
  static bool ADC0_SW2_ReadRaw(uint16_t *rawSample);
  static uint32_t ADC0_SW2_ConvertToMillivolts(uint16_t rawSample);
+ static bool P3T1755_ReadRaw(int16_t *rawTemperature);
+ static int32_t P3T1755_RawToMilliCelsius(int16_t rawTemperature);
  static void LPUART0_WriteFixedVoltage(uint32_t millivolts);
+ static void LPUART0_WriteSignedFixedTemperature(int32_t milliCelsius);
  
  /*******************************************************************************
   * Variables
@@ -115,6 +121,44 @@
  {
      return (((uint32_t)rawSample * APP_ADC_VREF_MV) + (APP_ADC_FULL_SCALE / 2U)) / APP_ADC_FULL_SCALE;
  }
+
+ static bool P3T1755_ReadRaw(int16_t *rawTemperature)
+ {
+     uint8_t rxBuffer[APP_P3T1755_TEMP_BYTES];
+     lpi2c_master_transfer_t transfer = {0};
+     status_t status;
+     uint16_t sample;
+     int16_t raw;
+
+     transfer.flags = kLPI2C_TransferDefaultFlag;
+     transfer.slaveAddress = APP_P3T1755_I2C_ADDRESS;
+     transfer.direction = kLPI2C_Read;
+     transfer.subaddress = APP_P3T1755_TEMP_REG;
+     transfer.subaddressSize = 1U;
+     transfer.data = rxBuffer;
+     transfer.dataSize = sizeof(rxBuffer);
+
+     status = LPI2C_MasterTransferBlocking(LPI2C0_PERIPHERAL, &transfer);
+     if (status != kStatus_Success)
+     {
+         return false;
+     }
+
+     sample = ((uint16_t)rxBuffer[0] << 8U) | rxBuffer[1];
+     raw = (int16_t)(sample >> 5U);
+     if ((raw & 0x0400) != 0)
+     {
+         raw |= (int16_t)0xF800;
+     }
+
+     *rawTemperature = raw;
+     return true;
+ }
+
+ static int32_t P3T1755_RawToMilliCelsius(int16_t rawTemperature)
+ {
+     return (int32_t)rawTemperature * 125;
+ }
  
  static void LPUART0_WriteFixedVoltage(uint32_t millivolts)
  {
@@ -133,6 +177,36 @@
      LPUART0_WriteU32(fractional);
      LPUART0_WriteString("V");
  }
+
+ static void LPUART0_WriteSignedFixedTemperature(int32_t milliCelsius)
+ {
+     uint32_t magnitude;
+     uint32_t fractional;
+
+     if (milliCelsius < 0)
+     {
+         LPUART0_WriteString("-");
+         magnitude = (uint32_t)(-milliCelsius);
+     }
+     else
+     {
+         magnitude = (uint32_t)milliCelsius;
+     }
+
+     fractional = magnitude % 1000U;
+     LPUART0_WriteU32(magnitude / 1000U);
+     LPUART0_WriteString(".");
+     if (fractional < 100U)
+     {
+         LPUART0_WriteString("0");
+     }
+     if (fractional < 10U)
+     {
+         LPUART0_WriteString("0");
+     }
+     LPUART0_WriteU32(fractional);
+     LPUART0_WriteString("C");
+ }
  
  /*!
   * @brief Main function
@@ -149,6 +223,7 @@
          if (flag)
          {
              uint16_t adcRawSample;
+             int16_t temperatureRaw;
  
              flag = 0;
              LPUART0_WriteString("counter=");
@@ -163,6 +238,15 @@
              else
              {
                  LPUART0_WriteString(" adc_error=timeout");
+             }
+             LPUART0_WriteString(" temp=");
+             if (P3T1755_ReadRaw(&temperatureRaw))
+             {
+                 LPUART0_WriteSignedFixedTemperature(P3T1755_RawToMilliCelsius(temperatureRaw));
+             }
+             else
+             {
+                 LPUART0_WriteString("i2c_error");
              }
              LPUART0_WriteString("\r\n");
              printCounter++;
