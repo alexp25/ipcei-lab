@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project Scoping Brief - FRDM-MCXA153 Walkie Talkie</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #18202a;
+      --muted: #5b6573;
+      --line: #d8dee8;
+      --soft: #f4f7fb;
+      --panel: #ffffff;
+      --accent: #006d77;
+      --accent-2: #9b5de5;
+      --warn: #9a5b00;
+      --risk: #a61b1b;
+      --ok: #18794e;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+      color: var(--ink);
+      background: var(--soft);
+    }
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+    header {
+      padding: 28px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    h1, h2, h3 {
+      margin: 0;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    h2 {
+      font-size: 1.35rem;
+      margin-bottom: 14px;
+    }
+    h3 {
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+    }
+    p {
+      margin: 0 0 10px;
+    }
+    section {
+      margin-top: 18px;
+      padding: 24px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    ul, ol {
+      margin: 8px 0 0 22px;
+      padding: 0;
+    }
+    li {
+      margin: 4px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.95rem;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #eef3f8;
+    }
+    .subtitle {
+      color: var(--muted);
+      max-width: 850px;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .badge.mandatory {
+      color: #064f57;
+      background: #d9f2f3;
+      border-color: #a6dadd;
+    }
+    .badge.ready {
+      color: #15583d;
+      background: #ddf3e9;
+      border-color: #a9dec5;
+    }
+    .badge.assumption {
+      color: #6b3f00;
+      background: #fff0d1;
+      border-color: #f0c36b;
+    }
+    .badge.advanced {
+      color: #57338a;
+      background: #efe4ff;
+      border-color: #d3b8fb;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: #fbfcfe;
+    }
+    .kv {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 8px 14px;
+      margin-top: 8px;
+    }
+    .key {
+      font-weight: 700;
+    }
+    .muted {
+      color: var(--muted);
+    }
+    .callout {
+      border-left: 4px solid var(--accent);
+      padding: 12px 14px;
+      background: #eefafa;
+      margin-top: 10px;
+    }
+    .warning {
+      border-left-color: var(--warn);
+      background: #fff7e8;
+    }
+    .risk {
+      color: var(--risk);
+      font-weight: 700;
+    }
+    .ok {
+      color: var(--ok);
+      font-weight: 700;
+    }
+    @media (max-width: 820px) {
+      main {
+        width: min(100% - 20px, 1120px);
+        padding-top: 16px;
+      }
+      header, section {
+        padding: 18px;
+      }
+      .grid, .kv {
+        grid-template-columns: 1fr;
+      }
+      h1 {
+        font-size: 1.55rem;
+      }
+    }
+    @media print {
+      body {
+        background: #ffffff;
+      }
+      main {
+        width: 100%;
+        padding: 0;
+      }
+      header, section {
+        break-inside: avoid;
+        border-color: #999;
+        border-radius: 0;
+      }
+      .badge {
+        border-color: #888;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>FRDM-MCXA153 Push-to-Talk Walkie Talkie Prototype</h1>
+      <p class="subtitle">Scoping brief for an Embedded Engineering and Gen AI Summer School project. The original idea was: <strong>walkie talkie</strong>.</p>
+      <div class="meta">
+        <span class="badge mandatory">NXP FRDM-MCXA153 mandatory</span>
+        <span class="badge assumption">Input quality: vague</span>
+        <span class="badge ready">Ready with assumptions</span>
+      </div>
+    </header>
+
+    <section>
+      <h2>Project Summary</h2>
+      <p>A student prototype that uses the NXP FRDM-MCXA153 as the controller for a push-to-talk audio communication device. The core version focuses on audio input, output, state control, and diagnostics. The recommended version adds short-range digital communication through an external 3.3 V-compatible module.</p>
+      <div class="kv">
+        <div class="key">Main objective</div>
+        <div>Demonstrate push-to-talk control, microphone input, speaker or headphone output, status feedback, and optional short-range audio packet transfer.</div>
+        <div class="key">Operating environment</div>
+        <div>Indoor lab or classroom prototype testing between two identical devices or between one device and a host-side simulator.</div>
+        <div class="key">Out of scope</div>
+        <div>Custom RF transmitter design, commercial walkie talkie compatibility, emergency communication use, and exact MCU pin assignment before hardware review.</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Fixed Platform</h2>
+      <table>
+        <tr><th>Item</th><th>Decision</th></tr>
+        <tr><td>Board</td><td>NXP FRDM-MCXA153</td></tr>
+        <tr><td>MCU</td><td>NXP MCXA153</td></tr>
+        <tr><td>Status</td><td>Mandatory user constraint</td></tr>
+        <tr><td>Pin policy</td><td>Use generic capabilities unless exact pins are provided.</td></tr>
+        <tr><td>Logic level policy</td><td>Assume 3.3 V logic unless verified otherwise.</td></tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>Scope Options</h2>
+      <div class="grid">
+        <article class="panel">
+          <h3>Core Student Version</h3>
+          <p><strong>Difficulty:</strong> Intermediate</p>
+          <p>Build a single-board push-to-talk audio interface with a button-controlled state machine, microphone level acquisition, simple output, LED feedback, and serial logs.</p>
+          <ul>
+            <li>Push-to-talk state machine</li>
+            <li>Microphone signal level capture</li>
+            <li>Speaker, buzzer, or headphone output</li>
+            <li>Idle, transmit, and error LEDs</li>
+            <li>Serial diagnostics</li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h3>Recommended Version</h3>
+          <p><strong>Difficulty:</strong> Intermediate</p>
+          <p>Create a two-device short-range digital prototype using two FRDM-MCXA153 boards and a 3.3 V-compatible external communication module.</p>
+          <ul>
+            <li>Half-duplex push-to-talk protocol</li>
+            <li>Audio frame buffering</li>
+            <li>External UART, SPI, or I2C communication module</li>
+            <li>Packet counters and receive status</li>
+            <li>Configurable channel or device ID</li>
+          </ul>
+        </article>
+        <article class="panel">
+          <h3>Advanced Extension</h3>
+          <p><strong>Difficulty:</strong> Advanced</p>
+          <p>Improve audio handling and diagnostics with optional compression, logging, display status, pairing concepts, and PC-side visualization.</p>
+          <ul>
+            <li>Voice activity detection or simple compression</li>
+            <li>Ring buffers for audio frames</li>
+            <li>Latency and packet-loss logging</li>
+            <li>Optional display and external storage</li>
+            <li>Optional privacy or pairing concept</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Likely Hardware</h2>
+      <table>
+        <tr><th>Component</th><th>Purpose</th><th>Likely Interface</th><th>Scope</th><th>Notes and Risks</th></tr>
+        <tr>
+          <td>Microphone module</td>
+          <td>Capture voice or voice-level input.</td>
+          <td>ADC-capable input or selected digital audio-capable interface</td>
+          <td>Core</td>
+          <td>Prefer 3.3 V-compatible modules. Raw microphone signals may need gain and filtering.</td>
+        </tr>
+        <tr>
+          <td>Speaker, buzzer, or headphone output</td>
+          <td>Provide tones or received audio playback.</td>
+          <td>PWM-capable output or external audio amplifier</td>
+          <td>Core</td>
+          <td>Do not drive a speaker directly from an MCU pin. Verify current and power limits.</td>
+        </tr>
+        <tr>
+          <td>Push-to-talk button</td>
+          <td>Enter transmit mode while pressed.</td>
+          <td>GPIO-capable pin</td>
+          <td>Core</td>
+          <td>Needs debounce handling.</td>
+        </tr>
+        <tr>
+          <td>Status LEDs</td>
+          <td>Show idle, transmit, receive, and error states.</td>
+          <td>GPIO-capable pins</td>
+          <td>Core</td>
+          <td>Use suitable current-limiting resistors and board-safe levels.</td>
+        </tr>
+        <tr>
+          <td>External short-range communication module</td>
+          <td>Exchange voice frames or simplified audio packets.</td>
+          <td>UART-capable, SPI-capable, or I2C-capable pins</td>
+          <td>Recommended</td>
+          <td>Must be legal, lab-approved, and voltage-compatible.</td>
+        </tr>
+        <tr>
+          <td>Small status display</td>
+          <td>Show channel, mode, link, and diagnostic data.</td>
+          <td>I2C-capable or SPI-capable pins</td>
+          <td>Advanced</td>
+          <td>Optional; LEDs and serial output are enough for earlier versions.</td>
+        </tr>
+      </table>
+      <div class="callout warning">
+        <strong>Power note:</strong> Use the board's normal development power path for bench testing. Add external regulated power only after checking the current needs of audio amplifiers, radio modules, and any battery setup.
+      </div>
+    </section>
+
+    <section>
+      <h2>Software Context</h2>
+      <p>Recommended development should follow the NXP-supported FRDM-MCXA153 workflow selected by course staff. Start from a minimal project that blinks LEDs and prints serial logs, then add push-to-talk input, microphone sampling or level reading, local output, and finally the communication module.</p>
+      <ul>
+        <li>Programming language: C</li>
+        <li>Starting point: new FRDM-MCXA153 project</li>
+        <li>Useful examples: GPIO, timers, serial debug, ADC or audio interface, UART, SPI, or I2C</li>
+        <li>Debugging: USB serial logs, on-board debugger, LED states, optional logic analyzer, optional host-side packet inspector</li>
+        <li>GenAI usage: requirements drafting, test generation, code review, debugging support, documentation generation</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Assumptions</h2>
+      <ol>
+        <li>The project is an educational prototype, not a certified consumer radio product.</li>
+        <li>Any over-the-air wireless link uses a pre-certified or lab-approved external communication module.</li>
+        <li>The recommended version may use reduced audio quality, simplified frames, or a host-side peer if two boards are unavailable.</li>
+        <li>All external modules are checked for 3.3 V logic compatibility before connection.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Open Questions</h2>
+      <table>
+        <tr><th>ID</th><th>Question</th><th>Why it matters</th></tr>
+        <tr><td>Q-001</td><td>Should the demo require real voice audio between two devices, or is staged audio-level and packet behavior acceptable?</td><td>Determines bandwidth, buffer size, module choice, and schedule risk.</td></tr>
+        <tr><td>Q-002</td><td>Which microphone, speaker amplifier, and wireless modules are available?</td><td>Drives interface choice, power design, and audio quality.</td></tr>
+        <tr><td>Q-003</td><td>Are two FRDM-MCXA153 boards available per team?</td><td>A two-device demo is natural, but a host-side peer can reduce hardware needs.</td></tr>
+        <tr><td>Q-004</td><td>What wireless bands, transmit powers, and lab policies are approved?</td><td>Over-the-air communication must remain legal and safe.</td></tr>
+        <tr><td>Q-005</td><td>Is portable battery operation required or optional?</td><td>Battery operation adds power, safety, enclosure, and testing complexity.</td></tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>Risks</h2>
+      <div class="grid">
+        <div class="panel">
+          <h3>Technical</h3>
+          <ul>
+            <li>Audio capture and playback require bounded timing.</li>
+            <li>Communication bandwidth may be insufficient for raw audio.</li>
+            <li>Half-duplex behavior must be clearly defined.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Voltage and Power</h3>
+          <ul>
+            <li>External modules may draw too much current from board headers.</li>
+            <li>Some breakouts may use 5 V logic.</li>
+            <li>Direct speaker drive from an MCU pin can damage hardware.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Privacy and Safety</h3>
+          <ul>
+            <li>Voice transmission may expose personal speech.</li>
+            <li>Unencrypted links may be observable nearby.</li>
+            <li>Battery and audio volume must be handled conservatively.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Human Approval Required</h2>
+      <ul>
+        <li>Approve the selected scope: core, recommended, or advanced.</li>
+        <li>Approve the wireless module and confirm it is legal and lab-approved.</li>
+        <li>Approve external microphone and speaker amplifier modules after voltage and current checks.</li>
+        <li>Approve whether real voice exchange is required for the final demonstration.</li>
+        <li>Approve any battery-powered operation plan.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Agent 1 Readiness</h2>
+      <p><span class="badge ready">Ready for requirements engineering</span> <span class="badge assumption">Recommended scope: recommended version</span></p>
+      <p>The project is ready for requirements engineering if Agent 1 treats the target as a staged push-to-talk digital audio prototype and keeps exact pins, SDK calls, wireless module choice, and audio quality as decisions to confirm.</p>
+      <p><strong>Critical missing information:</strong> available audio and wireless modules, number of FRDM-MCXA153 boards per team, approved wireless policy, and required final audio fidelity.</p>
+    </section>
+  </main>
+</body>
+</html>

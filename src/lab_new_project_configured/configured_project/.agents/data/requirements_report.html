@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Requirements Report - FRDM-MCXA153 Walkie Talkie Prototype</title>
+  <style>
+    :root { --ink:#17202a; --muted:#5d6d7e; --line:#d7dbdd; --bg:#f7f9fb; --panel:#ffffff; --core:#1f7a4d; --rec:#1f5f99; --adv:#8a5a00; --risk:#a93226; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.45; }
+    main { max-width: 1180px; margin: 0 auto; padding: 28px; }
+    header, section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 22px; margin: 0 0 18px; }
+    h1 { margin: 0 0 8px; font-size: 30px; }
+    h2 { margin: 0 0 14px; font-size: 22px; border-bottom: 2px solid var(--line); padding-bottom: 8px; }
+    h3 { margin: 18px 0 8px; font-size: 17px; }
+    p { margin: 0 0 10px; }
+    ul, ol { margin-top: 6px; padding-left: 22px; }
+    table { width: 100%; border-collapse: collapse; margin: 10px 0 16px; font-size: 14px; }
+    th, td { border: 1px solid var(--line); padding: 8px; vertical-align: top; }
+    th { background: #edf2f7; text-align: left; }
+    code { background: #eef1f5; padding: 1px 4px; border-radius: 4px; }
+    .badge { display: inline-block; padding: 4px 9px; border-radius: 999px; color: white; font-weight: 700; font-size: 12px; }
+    .ready { background: var(--rec); }
+    .core { background: var(--core); }
+    .recommended { background: var(--rec); }
+    .advanced { background: var(--adv); }
+    .risk { background: var(--risk); }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .note { color: var(--muted); }
+    .checklist label { display: block; margin: 6px 0; }
+    .small { font-size: 13px; }
+    @media print {
+      body { background: white; }
+      main { max-width: none; padding: 0; }
+      header, section { break-inside: avoid; border-radius: 0; }
+      a { color: inherit; text-decoration: none; }
+    }
+    @media (max-width: 760px) {
+      main { padding: 12px; }
+      .grid { grid-template-columns: 1fr; }
+      table { font-size: 12px; }
+      th, td { padding: 6px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="badge ready">READY WITH ASSUMPTIONS</span>
+    <h1>Requirements and Specification Package</h1>
+    <p><strong>Project:</strong> FRDM-MCXA153 Walkie Talkie Prototype</p>
+    <p><strong>Generated for:</strong> Embedded Engineering and Gen AI Summer School, third-year Computer Science students</p>
+    <p><strong>Generation note:</strong> Human-review draft generated from Agent 0 scoping JSON. AI assists; humans decide.</p>
+  </header>
+
+  <section>
+    <h2>Table of Contents</h2>
+    <ol>
+      <li><a href="#interpretation">Input Interpretation and Selected Scope</a></li>
+      <li><a href="#tiers">Feature Tiers</a></li>
+      <li><a href="#scenarios">Scenarios and User Stories</a></li>
+      <li><a href="#functional">Functional Requirements</a></li>
+      <li><a href="#nonfunctional">Non-Functional Requirements</a></li>
+      <li><a href="#hardware">Hardware Block Diagram Description</a></li>
+      <li><a href="#pins">Pin Allocation Draft</a></li>
+      <li><a href="#firmware">Firmware Architecture</a></li>
+      <li><a href="#tests">Test Cases and Acceptance Criteria</a></li>
+      <li><a href="#traceability">Traceability Matrix</a></li>
+      <li><a href="#risks">Assumptions and Risk Register</a></li>
+      <li><a href="#review">Human Review Checklist</a></li>
+      <li><a href="#status">Final Status</a></li>
+    </ol>
+  </section>
+
+  <section id="interpretation">
+    <h2>1. Input Interpretation and Selected Scope</h2>
+    <div class="grid">
+      <div>
+        <p><strong>Purpose:</strong> Build a push-to-talk embedded audio communication prototype that starts with local audio capture/playback and can extend toward short-range wireless voice transfer.</p>
+        <p><strong>Mandatory target board:</strong> NXP FRDM-MCXA153 with NXP MCXA153 MCU.</p>
+        <p><strong>Intended user:</strong> Third-year Computer Science student.</p>
+        <p><strong>Operating environment:</strong> Indoor laboratory or classroom prototype environment with controlled power and supervised hardware integration.</p>
+      </div>
+      <div>
+        <p><strong>Available ambition levels:</strong> <span class="badge core">core</span> <span class="badge recommended">recommended</span> <span class="badge advanced">advanced</span></p>
+        <p><strong>Selected scope for requirements:</strong> Recommended summer school version, with a core one-board milestone and optional advanced extensions.</p>
+        <p><strong>Readiness status:</strong> Ready with assumptions.</p>
+        <p><strong>Critical missing information:</strong> number of boards, available audio modules, wireless module, continuous speech versus short clips, allowed wireless technology and range.</p>
+      </div>
+    </div>
+    <h3>Facts from User and Agent 0</h3>
+    <ul>
+      <li>The project idea is “walkie talkie”.</li>
+      <li>The project must use the NXP FRDM-MCXA153 board.</li>
+      <li>Exact pins and SDK APIs must not be invented.</li>
+      <li>The output report must separate core, recommended, and advanced requirements and include tests, traceability, risks, and human review.</li>
+    </ul>
+    <h3>Agent 0 Assumptions</h3>
+    <ul>
+      <li>The project is an educational lab prototype, not a certified consumer radio product.</li>
+      <li>Two boards may be available for the recommended version, but the core version must work with one board.</li>
+      <li>Short-range classroom communication is sufficient.</li>
+      <li>Low-fidelity voice or short audio clips are acceptable for the recommended version.</li>
+    </ul>
+    <h3>Additional Agent 1 Assumptions</h3>
+    <ul>
+      <li>USB-powered operation is acceptable for first implementation and verification.</li>
+      <li>Core acceptance can be demonstrated by state changes, serial logs, and observable audio-level or playback behavior.</li>
+      <li>Wireless voice transfer may use short buffered clips if continuous streaming is not feasible.</li>
+      <li>All numeric thresholds in this report are AI assumptions pending human approval.</li>
+    </ul>
+    <h3>Human Approvals Needed</h3>
+    <ul>
+      <li>Approve selected tier and whether the recommended scope requires two FRDM-MCXA153 boards.</li>
+      <li>Approve microphone, audio output, display, and wireless modules after voltage and current review.</li>
+      <li>Approve short voice clips as an acceptable fallback to continuous speech streaming.</li>
+      <li>Approve radio use according to lab policy and local regulations.</li>
+      <li>Approve whether battery operation is in or out of scope.</li>
+    </ul>
+  </section>
+
+  <section id="tiers">
+    <h2>2. Feature Tiers</h2>
+    <table>
+      <thead><tr><th>Tier</th><th>Features</th><th>Extra Components</th><th>Main Risks</th><th>Student Suitability</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge core">Core</span></td><td>Push-to-talk button, microphone activity capture, LED states, serial debug, local audio level or playback demo.</td><td>3.3 V-compatible microphone module, safe speaker or audio output path, LEDs/buttons.</td><td>Audio quality, microphone gain, debouncing, safe speaker drive.</td><td>Suitable with instructor-provided starter project.</td></tr>
+        <tr><td><span class="badge recommended">Recommended</span></td><td>Two-device half-duplex behavior, packetized low-rate audio or short clips, link state, packet counters, error reporting.</td><td>Second FRDM-MCXA153, 3.3 V-compatible wireless modules, optional mode/channel buttons.</td><td>Bandwidth, latency, packet loss, module driver effort.</td><td>Achievable if audio fidelity expectations are conservative.</td></tr>
+        <tr><td><span class="badge advanced">Advanced</span></td><td>Voice activity detection, companding or compression, channel selection, diagnostics display, logging, optional edge AI concept.</td><td>Display, codec or digital audio path, optional storage or host dashboard, optional battery system.</td><td>Memory pressure, timing jitter, battery safety, AI/model complexity.</td><td>Optional extension for stronger teams.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="scenarios">
+    <h2>3. Scenarios and User Stories</h2>
+    <table>
+      <thead><tr><th>ID</th><th>Scenario</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>SC-001</td><td>Startup/setup</td><td>System powers on, initializes configured modules, and reports idle or fault state.</td></tr>
+        <tr><td>SC-002</td><td>Normal operation</td><td>User presses push-to-talk, speaks, releases the button, and the device returns to receive or idle mode.</td></tr>
+        <tr><td>SC-003</td><td>User interaction</td><td>User observes LEDs or display to identify idle, transmit, receive, link, and error states.</td></tr>
+        <tr><td>SC-004</td><td>Sensor/input processing</td><td>System reads a button and microphone or audio input path without using exact unverified pins.</td></tr>
+        <tr><td>SC-005</td><td>Actuator/output behavior</td><td>System drives LEDs and safe audio output through suitable interface circuitry.</td></tr>
+        <tr><td>SC-006</td><td>Communication/logging</td><td>Recommended version exchanges audio packets or short clips and logs packet statistics.</td></tr>
+        <tr><td>SC-007</td><td>Advanced behavior</td><td>Optional features process audio activity, show richer diagnostics, or log quality metrics.</td></tr>
+        <tr><td>SC-008</td><td>Error/fault handling</td><td>System reports missing peer, audio input fault, buffer overflow, or module initialization failure.</td></tr>
+        <tr><td>SC-009</td><td>Debugging/maintenance</td><td>Developer uses serial logs, LEDs, oscilloscope, or logic analyzer evidence to verify behavior.</td></tr>
+        <tr><td>SC-010</td><td>Safety/reliability</td><td>System avoids unsafe current draw, unverified 5 V logic, direct speaker drive, and uncontrolled battery behavior.</td></tr>
+      </tbody>
+    </table>
+    <table>
+      <thead><tr><th>ID</th><th>User Story</th></tr></thead>
+      <tbody>
+        <tr><td>US-001</td><td>As a student developer, I need the FRDM-MCXA153 to be the main controller, so that the project satisfies the fixed platform requirement.</td></tr>
+        <tr><td>US-002</td><td>As a walkie-talkie user, I need a push-to-talk control, so that I can intentionally enter transmit mode.</td></tr>
+        <tr><td>US-003</td><td>As a walkie-talkie user, I need microphone activity to be captured, so that my speech can be processed or sent.</td></tr>
+        <tr><td>US-004</td><td>As a walkie-talkie user, I need audible or visual feedback, so that I know the device is responding.</td></tr>
+        <tr><td>US-005</td><td>As a demonstrator, I need a peer communication mode, so that the project behaves like a walkie talkie.</td></tr>
+        <tr><td>US-006</td><td>As a developer, I need debug logs and status indicators, so that I can diagnose timing, packet, and hardware issues.</td></tr>
+        <tr><td>US-007</td><td>As an instructor, I need safe electrical integration, so that students do not damage the board or modules.</td></tr>
+        <tr><td>US-008</td><td>As an advanced student, I need optional audio processing and diagnostics, so that I can explore richer embedded behavior.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="functional">
+    <h2>4. Functional Requirements</h2>
+    <table>
+      <thead><tr><th>ID</th><th>Tier</th><th>Requirement</th><th>Source</th><th>Story</th><th>Component</th><th>Priority</th><th>Verification</th><th>Acceptance Criterion</th><th>Quality</th></tr></thead>
+      <tbody>
+        <tr><td>FR-001</td><td>core</td><td>The system shall use the NXP FRDM-MCXA153 board as the main controller platform.</td><td>user fact</td><td>US-001</td><td>Main board</td><td>Must</td><td>inspection</td><td>Hardware review confirms FRDM-MCXA153 is the only main controller.</td><td>atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-002</td><td>core</td><td>When powered from the approved source, the system shall initialize configured inputs, outputs, audio path, and debug reporting.</td><td>derived</td><td>US-006</td><td>Firmware startup</td><td>Must</td><td>test</td><td>Serial log or LED sequence shows startup complete or a named fault.</td><td>atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-003</td><td>core</td><td>When the push-to-talk button state changes, the system shall debounce the input before changing operating state.</td><td>derived</td><td>US-002</td><td>Button input</td><td>Must</td><td>test</td><td>At least 20 deliberate presses produce no unintended multiple state changes; threshold is an AI assumption.</td><td>atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-004</td><td>core</td><td>While push-to-talk is active, the system shall enter transmit or record state and indicate that state to the user.</td><td>derived</td><td>US-002</td><td>State machine, LEDs</td><td>Must</td><td>demonstration</td><td>Transmit indicator is active for the duration of the pressed button.</td><td>atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-005</td><td>core</td><td>While in transmit or record state, the system shall capture microphone or audio input samples or audio activity measurements.</td><td>derived</td><td>US-003</td><td>Audio input</td><td>Must</td><td>test</td><td>Serial output, meter, or captured buffer changes when speech or a test tone is applied.</td><td>atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-006</td><td>core</td><td>The system shall provide an observable local audio-level or local playback demonstration.</td><td>Agent 0 assumption</td><td>US-004</td><td>Audio output/UI</td><td>Must</td><td>demonstration</td><td>Reviewer observes level indication or playback from a captured short buffer.</td><td>atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-007</td><td>core</td><td>If a configured core audio input or output path cannot be initialized, the system shall enter an error state and report the failed module through LED or serial debug output.</td><td>derived</td><td>US-006</td><td>Error handling</td><td>Must</td><td>test</td><td>Fault injection produces a named error state without misleading transmit indication.</td><td>atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-008</td><td>recommended</td><td>The system should support a paired-device half-duplex mode using two FRDM-MCXA153-based prototypes and approved communication modules.</td><td>Agent 0 assumption</td><td>US-005</td><td>Wireless link</td><td>Should</td><td>demonstration</td><td>One device transmits while the peer receives in a controlled lab setup.</td><td>atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-009</td><td>recommended</td><td>When operating in paired mode, the transmitting device should package audio samples or short voice clips into framed messages for the peer device.</td><td>derived</td><td>US-005</td><td>Packetizer</td><td>Should</td><td>test</td><td>Receiver log shows valid frame count increasing during transmit.</td><td>atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-010</td><td>recommended</td><td>When valid audio frames are received, the receiving device should play or otherwise present the received audio content.</td><td>derived</td><td>US-005</td><td>Receiver/audio output</td><td>Should</td><td>demonstration</td><td>Reviewer hears playback or observes a decoded audio-level trace tied to received frames.</td><td>atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-011</td><td>recommended</td><td>The system should report link, transmit, receive, and packet-error status through serial debug output and at least one visible indicator.</td><td>derived</td><td>US-006</td><td>Debug/UI</td><td>Should</td><td>test</td><td>Status output changes correctly during idle, transmit, receive, and link-fault conditions.</td><td>atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-012</td><td>advanced</td><td>The system could estimate voice activity from captured audio to suppress silent packets or annotate logs.</td><td>Agent 0 assumption</td><td>US-008</td><td>Audio processing</td><td>Could</td><td>analysis/test</td><td>Voice activity flag changes between quiet room and speech samples in a repeatable demo; threshold is an AI assumption.</td><td>atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-013</td><td>advanced</td><td>The system could apply simple companding or compression to audio data before transmission.</td><td>Agent 0 assumption</td><td>US-008</td><td>Audio processing</td><td>Could</td><td>test</td><td>Encoded and decoded test samples remain recognizable and frame size is reduced or normalized.</td><td>atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-014</td><td>advanced</td><td>The system could show channel, state, packet count, or battery estimate on an approved display module.</td><td>Agent 0 assumption</td><td>US-008</td><td>Display</td><td>Could</td><td>demonstration</td><td>Display updates match serial state during a transmit/receive demo.</td><td>atomic, clear, verifiable, traceable</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="nonfunctional">
+    <h2>5. Non-Functional Requirements</h2>
+    <table>
+      <thead><tr><th>ID</th><th>Tier</th><th>Category</th><th>Statement</th><th>Threshold or Metric</th><th>Source</th><th>Verification</th><th>Risk if Not Satisfied</th></tr></thead>
+      <tbody>
+        <tr><td>NFR-001</td><td>core</td><td>safety</td><td>All external components connected to the FRDM-MCXA153 shall be electrically compatible with the board logic level and current limits, or shall use appropriate interface circuitry.</td><td>3.3 V logic compatibility or documented level shifting; current within board limits.</td><td>user fact</td><td>inspection/measurement</td><td>Board or module damage.</td></tr>
+        <tr><td>NFR-002</td><td>core</td><td>power</td><td>The core prototype shall use an approved USB or regulated power source.</td><td>Power source approved during hardware review.</td><td>AI assumption</td><td>inspection</td><td>Unexpected resets or unsafe supply wiring.</td></tr>
+        <tr><td>NFR-003</td><td>core</td><td>timing</td><td>The core audio capture path shall use a consistent sampling schedule suitable for the selected low-fidelity demo.</td><td>Sample period variation reviewed with serial timing or instrument evidence; exact threshold unresolved.</td><td>unresolved</td><td>analysis/test</td><td>Unusable audio-level or playback behavior.</td></tr>
+        <tr><td>NFR-004</td><td>core</td><td>usability</td><td>Transmit, idle, and error states shall be distinguishable to a reviewer.</td><td>Reviewer can identify each state during checklist demo.</td><td>AI assumption</td><td>demonstration</td><td>Demo is confusing and hard to assess.</td></tr>
+        <tr><td>NFR-005</td><td>recommended</td><td>reliability</td><td>The paired-device mode should expose packet counts and dropped-frame indicators.</td><td>Serial log includes sent, received, and rejected frame counts.</td><td>AI assumption</td><td>test</td><td>Wireless failures cannot be diagnosed.</td></tr>
+        <tr><td>NFR-006</td><td>recommended</td><td>privacy-security</td><td>The prototype should avoid storing or transmitting sensitive speech outside the controlled lab demo.</td><td>Demo script and review checklist confirm no sensitive recording is used.</td><td>derived</td><td>inspection</td><td>Privacy concern for participants.</td></tr>
+        <tr><td>NFR-007</td><td>recommended</td><td>memory</td><td>Audio buffers should be sized conservatively and documented.</td><td>Memory map or build report reviewed; exact limit unresolved until toolchain and modules are selected.</td><td>unresolved</td><td>analysis</td><td>Stack/heap collision or unstable behavior.</td></tr>
+        <tr><td>NFR-008</td><td>advanced</td><td>maintainability</td><td>Advanced audio processing, display, and logging features should be separable from the core state machine.</td><td>Module review shows optional features can be disabled at build or configuration time.</td><td>AI assumption</td><td>inspection</td><td>Advanced work destabilizes the core demo.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="hardware">
+    <h2>6. Hardware Block Diagram Description</h2>
+    <p><strong>Main controller:</strong> The NXP FRDM-MCXA153 board hosts the system state machine, button reading, audio input handling, optional packetization, audio output control, and debug reporting.</p>
+    <p><strong>Core components:</strong> push-to-talk button on a GPIO-capable input, microphone or audio input module on an ADC-capable or verified digital-audio-capable interface, safe audio output path through an amplifier or approved audio module, and visible LEDs on GPIO-capable outputs.</p>
+    <p><strong>Recommended components:</strong> second FRDM-MCXA153 prototype, approved 3.3 V-compatible wireless module connected through generic SPI-capable or UART-capable pins, optional channel/mode buttons, and serial debug.</p>
+    <p><strong>Advanced optional components:</strong> display on generic I2C-capable or SPI-capable pins, codec or digital microphone/amplifier pair, optional storage or host logging, and optional regulated battery subsystem.</p>
+    <p><strong>Power flow:</strong> USB or approved regulated power feeds the FRDM-MCXA153. External modules may draw from approved board rails only after current review; higher-current audio amplifier or radio modules may need separate regulated power with a safe common ground.</p>
+    <p><strong>Data/control flow:</strong> Button state controls the firmware state machine. Microphone data flows to audio analysis, local playback, or packet framing. Wireless frames flow to the peer device, which decodes and presents audio. Logs flow to USB serial debug.</p>
+    <p><strong>Electrical concerns:</strong> Verify 3.3 V logic, current limits, pull-up/pull-down requirements, audio biasing, decoupling, common ground, and protection before wiring. Datasheets are required for every module before implementation.</p>
+  </section>
+
+  <section id="pins">
+    <h2>7. Pin Allocation Draft</h2>
+    <table>
+      <thead><tr><th>Component</th><th>Tier</th><th>Signal</th><th>Required MCU Capability</th><th>Suggested Pin</th><th>Voltage</th><th>Direction</th><th>Interface</th><th>Verification Needed</th></tr></thead>
+      <tbody>
+        <tr><td>Push-to-talk button</td><td>core</td><td>Button state</td><td>GPIO-capable pin with pull-up or pull-down support</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V logic</td><td>Input</td><td>GPIO</td><td>Pinout, debounce approach, pull resistor configuration.</td></tr>
+        <tr><td>Microphone/audio input</td><td>core</td><td>Audio sample or data</td><td>ADC-capable pin or verified digital audio-capable interface</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V or conditioned analog range</td><td>Input</td><td>ADC or selected digital interface</td><td>Signal range, bias, filtering, timing support.</td></tr>
+        <tr><td>Status LEDs</td><td>core</td><td>Idle/transmit/error indicators</td><td>GPIO-capable pins</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V logic with current limiting</td><td>Output</td><td>GPIO</td><td>LED polarity, resistor value, current limit.</td></tr>
+        <tr><td>Audio output/amplifier</td><td>core</td><td>Playback signal</td><td>PWM-capable output, selected audio interface, or external codec interface</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V logic or module-specific conditioned signal</td><td>Output</td><td>PWM/audio interface</td><td>Amplifier input requirements, output filtering, current supply.</td></tr>
+        <tr><td>Wireless module</td><td>recommended</td><td>Audio frames/control</td><td>SPI-capable or UART-capable pins depending on module</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V logic unless level shifted</td><td>Bidirectional</td><td>SPI or UART</td><td>Voltage, current peaks, module interface mode, radio approval.</td></tr>
+        <tr><td>Optional display</td><td>advanced</td><td>Status/diagnostics</td><td>I2C-capable or SPI-capable pins</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V logic unless level shifted</td><td>Output/bidirectional</td><td>I2C or SPI</td><td>Bus pull-ups, address conflicts, update timing.</td></tr>
+        <tr><td>Optional battery monitor</td><td>advanced</td><td>Scaled voltage</td><td>ADC-capable pin</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>ADC-safe divided voltage</td><td>Input</td><td>ADC</td><td>Divider values, maximum input voltage, battery safety.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="firmware">
+    <h2>8. Firmware Architecture</h2>
+    <p><strong>Architecture style:</strong> Bare-metal superloop with interrupt-driven timing or event flags is recommended for core and recommended tiers. RTOS use is unknown and should be approved only if it matches course templates.</p>
+    <p><strong>Reason:</strong> The project needs clear state transitions and predictable audio timing without adding unnecessary scheduling complexity for the core student version.</p>
+    <table>
+      <thead><tr><th>Module</th><th>Responsibilities</th></tr></thead>
+      <tbody>
+        <tr><td>Board/platform module</td><td>Initialize clocks, board support, debug console, and approved peripherals without naming unverified SDK APIs.</td></tr>
+        <tr><td>Input module</td><td>Read and debounce push-to-talk and optional mode/channel controls.</td></tr>
+        <tr><td>State machine</td><td>Manage idle, transmit/record, receive/playback, error, and optional pairing states.</td></tr>
+        <tr><td>Audio input module</td><td>Acquire audio samples or activity measurements and store them in bounded buffers.</td></tr>
+        <tr><td>Audio output module</td><td>Drive approved playback path or visual audio-level output.</td></tr>
+        <tr><td>Communication module</td><td>Recommended tier: frame audio data, exchange packets, count errors, and expose link state.</td></tr>
+        <tr><td>Diagnostics module</td><td>Emit serial logs and drive status LEDs or optional display.</td></tr>
+        <tr><td>Advanced processing module</td><td>Optional voice activity, companding, compression, display, and logging features.</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Startup sequence:</strong> initialize board support, configure approved pins and peripherals, verify optional modules, clear buffers, report version/configuration, enter idle or named fault state.</p>
+    <p><strong>Main loop/task flow:</strong> process input events, update state machine, service audio buffers, service communication frames if enabled, update indicators, emit bounded logs.</p>
+    <p><strong>Interrupt/event handling:</strong> timers or peripheral events may set flags for audio sampling, communication receive, and button changes; heavy processing should run outside interrupt context.</p>
+    <p><strong>Error and safe-state strategy:</strong> on module fault, buffer overflow, invalid frame, or unsafe configuration, stop transmit/playback where needed, report the fault, and remain inspectable through LED or serial output.</p>
+    <p><strong>Configuration constants:</strong> sample rate, buffer size, debounce time, frame size, log level, and optional display refresh period must be declared as reviewable constants; exact values require human approval.</p>
+  </section>
+
+  <section id="tests">
+    <h2>9. Test Cases and Acceptance Criteria</h2>
+    <table>
+      <thead><tr><th>ID</th><th>Requirement</th><th>Tier</th><th>Type</th><th>Preconditions</th><th>Steps</th><th>Expected Result</th><th>Evidence</th><th>Pass/Fail Rule</th></tr></thead>
+      <tbody>
+        <tr><td>TC-001</td><td>FR-001</td><td>core</td><td>inspection</td><td>Prototype assembled.</td><td>Inspect main controller and bill of materials.</td><td>FRDM-MCXA153 is the main controller.</td><td>Photo and checklist result.</td><td>Pass if no alternate main controller is used.</td></tr>
+        <tr><td>TC-002</td><td>FR-002</td><td>core</td><td>test</td><td>Approved power connected.</td><td>Power cycle system and observe startup logs/LEDs.</td><td>Startup complete or named fault is reported.</td><td>Serial log and video.</td><td>Pass if startup state is unambiguous.</td></tr>
+        <tr><td>TC-003</td><td>FR-003</td><td>core</td><td>test</td><td>Button connected to approved GPIO-capable input.</td><td>Press and release button 20 times at normal pace.</td><td>One state transition per deliberate press or release.</td><td>Serial log.</td><td>Pass if no unintended duplicate transitions are observed.</td></tr>
+        <tr><td>TC-004</td><td>FR-004</td><td>core</td><td>demonstration</td><td>Startup complete.</td><td>Hold push-to-talk, then release it.</td><td>Transmit indicator appears while held and clears after release.</td><td>Video or checklist result.</td><td>Pass if indicator follows button state after debouncing.</td></tr>
+        <tr><td>TC-005</td><td>FR-005</td><td>core</td><td>test</td><td>Microphone path approved and connected.</td><td>Apply speech or test tone and inspect reported audio values.</td><td>Measured level or buffer data changes with sound.</td><td>Serial log, oscilloscope capture, or saved data log.</td><td>Pass if quiet and sound conditions are distinguishable.</td></tr>
+        <tr><td>TC-006</td><td>FR-006</td><td>core</td><td>demonstration</td><td>Audio input/output or level indicator configured.</td><td>Capture a short sound and present local level or playback.</td><td>Reviewer observes audio response.</td><td>Video or reviewer checklist.</td><td>Pass if response corresponds to captured input.</td></tr>
+        <tr><td>TC-007</td><td>FR-007</td><td>core</td><td>test</td><td>Fault injection method approved.</td><td>Disconnect or disable one configured module, then restart.</td><td>System enters named error state.</td><td>Serial log and LED observation.</td><td>Pass if fault is reported without false ready state.</td></tr>
+        <tr><td>TC-008</td><td>FR-008</td><td>recommended</td><td>demonstration</td><td>Two approved prototypes powered and paired.</td><td>Transmit from device A while observing device B.</td><td>Device B enters receive behavior.</td><td>Video and serial logs from both devices.</td><td>Pass if half-duplex state is observable on both devices.</td></tr>
+        <tr><td>TC-009</td><td>FR-009</td><td>recommended</td><td>test</td><td>Wireless link configured.</td><td>Transmit sample audio or clip and inspect frame logs.</td><td>Valid frame count increases and invalid frames are counted separately.</td><td>Serial log or logic analyzer capture.</td><td>Pass if frames are formed and counted consistently.</td></tr>
+        <tr><td>TC-010</td><td>FR-010</td><td>recommended</td><td>demonstration</td><td>Receiver audio output approved.</td><td>Send a short audio clip from peer device.</td><td>Receiver presents playback or corresponding audio-level trace.</td><td>Video/audio recording or saved data log.</td><td>Pass if received content is visibly or audibly tied to transmit event.</td></tr>
+        <tr><td>TC-011</td><td>FR-011</td><td>recommended</td><td>test</td><td>Debug output enabled.</td><td>Exercise idle, transmit, receive, and link fault states.</td><td>Logs and visible indicators match each state.</td><td>Serial log and video.</td><td>Pass if every tested state has a distinct report.</td></tr>
+        <tr><td>TC-012</td><td>FR-012</td><td>advanced</td><td>test</td><td>Voice activity feature enabled.</td><td>Compare quiet input and speech input.</td><td>Voice activity flag changes predictably.</td><td>Saved data log.</td><td>Pass if reviewer accepts threshold and observed behavior.</td></tr>
+        <tr><td>TC-013</td><td>FR-013</td><td>advanced</td><td>test</td><td>Compression feature enabled.</td><td>Encode and decode known sample data.</td><td>Decoded output remains recognizable and frame handling remains stable.</td><td>Unit test result or data log.</td><td>Pass if no buffer overflow and result is accepted by reviewer.</td></tr>
+        <tr><td>TC-014</td><td>FR-014</td><td>advanced</td><td>demonstration</td><td>Display approved and connected.</td><td>Run transmit/receive demo while observing display and serial log.</td><td>Displayed state matches serial state.</td><td>Photo/video and serial log.</td><td>Pass if display does not conflict with core operation.</td></tr>
+        <tr><td>TC-015</td><td>NFR-001</td><td>core</td><td>inspection/measurement</td><td>Modules selected.</td><td>Review datasheets and measure supply/logic levels before final connection.</td><td>Compatibility or interface circuitry is documented.</td><td>Datasheet checklist and measured voltages.</td><td>Pass if every external connection is approved.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="traceability">
+    <h2>10. Traceability Matrix</h2>
+    <table>
+      <thead><tr><th>User Story</th><th>Requirement</th><th>Test Case</th><th>Acceptance Criterion</th><th>Evidence</th><th>Gap</th></tr></thead>
+      <tbody>
+        <tr><td>US-001</td><td>FR-001</td><td>TC-001</td><td>FRDM-MCXA153 is main controller.</td><td>Photo, checklist</td><td>None</td></tr>
+        <tr><td>US-006</td><td>FR-002</td><td>TC-002</td><td>Startup complete or named fault.</td><td>Serial log, video</td><td>None</td></tr>
+        <tr><td>US-002</td><td>FR-003, FR-004</td><td>TC-003, TC-004</td><td>Debounced transition and transmit indicator.</td><td>Serial log, video</td><td>None</td></tr>
+        <tr><td>US-003</td><td>FR-005</td><td>TC-005</td><td>Audio input changes with sound.</td><td>Log or instrument capture</td><td>None</td></tr>
+        <tr><td>US-004</td><td>FR-006</td><td>TC-006</td><td>Local audio response observed.</td><td>Video/checklist</td><td>None</td></tr>
+        <tr><td>US-006</td><td>FR-007</td><td>TC-007</td><td>Fault is reported without false ready state.</td><td>Serial log, LED observation</td><td>None</td></tr>
+        <tr><td>US-005</td><td>FR-008, FR-009, FR-010, FR-011</td><td>TC-008, TC-009, TC-010, TC-011</td><td>Peer mode, frame transfer, received output, and state reporting work.</td><td>Logs, video, capture</td><td>Wireless module unresolved</td></tr>
+        <tr><td>US-008</td><td>FR-012, FR-013, FR-014</td><td>TC-012, TC-013, TC-014</td><td>Optional advanced behavior accepted by reviewer.</td><td>Logs, unit results, photos</td><td>Advanced components unresolved</td></tr>
+        <tr><td>US-007</td><td>NFR-001</td><td>TC-015</td><td>Every external connection approved.</td><td>Datasheets, measurements</td><td>None</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Every Must functional requirement has at least one test case. Remaining gaps are component-selection gaps, not missing test coverage.</p>
+  </section>
+
+  <section id="risks">
+    <h2>11. Assumptions and Risk Register</h2>
+    <h3>Facts from User</h3>
+    <ul><li>Walkie talkie project idea.</li><li>NXP FRDM-MCXA153 board is mandatory.</li><li>No exact pins or SDK APIs may be invented.</li></ul>
+    <h3>Open Questions</h3>
+    <ul><li>Will teams have one or two boards?</li><li>Which audio and wireless modules are available?</li><li>Are short voice clips acceptable?</li><li>What wireless technology and range are allowed?</li><li>Is battery operation required?</li></ul>
+    <table>
+      <thead><tr><th>ID</th><th>Risk Area</th><th>Tier</th><th>Severity</th><th>Impact</th><th>Mitigation</th><th>Human Approval</th></tr></thead>
+      <tbody>
+        <tr><td>R-001</td><td>technical</td><td>core</td><td>Medium</td><td>Audio input/output integration takes longer than expected.</td><td>Start with audio level reporting before playback.</td><td>no</td></tr>
+        <tr><td>R-002</td><td>safety</td><td>core</td><td>High</td><td>Speaker or amplifier wiring exceeds MCU or board current limits.</td><td>Use approved amplifier module and inspect wiring before power.</td><td>yes</td></tr>
+        <tr><td>R-003</td><td>voltage/power</td><td>core/recommended</td><td>High</td><td>5 V module damages 3.3 V board I/O.</td><td>Verify datasheets and add level shifting or reject module.</td><td>yes</td></tr>
+        <tr><td>R-004</td><td>timing</td><td>recommended</td><td>Medium</td><td>Packet delays produce choppy or unusable audio.</td><td>Permit short clips or lower sample rate fallback.</td><td>yes</td></tr>
+        <tr><td>R-005</td><td>memory</td><td>recommended/advanced</td><td>Medium</td><td>Audio buffers consume too much memory.</td><td>Review build memory report and use bounded buffers.</td><td>no</td></tr>
+        <tr><td>R-006</td><td>privacy/security</td><td>recommended</td><td>Medium</td><td>Voice data is recorded or transmitted without consent.</td><td>Use controlled demo phrases and avoid persistent storage unless approved.</td><td>yes</td></tr>
+        <tr><td>R-007</td><td>reliability</td><td>recommended</td><td>Medium</td><td>Wireless packet loss is hard to diagnose.</td><td>Log sent, received, rejected, and dropped frame counts.</td><td>no</td></tr>
+        <tr><td>R-008</td><td>advanced feature</td><td>advanced</td><td>Medium</td><td>Compression, display, or AI work destabilizes core demo.</td><td>Keep advanced modules optional and disable-able.</td><td>yes</td></tr>
+        <tr><td>R-009</td><td>safety</td><td>advanced</td><td>High</td><td>Battery operation introduces charging or protection hazards.</td><td>Keep USB power unless battery subsystem is reviewed.</td><td>yes</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="review">
+    <h2>12. Human Review Checklist</h2>
+    <div class="checklist">
+      <label><input type="checkbox"> Scope approved</label>
+      <label><input type="checkbox"> Selected feature tier approved</label>
+      <label><input type="checkbox"> FRDM-MCXA153 confirmed as mandatory board</label>
+      <label><input type="checkbox"> FRDM-MCXA153 pinout checked</label>
+      <label><input type="checkbox"> Voltage compatibility checked</label>
+      <label><input type="checkbox"> Current limits checked</label>
+      <label><input type="checkbox"> Power budget checked</label>
+      <label><input type="checkbox"> External modules checked</label>
+      <label><input type="checkbox"> Advanced components approved or removed</label>
+      <label><input type="checkbox"> Sensor/actuator interfaces confirmed</label>
+      <label><input type="checkbox"> Firmware architecture approved</label>
+      <label><input type="checkbox"> Timing and memory constraints reviewed</label>
+      <label><input type="checkbox"> Test plan reviewed</label>
+      <label><input type="checkbox"> Traceability reviewed</label>
+      <label><input type="checkbox"> Safety/privacy/security risks reviewed</label>
+      <label><input type="checkbox"> AI assumptions accepted or rejected</label>
+      <label><input type="checkbox"> Implementation allowed to start: yes/no</label>
+    </div>
+  </section>
+
+  <section id="status">
+    <h2>13. Final Status</h2>
+    <p><span class="badge ready">READY FOR HUMAN REVIEW</span></p>
+    <ul>
+      <li>The report defines core, recommended, and advanced requirements while keeping the FRDM-MCXA153 as the mandatory main controller.</li>
+      <li>All exact pins and SDK APIs are intentionally left unresolved until board pinout, module datasheets, and course templates are reviewed.</li>
+      <li>Every Must functional requirement has at least one linked test case.</li>
+      <li>The recommended two-device wireless scope is feasible only after module, power, radio, and audio-quality assumptions are approved.</li>
+      <li>Implementation should begin with the core one-board audio and push-to-talk milestone.</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>
