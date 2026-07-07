@@ -177,6 +177,10 @@ The SD card pads are labeled separately as `SD_CS`, `SD_MOSI`, `SD_MISO`, and `S
 
 ## ILI9341 Connections
 
+
+![Circuit Schematic](../img/lab_lpspi_tft_lcd/schematic.png)
+
+
 | LCD signal | Role | FRDM-MCXA153 |
 |---|---|---|
 | `SCK` | SPI clock | configured LPSPI0 SCK pin |
