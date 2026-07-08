@@ -8,17 +8,15 @@
 #include "board.h"
 #include "app.h"
 #include "peripherals.h"
+#include "pin_mux.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-
-#include "app/uart.h"
 
 #include "app/board_ili9341.h"
 #include "app/ili9341.h"
 #include "fsl_debug_console.h"
 #include "fsl_lpadc.h"
-
 
 /*******************************************************************************
  * Definitions
@@ -28,31 +26,35 @@
 #define ADC_TRIGGER_ID 0U
 #define ADC_PRINT_TICKS 100U
 #define PWM_FADE_DUTY_MAX 100U
-#define GAME_FRAME_DELAY_US 12000U
-#define GAME_BIRD_X 48
-#define GAME_BIRD_W 22
-#define GAME_BIRD_H 18
-#define GAME_BIRD_BEAK_W 5
-#define GAME_PIPE_WIDTH 28
-#define GAME_PIPE_GAP 98
-#define GAME_GRAVITY_Q8 40
-#define GAME_FLAP_VELOCITY_Q8 (-520)
-#define GAME_FLAP_HOLD_ACCEL_Q8 (-42)
-#define GAME_RISE_VELOCITY_LIMIT_Q8 (-980)
-#define GAME_MAX_FALL_Q8 1150
-#define GAME_PIPE_SPEED 3
+#define GAME_FRAME_DELAY_US 0U
 #define GAME_SW2_PRESSED_THRESHOLD 1000U
-#define GAME_BACKGROUND_COLOR ILI9341_COLOR_CYAN
-#define GAME_GROUND_COLOR ILI9341_COLOR_GREEN
-#define GAME_PIPE_COLOR ILI9341_COLOR_GREEN
-#define GAME_BIRD_COLOR ILI9341_COLOR_YELLOW
+#define SW3_PRESSED_LEVEL 0U
+#define GAME_SKY_COLOR ILI9341_COLOR_CYAN
+#define GAME_FLOOR_COLOR 0x4208U
+#define GAME_ROAD_COLOR ILI9341_COLOR_BLACK
+#define GAME_ROAD_EDGE_COLOR ILI9341_COLOR_WHITE
+#define GAME_PLAYER_COLOR ILI9341_COLOR_YELLOW
+#define GAME_OBSTACLE_COLOR ILI9341_COLOR_RED
 #define GAME_TEXT_COLOR ILI9341_COLOR_WHITE
-#define GAME_SCORE_W 72U
+#define GAME_HORIZON_Y 54U
+#define GAME_ROAD_NEAR_HALF_W 118U
+#define GAME_ROAD_FAR_HALF_W 18U
+#define GAME_LANE_COUNT 3U
+#define GAME_CENTER_LANE 1U
+#define GAME_PLAYER_BASE_W 22
+#define GAME_PLAYER_BASE_H 32
+#define GAME_OBSTACLE_COUNT 3U
+#define GAME_OBSTACLE_MIN_Z_Q8 (70 * 256)
+#define GAME_OBSTACLE_MAX_Z_Q8 (240 * 256)
+#define GAME_OBSTACLE_BASE_SPEED_Q8 1300U
+#define GAME_OBSTACLE_MAX_SPEED_Q8 3200U
+#define GAME_DIRTY_PAD 8
+#define GAME_SCORE_W 120U
 #define GAME_SCORE_H 24U
-#define GAME_OVER_X 66U
-#define GAME_OVER_Y 88U
-#define GAME_OVER_W 132U
-#define GAME_OVER_H 48U
+#define GAME_OVER_X 72U
+#define GAME_OVER_Y 82U
+#define GAME_OVER_W 150U
+#define GAME_OVER_H 54U
 
 /*******************************************************************************
  * Prototypes
@@ -62,19 +64,44 @@ static void PWM0_LED_UpdateFade(void);
 static void SW2_ADC_InitInput(void);
 static uint16_t SW2_ADC_ReadRaw(void);
 static bool SW2_IsPressed(void);
-static uint16_t Game_RandomGapY(void);
+static bool SW3_IsPressed(void);
 static void Game_FillRectClipped(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+static uint16_t Game_CurrentSpeedQ8(void);
+static uint16_t Game_RoadHalfWidthAtY(uint16_t y);
+static int16_t Game_LaneCenterAtY(uint8_t lane, uint16_t y);
+static uint16_t Game_ProjectTQ8(int32_t zQ8);
+static uint16_t Game_ProjectY(int32_t zQ8);
+static uint16_t Game_ProjectScale(int32_t zQ8);
+static uint8_t Game_RandomLane(uint32_t seed);
+static void Game_GetObstacleMainRect(int32_t zQ8, uint8_t lane, int16_t *x, int16_t *y, int16_t *w, int16_t *h);
+static void Game_GetObstacleRect(int32_t zQ8, uint8_t lane, int16_t *x, int16_t *y, int16_t *w, int16_t *h);
+static void Game_ResetObstacle(uint32_t index, uint32_t seed);
 static void Game_Reset(void);
-static void Game_DrawPipeAt(int16_t pipeX, uint16_t gapY, uint16_t color);
-static void Game_DrawPipeStripAt(int16_t pipeX, uint16_t gapY, int16_t stripX, uint16_t stripW, uint16_t color);
-static void Game_ErasePipeTrail(int16_t oldPipeX, int16_t newPipeX, uint16_t oldGapY);
-static void Game_DrawPipeLeadingEdge(int16_t oldPipeX, int16_t newPipeX, uint16_t gapY);
-static void Game_DrawBirdAt(int16_t birdY, uint16_t color);
+static void Game_DrawRoad(void);
+static void Game_GetRectUnion(int16_t ax,
+                              int16_t ay,
+                              int16_t aw,
+                              int16_t ah,
+                              int16_t bx,
+                              int16_t by,
+                              int16_t bw,
+                              int16_t bh,
+                              int16_t *x,
+                              int16_t *y,
+                              int16_t *w,
+                              int16_t *h);
+static void Game_ClearGameplayRect(int16_t x, int16_t y, int16_t w, int16_t h);
+static void Game_GetPlayerRect(uint8_t lane, int16_t *x, int16_t *y, int16_t *w, int16_t *h);
+static void Game_ErasePlayerRect(void);
+static void Game_DrawPlayerAtLane(uint8_t lane);
+static void Game_DrawPlayer(void);
+static void Game_DrawObstacle(uint32_t index);
 static void Game_DrawScore(void);
 static void Game_DrawGameOverOverlay(void);
 static void Game_DrawScene(void);
+static bool Game_HandleInput(bool moveLeftEdge, bool moveRightEdge);
 static bool Game_CheckCollision(void);
-static void Game_Update(bool flapPressedEdge, bool flapHeld);
+static void Game_UpdateWorld(void);
 
 /*******************************************************************************
  * Variables
@@ -83,20 +110,31 @@ static volatile uint16_t counterPrintTick = 0;
 static volatile uint32_t printCounter = 0;
 static volatile bool flag = false;
 static volatile uint8_t pwmDutyCycle = 0;
+static uint16_t s_lastSw2Raw = 4095U;
 static ili9341_t s_lcd;
 static uint16_t s_lcdWidth;
 static uint16_t s_lcdHeight;
-static int32_t s_birdYQ8;
-static int32_t s_birdVelocityQ8;
-static int16_t s_pipeX;
-static uint16_t s_pipeGapY;
+static uint16_t s_centerX;
+static uint16_t s_nearY;
+static int32_t s_obstacleZQ8[GAME_OBSTACLE_COUNT];
+static int32_t s_prevObstacleZQ8[GAME_OBSTACLE_COUNT];
+static uint8_t s_obstacleLane[GAME_OBSTACLE_COUNT];
+static uint8_t s_prevObstacleLane[GAME_OBSTACLE_COUNT];
+static int16_t s_prevObstacleX[GAME_OBSTACLE_COUNT];
+static int16_t s_prevObstacleY[GAME_OBSTACLE_COUNT];
+static int16_t s_prevObstacleW[GAME_OBSTACLE_COUNT];
+static int16_t s_prevObstacleH[GAME_OBSTACLE_COUNT];
+static uint8_t s_playerLane;
+static uint8_t s_prevPlayerLane;
+static int16_t s_prevPlayerX;
+static int16_t s_prevPlayerY;
+static int16_t s_prevPlayerW;
+static int16_t s_prevPlayerH;
 static uint32_t s_score;
 static uint32_t s_frame;
 static bool s_gameOver;
 static bool s_sw2WasPressed;
-static int16_t s_prevBirdY;
-static int16_t s_prevPipeX;
-static uint16_t s_prevPipeGapY;
+static bool s_sw3WasPressed;
 static uint32_t s_prevScore;
 static bool s_prevGameOver;
 static bool s_fullRedrawNeeded;
@@ -112,12 +150,12 @@ void SysTick_Handler(void)
     {
         counterPrintTick = 0;
         flag = true;
+        printCounter++;
         GPIO_PortToggle(BOARD_LED_GPIO, 1u << BOARD_LED_GPIO_PIN);
     }
 
     PWM0_LED_UpdateFade();
 }
-
 
 static void PWM0_LED_InitOutput(void)
 {
@@ -157,18 +195,19 @@ static void SW2_ADC_InitInput(void)
 static uint16_t SW2_ADC_ReadRaw(void)
 {
     lpadc_conv_result_t result;
-    uint32_t timeout = 10000U;
+    uint32_t timeout = 1000U;
 
     LPADC_DoSoftwareTrigger(ADC0_PERIPHERAL, 1UL << ADC_TRIGGER_ID);
     while (!LPADC_GetConvResult(ADC0_PERIPHERAL, &result))
     {
         if (timeout-- == 0U)
         {
-            return 4095U;
+            return s_lastSw2Raw;
         }
     }
 
-    return (uint16_t)result.convValue;
+    s_lastSw2Raw = (uint16_t)result.convValue;
+    return s_lastSw2Raw;
 }
 
 static bool SW2_IsPressed(void)
@@ -176,14 +215,9 @@ static bool SW2_IsPressed(void)
     return SW2_ADC_ReadRaw() < GAME_SW2_PRESSED_THRESHOLD;
 }
 
-static uint16_t Game_RandomGapY(void)
+static bool SW3_IsPressed(void)
 {
-    const uint16_t minY = (GAME_PIPE_GAP / 2U) + 16U;
-    const uint16_t maxY = (uint16_t)(s_lcdHeight - (GAME_PIPE_GAP / 2U) - 24U);
-    const uint16_t range = (uint16_t)((maxY > minY) ? (maxY - minY) : 1U);
-    const uint32_t seed = (s_frame * 37U) + (s_score * 71U) + 53U;
-
-    return (uint16_t)(minY + (seed % range));
+    return GPIO_PinRead(BOARD_INITPINS_SW3_GPIO, BOARD_INITPINS_SW3_GPIO_PIN) == SW3_PRESSED_LEVEL;
 }
 
 static void Game_FillRectClipped(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
@@ -222,143 +256,320 @@ static void Game_FillRectClipped(int16_t x, int16_t y, int16_t w, int16_t h, uin
     }
 }
 
+static uint16_t Game_CurrentSpeedQ8(void)
+{
+    uint32_t speed = GAME_OBSTACLE_BASE_SPEED_Q8 + (s_score * 12U);
+
+    if (speed > GAME_OBSTACLE_MAX_SPEED_Q8)
+    {
+        speed = GAME_OBSTACLE_MAX_SPEED_Q8;
+    }
+
+    return (uint16_t)speed;
+}
+
+static uint16_t Game_RoadHalfWidthAtY(uint16_t y)
+{
+    const uint16_t span = (uint16_t)((s_nearY > GAME_HORIZON_Y) ? (s_nearY - GAME_HORIZON_Y) : 1U);
+    uint16_t offset;
+    uint32_t width;
+
+    if (y <= GAME_HORIZON_Y)
+    {
+        return GAME_ROAD_FAR_HALF_W;
+    }
+    if (y >= s_nearY)
+    {
+        return GAME_ROAD_NEAR_HALF_W;
+    }
+
+    offset = (uint16_t)(y - GAME_HORIZON_Y);
+    width = GAME_ROAD_FAR_HALF_W;
+    width += (((uint32_t)(GAME_ROAD_NEAR_HALF_W - GAME_ROAD_FAR_HALF_W) * offset) / span);
+
+    return (uint16_t)width;
+}
+
+static int16_t Game_LaneCenterAtY(uint8_t lane, uint16_t y)
+{
+    const int16_t halfWidth = (int16_t)Game_RoadHalfWidthAtY(y);
+    const int16_t laneWidth = (int16_t)((halfWidth * 2) / (int16_t)GAME_LANE_COUNT);
+    const int16_t left = (int16_t)s_centerX - halfWidth;
+
+    if (lane >= GAME_LANE_COUNT)
+    {
+        lane = GAME_CENTER_LANE;
+    }
+
+    return (int16_t)(left + ((int16_t)laneWidth * (int16_t)lane) + (laneWidth / 2));
+}
+
+static uint16_t Game_ProjectTQ8(int32_t zQ8)
+{
+    const int32_t zRange = GAME_OBSTACLE_MAX_Z_Q8 - GAME_OBSTACLE_MIN_Z_Q8;
+    int32_t tQ8;
+
+    if (zQ8 < GAME_OBSTACLE_MIN_Z_Q8)
+    {
+        zQ8 = GAME_OBSTACLE_MIN_Z_Q8;
+    }
+    if (zQ8 > GAME_OBSTACLE_MAX_Z_Q8)
+    {
+        zQ8 = GAME_OBSTACLE_MAX_Z_Q8;
+    }
+
+    tQ8 = (int32_t)(((uint32_t)(GAME_OBSTACLE_MAX_Z_Q8 - zQ8) * 256U) / (uint32_t)zRange);
+    return (uint16_t)(((uint32_t)tQ8 * (uint32_t)tQ8) / 256U);
+}
+
+static uint16_t Game_ProjectY(int32_t zQ8)
+{
+    const uint16_t yRange = (uint16_t)(s_nearY - GAME_HORIZON_Y);
+    const uint16_t perspectiveQ8 = Game_ProjectTQ8(zQ8);
+    const uint32_t y = GAME_HORIZON_Y + (((uint32_t)perspectiveQ8 * yRange) / 256U);
+
+    return (uint16_t)y;
+}
+
+static uint16_t Game_ProjectScale(int32_t zQ8)
+{
+    const uint16_t perspectiveQ8 = Game_ProjectTQ8(zQ8);
+    return (uint16_t)(1U + (((uint32_t)perspectiveQ8 * 4U) / 256U));
+}
+
+static uint8_t Game_RandomLane(uint32_t seed)
+{
+    return (uint8_t)(seed % GAME_LANE_COUNT);
+}
+
+static void Game_GetObstacleMainRect(int32_t zQ8, uint8_t lane, int16_t *x, int16_t *y, int16_t *w, int16_t *h)
+{
+    const uint16_t screenY = Game_ProjectY(zQ8);
+    const uint16_t scale = Game_ProjectScale(zQ8);
+    const int16_t centerX = Game_LaneCenterAtY(lane, screenY);
+
+    *w = (int16_t)(10U * scale);
+    *h = (int16_t)(9U * scale);
+    *x = (int16_t)(centerX - (*w / 2));
+    *y = (int16_t)screenY - *h;
+}
+
+static void Game_GetObstacleRect(int32_t zQ8, uint8_t lane, int16_t *x, int16_t *y, int16_t *w, int16_t *h)
+{
+    int16_t mainX;
+    int16_t mainY;
+    int16_t mainW;
+    int16_t mainH;
+    const int16_t scale = (int16_t)Game_ProjectScale(zQ8);
+
+    Game_GetObstacleMainRect(zQ8, lane, &mainX, &mainY, &mainW, &mainH);
+
+    if (scale <= 1)
+    {
+        *x = mainX;
+        *y = mainY;
+        *w = mainW;
+        *h = mainH;
+        return;
+    }
+
+    const int16_t barX = (int16_t)(mainX - (2 * scale));
+    const int16_t barY = (int16_t)(mainY + (3 * scale));
+    const int16_t barW = (int16_t)(mainW + (4 * scale));
+    const int16_t barH = (int16_t)(2 * scale);
+    const int16_t right = (int16_t)(((mainX + mainW) > (barX + barW)) ? (mainX + mainW) : (barX + barW));
+    const int16_t bottom = (int16_t)(((mainY + mainH) > (barY + barH)) ? (mainY + mainH) : (barY + barH));
+
+    *x = (mainX < barX) ? mainX : barX;
+    *y = (mainY < barY) ? mainY : barY;
+    *w = (int16_t)(right - *x);
+    *h = (int16_t)(bottom - *y);
+}
+
+static void Game_ResetObstacle(uint32_t index, uint32_t seed)
+{
+    const int32_t spacingQ8 = ((GAME_OBSTACLE_MAX_Z_Q8 - GAME_OBSTACLE_MIN_Z_Q8) / (int32_t)GAME_OBSTACLE_COUNT);
+    int32_t zQ8 = GAME_OBSTACLE_MAX_Z_Q8 + ((int32_t)index * spacingQ8);
+
+    zQ8 += (int32_t)((seed % 45U) * 256U);
+    s_obstacleZQ8[index] = zQ8;
+    s_obstacleLane[index] = Game_RandomLane((seed * 37U) + (index * 11U));
+}
+
 static void Game_Reset(void)
 {
-    s_birdYQ8 = (int32_t)(s_lcdHeight / 2U) << 8;
-    s_birdVelocityQ8 = 0;
-    s_pipeX = (int16_t)s_lcdWidth;
-    s_pipeGapY = Game_RandomGapY();
+    s_centerX = (uint16_t)(s_lcdWidth / 2U);
+    s_nearY = (uint16_t)(s_lcdHeight - 10U);
+    s_playerLane = GAME_CENTER_LANE;
+    s_prevPlayerLane = s_playerLane;
     s_score = 0;
     s_frame = 0;
     s_gameOver = false;
-    s_prevBirdY = (int16_t)(s_birdYQ8 >> 8);
-    s_prevPipeX = s_pipeX;
-    s_prevPipeGapY = s_pipeGapY;
     s_prevScore = s_score;
     s_prevGameOver = s_gameOver;
     s_fullRedrawNeeded = true;
-    (void)ili9341_fill_screen(&s_lcd, GAME_BACKGROUND_COLOR);
+
+    for (uint32_t i = 0U; i < GAME_OBSTACLE_COUNT; i++)
+    {
+        Game_ResetObstacle(i, (i * 23U) + 5U);
+        s_prevObstacleZQ8[i] = s_obstacleZQ8[i];
+        s_prevObstacleLane[i] = s_obstacleLane[i];
+        Game_GetObstacleRect(s_obstacleZQ8[i],
+                             s_obstacleLane[i],
+                             &s_prevObstacleX[i],
+                             &s_prevObstacleY[i],
+                             &s_prevObstacleW[i],
+                             &s_prevObstacleH[i]);
+    }
+    Game_GetPlayerRect(s_playerLane, &s_prevPlayerX, &s_prevPlayerY, &s_prevPlayerW, &s_prevPlayerH);
+
+    (void)ili9341_fill_screen(&s_lcd, GAME_SKY_COLOR);
 }
 
-static void Game_DrawPipeAt(int16_t pipeX, uint16_t gapY, uint16_t color)
+static void Game_DrawRoad(void)
 {
-    Game_DrawPipeStripAt(pipeX, gapY, pipeX, GAME_PIPE_WIDTH, color);
+    (void)ili9341_fill_rect(&s_lcd, 0U, 0U, s_lcdWidth, GAME_HORIZON_Y, GAME_SKY_COLOR);
+    Game_FillRectClipped(0, (int16_t)GAME_HORIZON_Y, (int16_t)s_lcdWidth, (int16_t)(s_lcdHeight - GAME_HORIZON_Y),
+                         GAME_FLOOR_COLOR);
+    for (uint16_t y = GAME_HORIZON_Y; y < s_lcdHeight; y = (uint16_t)(y + 10U))
+    {
+        const uint16_t halfWidth = Game_RoadHalfWidthAtY(y);
+        const uint16_t stripH = ((uint16_t)(y + 10U) > s_lcdHeight) ? (uint16_t)(s_lcdHeight - y) : 10U;
+        Game_FillRectClipped((int16_t)(s_centerX - halfWidth), (int16_t)y, (int16_t)(halfWidth * 2U), (int16_t)stripH,
+                             GAME_ROAD_COLOR);
+    }
 }
 
-static void Game_DrawPipeStripAt(int16_t pipeX, uint16_t gapY, int16_t stripX, uint16_t stripW, uint16_t color)
+static void Game_GetRectUnion(int16_t ax,
+                              int16_t ay,
+                              int16_t aw,
+                              int16_t ah,
+                              int16_t bx,
+                              int16_t by,
+                              int16_t bw,
+                              int16_t bh,
+                              int16_t *x,
+                              int16_t *y,
+                              int16_t *w,
+                              int16_t *h)
 {
-    const int16_t pipeRight = (int16_t)(pipeX + GAME_PIPE_WIDTH);
-    const int16_t stripRight = (int16_t)(stripX + stripW);
-    int16_t clippedLeft = (int16_t)stripX;
-    int16_t clippedRight = stripRight;
-    uint16_t drawX;
-    uint16_t drawW;
-    uint16_t topPipeHeight;
-    uint16_t lowerPipeY;
+    const int16_t ar = (int16_t)(ax + aw);
+    const int16_t ab = (int16_t)(ay + ah);
+    const int16_t br = (int16_t)(bx + bw);
+    const int16_t bb = (int16_t)(by + bh);
+    const int16_t right = (ar > br) ? ar : br;
+    const int16_t bottom = (ab > bb) ? ab : bb;
 
-    if ((pipeRight <= 0) || (pipeX >= (int16_t)s_lcdWidth) || (stripW == 0U))
+    *x = (ax < bx) ? ax : bx;
+    *y = (ay < by) ? ay : by;
+    *w = (int16_t)(right - *x);
+    *h = (int16_t)(bottom - *y);
+}
+
+static void Game_ClearGameplayRect(int16_t x, int16_t y, int16_t w, int16_t h)
+{
+    int16_t clearX = (int16_t)(x - GAME_DIRTY_PAD);
+    int16_t clearY = (int16_t)(y - GAME_DIRTY_PAD);
+    int16_t clearW = (int16_t)(w + (2 * GAME_DIRTY_PAD));
+    int16_t clearH = (int16_t)(h + (2 * GAME_DIRTY_PAD));
+    int16_t clearBottom;
+
+    if ((clearW <= 0) || (clearH <= 0))
     {
         return;
     }
 
-    if (clippedLeft < pipeX)
+    clearBottom = (int16_t)(clearY + clearH);
+    if (clearBottom <= (int16_t)GAME_HORIZON_Y)
     {
-        clippedLeft = pipeX;
-    }
-    if (clippedRight > pipeRight)
-    {
-        clippedRight = pipeRight;
-    }
-    if (clippedLeft < 0)
-    {
-        clippedLeft = 0;
-    }
-    if (clippedRight > (int16_t)s_lcdWidth)
-    {
-        clippedRight = (int16_t)s_lcdWidth;
-    }
-    if (clippedRight <= clippedLeft)
-    {
+        Game_FillRectClipped(clearX, clearY, clearW, clearH, GAME_SKY_COLOR);
         return;
     }
 
-    drawX = (uint16_t)clippedLeft;
-    drawW = (uint16_t)(clippedRight - clippedLeft);
-    topPipeHeight = (uint16_t)(gapY - (GAME_PIPE_GAP / 2U));
-    lowerPipeY = (uint16_t)(gapY + (GAME_PIPE_GAP / 2U));
-
-    if ((drawW > 0U) && (topPipeHeight > 0U))
+    if (clearY < (int16_t)GAME_HORIZON_Y)
     {
-        (void)ili9341_fill_rect(&s_lcd, drawX, 0U, drawW, topPipeHeight, color);
-    }
-    if ((drawW > 0U) && (lowerPipeY < s_lcdHeight))
-    {
-        (void)ili9341_fill_rect(&s_lcd, drawX, lowerPipeY, drawW, (uint16_t)(s_lcdHeight - lowerPipeY), color);
-    }
-}
-
-static void Game_ErasePipeTrail(int16_t oldPipeX, int16_t newPipeX, uint16_t oldGapY)
-{
-    const int16_t delta = (int16_t)(oldPipeX - newPipeX);
-
-    if ((delta > 0) && (delta <= GAME_PIPE_WIDTH))
-    {
-        Game_DrawPipeStripAt(oldPipeX,
-                             oldGapY,
-                             (int16_t)(oldPipeX + GAME_PIPE_WIDTH - delta),
-                             (uint16_t)delta,
-                             GAME_BACKGROUND_COLOR);
-    }
-    else
-    {
-        Game_DrawPipeAt(oldPipeX, oldGapY, GAME_BACKGROUND_COLOR);
-    }
-}
-
-static void Game_DrawPipeLeadingEdge(int16_t oldPipeX, int16_t newPipeX, uint16_t gapY)
-{
-    const int16_t delta = (int16_t)(oldPipeX - newPipeX);
-
-    if ((delta > 0) && (delta <= GAME_PIPE_WIDTH))
-    {
-        Game_DrawPipeStripAt(newPipeX, gapY, newPipeX, (uint16_t)delta, GAME_PIPE_COLOR);
-    }
-    else
-    {
-        Game_DrawPipeAt(newPipeX, gapY, GAME_PIPE_COLOR);
-    }
-}
-
-static void Game_DrawBirdAt(int16_t birdY, uint16_t color)
-{
-    uint16_t drawY;
-    uint16_t drawH;
-
-    if (((birdY + GAME_BIRD_H) <= 0) || (birdY >= (int16_t)s_lcdHeight))
-    {
-        return;
+        const int16_t skyH = (int16_t)(GAME_HORIZON_Y - clearY);
+        Game_FillRectClipped(clearX, clearY, clearW, skyH, GAME_SKY_COLOR);
+        clearY = (int16_t)GAME_HORIZON_Y;
     }
 
-    drawY = (birdY < 0) ? 0U : (uint16_t)birdY;
-    drawH = (uint16_t)((((birdY + GAME_BIRD_H) > (int16_t)s_lcdHeight) ? (int16_t)s_lcdHeight :
-                                                                         (birdY + GAME_BIRD_H)) -
-                       (int16_t)drawY);
-
-    if (drawH > 0U)
+    for (int16_t stripY = clearY; stripY < clearBottom; stripY = (int16_t)(stripY + 5))
     {
-        (void)ili9341_fill_rect(&s_lcd, GAME_BIRD_X, drawY, (uint16_t)(GAME_BIRD_W + GAME_BIRD_BEAK_W), drawH, color);
-        if (color == GAME_BIRD_COLOR)
+        int16_t stripH = 5;
+        const uint16_t halfWidth = Game_RoadHalfWidthAtY((uint16_t)stripY);
+        const int16_t roadLeft = (int16_t)(s_centerX - halfWidth);
+        const int16_t roadRight = (int16_t)(s_centerX + halfWidth);
+        const int16_t clearRight = (int16_t)(clearX + clearW);
+        const int16_t drawLeft = (clearX > roadLeft) ? clearX : roadLeft;
+        const int16_t drawRight = (clearRight < roadRight) ? clearRight : roadRight;
+
+        if ((stripY + stripH) > clearBottom)
         {
-            Game_FillRectClipped(GAME_BIRD_X, (int16_t)(birdY + 3), GAME_BIRD_W, 12, GAME_BIRD_COLOR);
-            Game_FillRectClipped((int16_t)(GAME_BIRD_X + 3), (int16_t)(birdY + 10), 9, 5, ILI9341_COLOR_ORANGE);
-            Game_FillRectClipped((int16_t)(GAME_BIRD_X + GAME_BIRD_W),
-                                 (int16_t)(birdY + 7),
-                                 GAME_BIRD_BEAK_W,
-                                 5,
-                                 ILI9341_COLOR_ORANGE);
-            Game_FillRectClipped((int16_t)(GAME_BIRD_X + 15), (int16_t)(birdY + 5), 5, 5, ILI9341_COLOR_WHITE);
-            Game_FillRectClipped((int16_t)(GAME_BIRD_X + 18), (int16_t)(birdY + 7), 2, 2, ILI9341_COLOR_BLACK);
+            stripH = (int16_t)(clearBottom - stripY);
         }
+
+        Game_FillRectClipped(clearX, stripY, clearW, stripH, GAME_FLOOR_COLOR);
+        if (drawRight > drawLeft)
+        {
+            Game_FillRectClipped(drawLeft, stripY, (int16_t)(drawRight - drawLeft), stripH, GAME_ROAD_COLOR);
+        }
+    }
+}
+
+static void Game_GetPlayerRect(uint8_t lane, int16_t *x, int16_t *y, int16_t *w, int16_t *h)
+{
+    const int16_t playerX = Game_LaneCenterAtY(lane, s_nearY);
+    const int16_t baseY = (int16_t)(s_nearY - 6U);
+
+    *w = GAME_PLAYER_BASE_W;
+    *h = GAME_PLAYER_BASE_H;
+    *x = (int16_t)(playerX - (GAME_PLAYER_BASE_W / 2));
+    *y = (int16_t)(baseY - GAME_PLAYER_BASE_H);
+}
+
+static void Game_ErasePlayerRect(void)
+{
+    Game_ClearGameplayRect(s_prevPlayerX, s_prevPlayerY, s_prevPlayerW, s_prevPlayerH);
+}
+
+static void Game_DrawPlayerAtLane(uint8_t lane)
+{
+    int16_t left;
+    int16_t bodyTop;
+    int16_t w;
+    int16_t h;
+
+    Game_GetPlayerRect(lane, &left, &bodyTop, &w, &h);
+    (void)w;
+    (void)h;
+
+    Game_FillRectClipped((int16_t)(left + 6), (int16_t)(bodyTop + 9), 10, 15, GAME_PLAYER_COLOR);
+    Game_FillRectClipped((int16_t)(left + 7), bodyTop, 8, 8, GAME_PLAYER_COLOR);
+    Game_FillRectClipped((int16_t)(left + 2), (int16_t)(bodyTop + 13), 5, 10, GAME_PLAYER_COLOR);
+    Game_FillRectClipped((int16_t)(left + 15), (int16_t)(bodyTop + 13), 5, 10, GAME_PLAYER_COLOR);
+    Game_FillRectClipped((int16_t)(left + 5), (int16_t)(bodyTop + 24), 5, 8, GAME_PLAYER_COLOR);
+    Game_FillRectClipped((int16_t)(left + 13), (int16_t)(bodyTop + 24), 5, 8, GAME_PLAYER_COLOR);
+}
+
+static void Game_DrawPlayer(void)
+{
+    Game_DrawPlayerAtLane(s_playerLane);
+}
+
+static void Game_DrawObstacle(uint32_t index)
+{
+    int16_t x;
+    int16_t y;
+    int16_t w;
+    int16_t h;
+    const uint16_t scale = Game_ProjectScale(s_obstacleZQ8[index]);
+
+    Game_GetObstacleMainRect(s_obstacleZQ8[index], s_obstacleLane[index], &x, &y, &w, &h);
+    Game_FillRectClipped(x, y, w, h, GAME_OBSTACLE_COLOR);
+    if (scale > 1U)
+    {
+        Game_FillRectClipped((int16_t)(x - (2 * (int16_t)scale)), (int16_t)(y + (3 * (int16_t)scale)),
+                             (int16_t)(w + (4 * (int16_t)scale)), (int16_t)(2U * scale), GAME_OBSTACLE_COLOR);
     }
 }
 
@@ -366,133 +577,161 @@ static void Game_DrawScore(void)
 {
     char scoreText[16];
 
-    (void)ili9341_fill_rect(&s_lcd, 0U, 0U, GAME_SCORE_W, GAME_SCORE_H, GAME_BACKGROUND_COLOR);
+    (void)ili9341_fill_rect(&s_lcd, 0U, 0U, GAME_SCORE_W, GAME_SCORE_H, GAME_SKY_COLOR);
     (void)snprintf(scoreText, sizeof(scoreText), "%lu", (unsigned long)s_score);
-    (void)ili9341_write_string(&s_lcd, 6U, 6U, scoreText, GAME_TEXT_COLOR, GAME_BACKGROUND_COLOR, 2U);
+    (void)ili9341_write_string(&s_lcd, 6U, 6U, scoreText, GAME_TEXT_COLOR, GAME_SKY_COLOR, 2U);
 }
 
 static void Game_DrawGameOverOverlay(void)
 {
-    (void)ili9341_fill_rect(&s_lcd, GAME_OVER_X, GAME_OVER_Y, GAME_OVER_W, GAME_OVER_H, GAME_BACKGROUND_COLOR);
-    (void)ili9341_write_string(&s_lcd, 72U, 88U, "GAME OVER", ILI9341_COLOR_RED, GAME_BACKGROUND_COLOR, 2U);
-    (void)ili9341_write_string(&s_lcd, 66U, 112U, "PRESS SW2", GAME_TEXT_COLOR, GAME_BACKGROUND_COLOR, 2U);
+    (void)ili9341_fill_rect(&s_lcd, GAME_OVER_X, GAME_OVER_Y, GAME_OVER_W, GAME_OVER_H, GAME_ROAD_COLOR);
+    (void)ili9341_write_string(&s_lcd, 90U, 88U, "GAME OVER", ILI9341_COLOR_RED, GAME_ROAD_COLOR, 2U);
+    (void)ili9341_write_string(&s_lcd, 90U, 112U, "SW2/SW3", GAME_TEXT_COLOR, GAME_ROAD_COLOR, 2U);
 }
 
 static void Game_DrawScene(void)
 {
-    const int16_t birdY = (int16_t)(s_birdYQ8 >> 8);
+    bool drawn[GAME_OBSTACLE_COUNT] = {false};
 
     if (s_fullRedrawNeeded)
     {
-        (void)ili9341_fill_screen(&s_lcd, GAME_BACKGROUND_COLOR);
-        Game_DrawPipeAt(s_pipeX, s_pipeGapY, GAME_PIPE_COLOR);
-        Game_DrawBirdAt(birdY, GAME_BIRD_COLOR);
+        Game_DrawRoad();
         Game_DrawScore();
-        if (s_gameOver)
-        {
-            Game_DrawGameOverOverlay();
-        }
         s_fullRedrawNeeded = false;
     }
     else
     {
-        const bool pipeWrapped = (s_pipeX > s_prevPipeX) || (s_pipeGapY != s_prevPipeGapY);
-        const bool scoreTouched = ((s_pipeX < (int16_t)GAME_SCORE_W) &&
-                                   ((s_pipeX + GAME_PIPE_WIDTH) > 0));
-
-        Game_DrawBirdAt(s_prevBirdY, GAME_BACKGROUND_COLOR);
-        if (pipeWrapped)
+        for (uint32_t i = 0U; i < GAME_OBSTACLE_COUNT; i++)
         {
-            Game_DrawPipeAt(s_prevPipeX, s_prevPipeGapY, GAME_BACKGROUND_COLOR);
-            Game_DrawPipeAt(s_pipeX, s_pipeGapY, GAME_PIPE_COLOR);
-        }
-        else
-        {
-            Game_ErasePipeTrail(s_prevPipeX, s_pipeX, s_prevPipeGapY);
-            Game_DrawPipeLeadingEdge(s_prevPipeX, s_pipeX, s_pipeGapY);
-        }
+            int16_t currentX;
+            int16_t currentY;
+            int16_t currentW;
+            int16_t currentH;
+            int16_t unionX;
+            int16_t unionY;
+            int16_t unionW;
+            int16_t unionH;
 
-        Game_DrawBirdAt(birdY, GAME_BIRD_COLOR);
-        if ((s_score != s_prevScore) || scoreTouched || ((s_frame & 3U) == 0U))
+            Game_GetObstacleRect(s_obstacleZQ8[i], s_obstacleLane[i], &currentX, &currentY, &currentW, &currentH);
+            Game_GetRectUnion(s_prevObstacleX[i],
+                              s_prevObstacleY[i],
+                              s_prevObstacleW[i],
+                              s_prevObstacleH[i],
+                              currentX,
+                              currentY,
+                              currentW,
+                              currentH,
+                              &unionX,
+                              &unionY,
+                              &unionW,
+                              &unionH);
+            Game_ClearGameplayRect(unionX, unionY, unionW, unionH);
+        }
+        if (s_playerLane != s_prevPlayerLane)
+        {
+            Game_ErasePlayerRect();
+        }
+        if (s_score != s_prevScore)
         {
             Game_DrawScore();
         }
-        if (s_gameOver && !s_prevGameOver)
-        {
-            Game_DrawGameOverOverlay();
-        }
     }
 
-    s_prevBirdY = birdY;
-    s_prevPipeX = s_pipeX;
-    s_prevPipeGapY = s_pipeGapY;
+    for (uint32_t pass = 0U; pass < GAME_OBSTACLE_COUNT; pass++)
+    {
+        int32_t farthestZ = -1;
+        uint32_t farthestIndex = 0U;
+
+        for (uint32_t i = 0U; i < GAME_OBSTACLE_COUNT; i++)
+        {
+            if (!drawn[i] && (s_obstacleZQ8[i] > farthestZ))
+            {
+                farthestZ = s_obstacleZQ8[i];
+                farthestIndex = i;
+            }
+        }
+        Game_DrawObstacle(farthestIndex);
+        drawn[farthestIndex] = true;
+    }
+
+    Game_DrawPlayer();
+    if (s_gameOver && !s_prevGameOver)
+    {
+        Game_DrawGameOverOverlay();
+    }
+
+    for (uint32_t i = 0U; i < GAME_OBSTACLE_COUNT; i++)
+    {
+        s_prevObstacleZQ8[i] = s_obstacleZQ8[i];
+        s_prevObstacleLane[i] = s_obstacleLane[i];
+        Game_GetObstacleRect(s_obstacleZQ8[i],
+                             s_obstacleLane[i],
+                             &s_prevObstacleX[i],
+                             &s_prevObstacleY[i],
+                             &s_prevObstacleW[i],
+                             &s_prevObstacleH[i]);
+    }
+    s_prevPlayerLane = s_playerLane;
+    Game_GetPlayerRect(s_playerLane, &s_prevPlayerX, &s_prevPlayerY, &s_prevPlayerW, &s_prevPlayerH);
     s_prevScore = s_score;
     s_prevGameOver = s_gameOver;
 }
 
-static bool Game_CheckCollision(void)
+static bool Game_HandleInput(bool moveLeftEdge, bool moveRightEdge)
 {
-    const int16_t birdY = (int16_t)(s_birdYQ8 >> 8);
-    const int16_t birdTop = (int16_t)(birdY + 2);
-    const int16_t birdBottom = (int16_t)(birdY + GAME_BIRD_H - 2);
-    const int16_t birdLeft = (int16_t)(GAME_BIRD_X + 2);
-    const int16_t birdRight = (int16_t)(GAME_BIRD_X + GAME_BIRD_W - 3);
-    const int16_t gapTop = (int16_t)(s_pipeGapY - (GAME_PIPE_GAP / 2U));
-    const int16_t gapBottom = (int16_t)(s_pipeGapY + (GAME_PIPE_GAP / 2U));
+    uint8_t oldLane = s_playerLane;
 
-    if ((birdY < 0) || ((birdY + GAME_BIRD_H) >= (int16_t)s_lcdHeight))
+    if (s_gameOver)
     {
-        return true;
+        if (moveLeftEdge || moveRightEdge)
+        {
+            Game_Reset();
+            return true;
+        }
+        return false;
     }
 
-    if ((birdRight >= s_pipeX) && (birdLeft <= (s_pipeX + GAME_PIPE_WIDTH)))
+    if (moveLeftEdge && (s_playerLane > 0U))
     {
-        return (birdTop < gapTop) || (birdBottom > gapBottom);
+        s_playerLane--;
+    }
+    if (moveRightEdge && (s_playerLane < (GAME_LANE_COUNT - 1U)))
+    {
+        s_playerLane++;
+    }
+
+    return s_playerLane != oldLane;
+}
+
+static bool Game_CheckCollision(void)
+{
+    for (uint32_t i = 0U; i < GAME_OBSTACLE_COUNT; i++)
+    {
+        if ((s_obstacleLane[i] == s_playerLane) &&
+            (s_obstacleZQ8[i] < (GAME_OBSTACLE_MIN_Z_Q8 + (18 * 256))))
+        {
+            return true;
+        }
     }
 
     return false;
 }
 
-static void Game_Update(bool flapPressedEdge, bool flapHeld)
+static void Game_UpdateWorld(void)
 {
     if (s_gameOver)
     {
-        if (flapPressedEdge)
-        {
-            Game_Reset();
-        }
         return;
     }
 
-    if (flapPressedEdge)
+    for (uint32_t i = 0U; i < GAME_OBSTACLE_COUNT; i++)
     {
-        if (s_birdVelocityQ8 > GAME_FLAP_VELOCITY_Q8)
+        s_obstacleZQ8[i] -= (int32_t)Game_CurrentSpeedQ8();
+        if (s_obstacleZQ8[i] < GAME_OBSTACLE_MIN_Z_Q8)
         {
-            s_birdVelocityQ8 = GAME_FLAP_VELOCITY_Q8;
+            s_score++;
+            Game_ResetObstacle(i, s_frame + s_score + i);
         }
-    }
-    if (flapHeld)
-    {
-        s_birdVelocityQ8 += GAME_FLAP_HOLD_ACCEL_Q8;
-        if (s_birdVelocityQ8 < GAME_RISE_VELOCITY_LIMIT_Q8)
-        {
-            s_birdVelocityQ8 = GAME_RISE_VELOCITY_LIMIT_Q8;
-        }
-    }
-
-    s_birdVelocityQ8 += GAME_GRAVITY_Q8;
-    if (s_birdVelocityQ8 > GAME_MAX_FALL_Q8)
-    {
-        s_birdVelocityQ8 = GAME_MAX_FALL_Q8;
-    }
-    s_birdYQ8 += s_birdVelocityQ8;
-
-    s_pipeX = (int16_t)(s_pipeX - GAME_PIPE_SPEED);
-    if ((s_pipeX + GAME_PIPE_WIDTH) < 0)
-    {
-        s_pipeX = (int16_t)s_lcdWidth;
-        s_pipeGapY = Game_RandomGapY();
-        s_score++;
     }
 
     if (Game_CheckCollision())
@@ -502,7 +741,6 @@ static void Game_Update(bool flapPressedEdge, bool flapHeld)
 
     s_frame++;
 }
-
 
 /*!
  * @brief Main function
@@ -539,16 +777,40 @@ int main(void)
     s_lcdWidth = s_lcd.width;
     s_lcdHeight = s_lcd.height;
     s_sw2WasPressed = SW2_IsPressed();
+    s_sw3WasPressed = SW3_IsPressed();
     Game_Reset();
 
     while (1)
     {
+        const bool sw3Pressed = SW3_IsPressed();
         const bool sw2Pressed = SW2_IsPressed();
-        const bool flapPressedEdge = sw2Pressed && !s_sw2WasPressed;
+        const bool moveLeftEdge = sw2Pressed && !s_sw2WasPressed;
+        const bool moveRightEdge = sw3Pressed && !s_sw3WasPressed;
 
         s_sw2WasPressed = sw2Pressed;
-        Game_Update(flapPressedEdge, sw2Pressed);
+        s_sw3WasPressed = sw3Pressed;
+        (void)Game_HandleInput(moveLeftEdge, moveRightEdge);
+        Game_UpdateWorld();
         Game_DrawScene();
-        SDK_DelayAtLeastUs(GAME_FRAME_DELAY_US, CLOCK_GetCoreSysClkFreq());
+
+        const bool lateSw3Pressed = SW3_IsPressed();
+        const bool lateSw2Pressed = SW2_IsPressed();
+        const bool lateMoveLeftEdge = lateSw2Pressed && !s_sw2WasPressed;
+        const bool lateMoveRightEdge = lateSw3Pressed && !s_sw3WasPressed;
+
+        s_sw2WasPressed = lateSw2Pressed;
+        s_sw3WasPressed = lateSw3Pressed;
+        if (Game_HandleInput(lateMoveLeftEdge, lateMoveRightEdge) && !s_fullRedrawNeeded)
+        {
+            Game_ErasePlayerRect();
+            Game_DrawPlayer();
+            s_prevPlayerLane = s_playerLane;
+            Game_GetPlayerRect(s_playerLane, &s_prevPlayerX, &s_prevPlayerY, &s_prevPlayerW, &s_prevPlayerH);
+        }
+
+        if (GAME_FRAME_DELAY_US > 0U)
+        {
+            SDK_DelayAtLeastUs(GAME_FRAME_DELAY_US, CLOCK_GetCoreSysClkFreq());
+        }
     }
 }

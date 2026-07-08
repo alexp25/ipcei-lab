@@ -599,18 +599,18 @@ static void LPI2C0_init(void) {
 }
 
 /***********************************************************************************************************************
- * LPUART1 initialization code
+ * LPUART2 initialization code
  **********************************************************************************************************************/
 /* clang-format off */
 /* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
 instance:
-- name: 'LPUART1'
+- name: 'LPUART2'
 - type: 'lpuart'
 - mode: 'polling'
 - custom_name_enabled: 'false'
 - type_id: 'lpuart_2.11.0'
 - functional_group: 'BOARD_InitPeripherals'
-- peripheral: 'LPUART1'
+- peripheral: 'LPUART2'
 - config_sets:
   - lpuartConfig_t:
     - lpuartConfig:
@@ -642,7 +642,7 @@ instance:
     - quick_selection: 'QuickSelection1'
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
 /* clang-format on */
-const lpuart_config_t LPUART1_config = {
+const lpuart_config_t LPUART2_config = {
   .baudRate_Bps = 115200UL,
   .parityMode = kLPUART_ParityDisabled,
   .dataBitsCount = kLPUART_EightDataBits,
@@ -664,8 +664,8 @@ const lpuart_config_t LPUART1_config = {
   .inverseTxd = false
 };
 
-static void LPUART1_init(void) {
-  LPUART_Init(LPUART1_PERIPHERAL, &LPUART1_config, LPUART1_CLOCK_SOURCE);
+static void LPUART2_init(void) {
+  LPUART_Init(LPUART2_PERIPHERAL, &LPUART2_config, LPUART2_CLOCK_SOURCE);
 }
 
 /***********************************************************************************************************************
@@ -680,7 +680,7 @@ void BOARD_InitPeripherals(void)
   CTIMER0_init();
   ADC0_init();
   LPI2C0_init();
-  LPUART1_init();
+  LPUART2_init();
 }
 
 /***********************************************************************************************************************

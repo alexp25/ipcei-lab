@@ -69,6 +69,7 @@ outputs:
 - {id: FRO_HF_clock.outFreq, value: 48 MHz}
 - {id: LPI2C0_clock.outFreq, value: 12 MHz}
 - {id: LPUART0_clock.outFreq, value: 48 MHz}
+- {id: LPUART1_clock.outFreq, value: 48 MHz}
 - {id: LPUART2_clock.outFreq, value: 48 MHz}
 - {id: MAIN_clock.outFreq, value: 12 MHz}
 - {id: Slow_clock.outFreq, value: 3 MHz}
@@ -87,7 +88,6 @@ settings:
 - {id: MRCC.ADC0CLKSEL.sel, value: SCG.FRO_12M}
 - {id: MRCC.CTIMER0CLKSEL.sel, value: SCG.FRO_HF}
 - {id: MRCC.LPI2C0CLKSEL.sel, value: SCG.FRO_12M}
-- {id: MRCC.LPUART1CLKSEL.sel, value: SCG.CLK_IN}
 - {id: MRCC.OSTIMERCLKSEL.sel, value: VBAT.CLK16K_1}
 - {id: SCG.SCSSEL.sel, value: SCG.SIRC}
  * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
@@ -155,6 +155,7 @@ void BOARD_BootClockFRO12M(void)
     CLOCK_AttachClk(kFRO_HF_to_CTIMER0);                   /* !< Switch CTIMER0 to FRO_HF */
     CLOCK_AttachClk(kFRO12M_to_LPI2C0);                    /* !< Switch LPI2C0 to FRO12M */
     CLOCK_AttachClk(kFRO_HF_DIV_to_LPUART0);               /* !< Switch LPUART0 to FRO_HF_DIV */
+    CLOCK_AttachClk(kFRO_HF_DIV_to_LPUART1);               /* !< Switch LPUART1 to FRO_HF_DIV */
     CLOCK_AttachClk(kFRO_HF_DIV_to_LPUART2);               /* !< Switch LPUART2 to FRO_HF_DIV */
     CLOCK_AttachClk(kFRO_HF_DIV_to_LPTMR0);                /* !< Switch LPTMR0 to FRO_HF_DIV */
     CLOCK_AttachClk(kFRO_HF_DIV_to_I3C0FCLK);              /* !< Switch I3C0FCLK to FRO_HF_DIV */
@@ -173,6 +174,7 @@ void BOARD_BootClockFRO12M(void)
     CLOCK_SetClockDiv(kCLOCK_DivCTIMER0, 1U);              /* !< Set CTIMER0CLKDIV divider to value 1 */
     CLOCK_SetClockDiv(kCLOCK_DivWWDT0, 1U);                /* !< Set WWDT0CLKDIV divider to value 1 */
     CLOCK_SetClockDiv(kCLOCK_DivLPUART0, 1U);              /* !< Set LPUART0CLKDIV divider to value 1 */
+    CLOCK_SetClockDiv(kCLOCK_DivLPUART1, 1U);              /* !< Set LPUART1CLKDIV divider to value 1 */
     CLOCK_SetClockDiv(kCLOCK_DivLPUART2, 1U);              /* !< Set LPUART2CLKDIV divider to value 1 */
     CLOCK_SetClockDiv(kCLOCK_DivLPI2C0, 1U);               /* !< Set LPI2C0CLKDIV divider to value 1 */
 

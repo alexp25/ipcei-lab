@@ -599,6 +599,76 @@ static void LPI2C0_init(void) {
 }
 
 /***********************************************************************************************************************
+ * LPUART1 initialization code
+ **********************************************************************************************************************/
+/* clang-format off */
+/* TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
+instance:
+- name: 'LPUART1'
+- type: 'lpuart'
+- mode: 'polling'
+- custom_name_enabled: 'false'
+- type_id: 'lpuart_2.11.0'
+- functional_group: 'BOARD_InitPeripherals'
+- peripheral: 'LPUART1'
+- config_sets:
+  - lpuartConfig_t:
+    - lpuartConfig:
+      - clockSource: 'LpuartClock'
+      - lpuartSrcClkFreq: 'ClocksTool_DefaultInit'
+      - baudRate_Bps: '115200'
+      - parityMode: 'kLPUART_ParityDisabled'
+      - dataBitsCount: 'kLPUART_EightDataBits'
+      - isMsb: 'false'
+      - stopBitCount: 'kLPUART_OneStopBit'
+      - enableMatchAddress1: 'false'
+      - matchAddress1: '0'
+      - enableMatchAddress2: 'false'
+      - matchAddress2: '0'
+      - txFifoWatermark: '0'
+      - rxFifoWatermark: '1'
+      - enableRxRTS: 'false'
+      - enableTxRTS: 'false'
+      - enableTxCTS: 'false'
+      - txCtsSource: 'kLPUART_CtsSourcePin'
+      - txCtsConfig: 'kLPUART_CtsSampleAtStart'
+      - txRtsPolarity: 'kLPUART_RtsPolarityLow'
+      - rtsWatermark: '0'
+      - rxIdleType: 'kLPUART_IdleTypeStartBit'
+      - rxIdleConfig: 'kLPUART_IdleCharacter1'
+      - enableTx: 'true'
+      - enableRx: 'true'
+      - inverseTxd: 'false'
+    - quick_selection: 'QuickSelection1'
+ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS **********/
+/* clang-format on */
+const lpuart_config_t LPUART1_config = {
+  .baudRate_Bps = 115200UL,
+  .parityMode = kLPUART_ParityDisabled,
+  .dataBitsCount = kLPUART_EightDataBits,
+  .isMsb = false,
+  .stopBitCount = kLPUART_OneStopBit,
+  .txFifoWatermark = 0U,
+  .rxFifoWatermark = 1U,
+  .enableRxRTS = false,
+  .enableTxRTS = false,
+  .enableTxCTS = false,
+  .txCtsSource = kLPUART_CtsSourcePin,
+  .txCtsConfig = kLPUART_CtsSampleAtStart,
+  .txRtsPolarity = kLPUART_RtsPolarityLow,
+  .rtsWatermark = 0U,
+  .rxIdleType = kLPUART_IdleTypeStartBit,
+  .rxIdleConfig = kLPUART_IdleCharacter1,
+  .enableTx = true,
+  .enableRx = true,
+  .inverseTxd = false
+};
+
+static void LPUART1_init(void) {
+  LPUART_Init(LPUART1_PERIPHERAL, &LPUART1_config, LPUART1_CLOCK_SOURCE);
+}
+
+/***********************************************************************************************************************
  * LPUART2 initialization code
  **********************************************************************************************************************/
 /* clang-format off */
@@ -680,6 +750,7 @@ void BOARD_InitPeripherals(void)
   CTIMER0_init();
   ADC0_init();
   LPI2C0_init();
+  LPUART1_init();
   LPUART2_init();
 }
 

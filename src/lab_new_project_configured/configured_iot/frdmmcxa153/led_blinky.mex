@@ -175,6 +175,7 @@
                   <clock_output id="FRO_HF_clock.outFreq" value="48 MHz" locked="false" accuracy=""/>
                   <clock_output id="LPI2C0_clock.outFreq" value="12 MHz" locked="false" accuracy=""/>
                   <clock_output id="LPUART0_clock.outFreq" value="48 MHz" locked="false" accuracy=""/>
+                  <clock_output id="LPUART1_clock.outFreq" value="48 MHz" locked="false" accuracy=""/>
                   <clock_output id="LPUART2_clock.outFreq" value="48 MHz" locked="false" accuracy=""/>
                   <clock_output id="MAIN_clock.outFreq" value="12 MHz" locked="false" accuracy=""/>
                   <clock_output id="Slow_clock.outFreq" value="3 MHz" locked="false" accuracy=""/>
@@ -194,7 +195,6 @@
                   <setting id="MRCC.ADC0CLKSEL.sel" value="SCG.FRO_12M" locked="false"/>
                   <setting id="MRCC.CTIMER0CLKSEL.sel" value="SCG.FRO_HF" locked="false"/>
                   <setting id="MRCC.LPI2C0CLKSEL.sel" value="SCG.FRO_12M" locked="false"/>
-                  <setting id="MRCC.LPUART1CLKSEL.sel" value="SCG.CLK_IN" locked="false"/>
                   <setting id="MRCC.OSTIMERCLKSEL.sel" value="VBAT.CLK16K_1" locked="false"/>
                   <setting id="SCG.SCSSEL.sel" value="SCG.SIRC" locked="false"/>
                </clock_settings>
@@ -529,6 +529,21 @@
                         <data type="Boolean">true</data>
                      </feature>
                   </dependency>
+                  <dependency resourceType="ClockOutput" resourceId="LPUART1_clock" description="LPUART1_clock is inactive." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="frequency" evaluation="greaterThan">
+                        <data type="Frequency" unit="Hz">0</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="PeripheralUnifiedSignal" resourceId="LPUART1.uart_tx" description="Signal TX is not routed." problem_level="1" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="routed" evaluation="equal">
+                        <data type="Boolean">true</data>
+                     </feature>
+                  </dependency>
+                  <dependency resourceType="PeripheralUnifiedSignal" resourceId="LPUART1.uart_rx" description="Signal RX is not routed." problem_level="1" source="Peripherals:BOARD_InitPeripherals">
+                     <feature name="routed" evaluation="equal">
+                        <data type="Boolean">true</data>
+                     </feature>
+                  </dependency>
                   <dependency resourceType="ClockOutput" resourceId="LPUART2_clock" description="LPUART2_clock is inactive." problem_level="2" source="Peripherals:BOARD_InitPeripherals">
                      <feature name="frequency" evaluation="greaterThan">
                         <data type="Frequency" unit="Hz">0</data>
@@ -859,7 +874,7 @@
                         </struct>
                      </config_set>
                   </instance>
-                  <instance name="LPUART1" uuid="4a767da9-236d-481a-bc42-4b05927c0438" type="lpuart" type_id="lpuart_2.11.0" mode="polling" peripheral="LPUART1" enabled="false" comment="" custom_name_enabled="false" editing_lock="false">
+                  <instance name="LPUART1" uuid="4a767da9-236d-481a-bc42-4b05927c0438" type="lpuart" type_id="lpuart_2.11.0" mode="polling" peripheral="LPUART1" enabled="true" comment="" custom_name_enabled="false" editing_lock="false">
                      <config_set name="lpuartConfig_t" quick_selection="QuickSelection1">
                         <struct name="lpuartConfig">
                            <setting name="clockSource" value="LpuartClock"/>

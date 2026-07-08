@@ -86,9 +86,9 @@ extern "C" {
 /* Definition of follower address */
 #define LPI2C0_MASTER_SLAVE_ADDRESS 0
 /* Definition of peripheral ID */
-#define LPUART1_PERIPHERAL LPUART1
+#define LPUART2_PERIPHERAL LPUART2
 /* Definition of the clock source frequency */
-#define LPUART1_CLOCK_SOURCE 48000000UL
+#define LPUART2_CLOCK_SOURCE 48000000UL
 
 /***********************************************************************************************************************
  * Global variables
@@ -109,7 +109,7 @@ extern const lpi2c_master_config_t LPI2C0_masterConfig;
 extern lpi2c_master_transfer_t LPI2C0_masterTransfer;
 extern uint8_t LPI2C0_masterBuffer[LPI2C0_MASTER_BUFFER_SIZE];
 extern lpi2c_master_handle_t LPI2C0_masterHandle;
-extern const lpuart_config_t LPUART1_config;
+extern const lpuart_config_t LPUART2_config;
 
 /***********************************************************************************************************************
  * Initialization functions
