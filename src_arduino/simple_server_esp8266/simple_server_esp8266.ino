@@ -29,8 +29,11 @@ ESP8266WebServer server(80);
 // const char* ssid = "YOUR_SSID";
 // const char* password = "YOUR_PASSWORD";
 
-const char* ssid = "DIGI-ehds";
-const char* password = "5bfPc4AFzA";
+// const char* ssid = "DIGI-ehds";
+// const char* password = "5bfPc4AFzA";
+
+const char* ssid = "UPB-Guest";
+const char* password = "";
 
 const char* mqttHost = "isilab.cloud.shiftr.io";
 const uint16_t mqttPort = 1883;
