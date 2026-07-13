@@ -1,0 +1,32 @@
+Use `.agents/agent_0_embedded_project_scoping.md`.
+
+This is the Agent 0: Embedded Project Idea Scoping Agent prompt.
+
+User spec:
+
+<<<PROJECT_IDEA>>>
+[PASTE THE STUDENT PROJECT IDEA / USER SPEC HERE]
+<<<END_PROJECT_IDEA>>>
+
+Output file:
+
+<<<OUTPUT_JSON_PATH>>>
+.agents/data/project_scoping_brief.json
+<<<END_OUTPUT_JSON_PATH>>>
+
+HTML output file:
+
+<<<OUTPUT_HTML_PATH>>>
+.agents/data/project_scoping_brief.html
+<<<END_OUTPUT_HTML_PATH>>>
+
+Generate the JSON scoping brief for Agent 1 and save it to the JSON output file.
+Also generate a self-contained HTML scoping report beside the JSON file.
+Create `.agents/data/` if needed.
+
+Remember:
+- The project must use the NXP FRDM-MCXA153 board.
+- Keep a core student version, a recommended version, and an advanced extension.
+- Do not invent exact pins or SDK APIs.
+- The JSON file content must be valid JSON only.
+- The HTML file must be self-contained and easy to open in a browser.

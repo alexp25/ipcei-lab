@@ -6,8 +6,8 @@
     "purpose": "Convert a vague embedded project idea into a structured scoping brief for requirements engineering"
   },
   "source_input": {
-    "original_project_idea": "walkie talkie",
-    "input_quality": "vague"
+    "original_project_idea": "Autonomous Car - self-driving vehicle that uses computer vision and TinyML on a microcontroller to follow a road, recognize traffic signs and traffic lights, and navigate autonomously in a controlled environment",
+    "input_quality": "clear"
   },
   "fixed_platform": {
     "board": "NXP FRDM-MCXA153",
@@ -17,124 +17,142 @@
     "logic_level_policy": "Assume 3.3 V logic unless verified otherwise"
   },
   "project": {
-    "name": "FRDM-MCXA153 Push-to-Talk Walkie Talkie Prototype",
-    "short_summary": "A student prototype that uses the NXP FRDM-MCXA153 as the controller for a push-to-talk audio communication device, starting with local audio capture/playback indicators and scaling toward short-range digital voice exchange using an external 3.3 V-compatible communication module.",
-    "main_objective": "Demonstrate the embedded-system building blocks of a walkie talkie: push-to-talk control, microphone input, speaker or headphone output, status feedback, and optional short-range wireless audio packet transfer.",
+    "name": "FRDM-MCXA153 Autonomous Road-Following Car",
+    "short_summary": "A small autonomous vehicle controlled by the NXP FRDM-MCXA153 that follows a controlled road track, reacts to simple traffic cues, and can scale from sensor-based line following to constrained TinyML vision classification.",
+    "main_objective": "Demonstrate embedded autonomy on the mandatory FRDM-MCXA153 board through motor control, road tracking, traffic cue recognition, and safe navigation in a controlled tabletop or floor environment.",
     "intended_user": "third-year Computer Science student",
-    "operating_environment": "Indoor lab or classroom prototype environment with short-range communication tests between two identical devices or between one device and a host-side simulator.",
-    "main_behavior": "The user presses a push-to-talk control, speaks into a microphone, sees transmit status feedback, and releases the control to return to receive or idle mode. More advanced versions exchange compressed or low-rate audio over an external communication module.",
+    "operating_environment": "Indoor lab track with printed or taped road lines, controlled lighting, low speed operation, and instructor-approved test zones.",
+    "main_behavior": "The car starts in a safe idle state, follows a marked road, slows or stops for recognized cues, responds to simple traffic lights or signs, and reports status through LEDs, serial logs, or an optional display.",
     "inputs": [
-      "Push-to-talk button",
-      "Microphone or audio input module",
-      "Optional channel or mode buttons",
-      "Optional received wireless data from a paired unit"
+      "Road or lane sensing from reflectance sensors in the core version",
+      "Optional low-resolution camera input for recommended and advanced versions",
+      "Traffic light cue from colored LEDs or printed markers",
+      "Traffic sign cue from printed cards or high-contrast markers",
+      "Start, stop, mode, or calibration button",
+      "Optional distance or obstacle sensor"
     ],
     "outputs": [
-      "Speaker, buzzer, or headphone audio output",
-      "Status LEDs",
-      "Optional display status text",
-      "Optional wireless transmit packets"
+      "Left and right motor drive commands through a motor driver",
+      "Steering or differential speed control depending on chassis type",
+      "Status LEDs for idle, running, stop, error, and classification state",
+      "USB serial debug logs",
+      "Optional display for mode, confidence, speed, and detected cue"
     ],
     "interaction_flow": [
-      "Power the FRDM-MCXA153-based prototype from a verified supply.",
-      "Device starts in idle or receive mode and shows ready status.",
-      "User presses the push-to-talk button to enter transmit mode.",
-      "Firmware samples microphone audio or an audio module output and provides local status feedback.",
-      "Recommended version sends audio frames or voice activity events through an external communication module.",
-      "User releases the push-to-talk button and the device returns to receive or idle mode.",
-      "Received audio data, if implemented, is played back or represented through a speaker, headphone output, or diagnostic stream."
+      "Place the car on the controlled road track with wheels clear or motors disabled for initial checks.",
+      "Power the FRDM-MCXA153 and external motor supply using verified safe wiring.",
+      "Calibrate road sensors or camera thresholds under the current lighting conditions.",
+      "Press the start button or send a debug command to enter autonomous mode.",
+      "Core version follows a road line using sensor feedback and stops on loss of track or obstacle detection.",
+      "Recommended version classifies a limited set of traffic cues and changes behavior based on the detected cue.",
+      "Advanced version logs inference and navigation data, supports more cues, and improves behavior after test runs."
     ],
     "out_of_scope": [
-      "Designing a regulated RF transmitter from discrete RF components",
-      "Long-range public-band radio compliance testing",
-      "Guaranteed compatibility with commercial walkie talkies",
-      "Emergency-service or safety-critical communication",
-      "Exact MCU pin assignment before board routing and peripheral configuration are reviewed"
+      "Operation on public roads or around people at vehicle scale",
+      "High-speed driving",
+      "Safety-critical autonomous vehicle claims",
+      "Exact MCU pin assignment before hardware review",
+      "Exact SDK API names before Agent 1 and implementation review",
+      "Unverified 5 V modules connected directly to MCU pins",
+      "Full general-purpose computer vision comparable to large embedded Linux platforms"
     ]
   },
   "problem_space": {
-    "purpose": "Explore embedded audio, real-time interaction, and short-range communication through a recognizable push-to-talk device.",
-    "physical_process_monitored_or_controlled": "Human voice pressure waves are captured by a microphone, converted to an electrical or digital signal, optionally transmitted as data, and converted back to audible sound.",
+    "purpose": "Teach embedded sensing, motor control, state machines, TinyML tradeoffs, and safe prototype autonomy using a constrained microcontroller platform.",
+    "physical_process_monitored_or_controlled": "A wheeled robot chassis moves along a controlled road track while sensing road markings, traffic cues, and optional obstacles; firmware controls motor speed and behavior in response.",
     "success_criteria": [
-      "User can clearly control transmit and receive or idle states with a push-to-talk input.",
-      "Device provides visible feedback for ready, transmit, receive, and error states.",
-      "Core version demonstrates audio input and output locally or through diagnostics.",
-      "Recommended version demonstrates short-range voice or voice-like packet exchange between two prototypes or one prototype and a test receiver.",
-      "The prototype uses 3.3 V-compatible interfaces or includes clearly documented level shifting and power protection."
+      "Car can start, stop, and remain in a safe idle or fault state when required.",
+      "Core version follows a marked road for a repeatable section of the lab track.",
+      "Recommended version recognizes at least two to three simple traffic cues in controlled lighting.",
+      "Vehicle reacts appropriately to cues such as stop, go, slow, turn, or traffic light color.",
+      "Motor driver, sensors, and camera modules are electrically compatible or protected with proper level shifting.",
+      "Firmware exposes debug information for calibration, classification confidence, and navigation decisions.",
+      "Advanced work remains optional and does not make the baseline demonstration unsafe or unachievable."
     ],
     "known_constraints": [
       "NXP FRDM-MCXA153 board is mandatory.",
       "Exact pins and SDK APIs are not specified.",
-      "RF communication must use legal, pre-certified, or lab-approved modules rather than a custom radio transmitter.",
-      "Audio sampling, buffering, and playback timing need careful design even at low quality."
+      "The MCU has limited memory and compute compared with single-board computers.",
+      "Motors require an external driver and likely a separate power source.",
+      "Camera-based TinyML must use low-resolution inputs and a small model.",
+      "Lighting and printed track quality strongly affect vision reliability."
     ],
     "unknown_constraints": [
-      "Whether two FRDM-MCXA153 boards are available.",
-      "Which microphone, speaker amplifier, and communication modules are available in the lab.",
-      "Permitted wireless frequency band and transmit power for the summer school setting.",
-      "Whether full voice audio, simple voice activity, or simulated packets are acceptable for the demonstration."
+      "Available chassis, motor driver, camera, line sensor array, and battery hardware.",
+      "Allowed model size and available memory after runtime and application code.",
+      "Whether camera capture bandwidth is sufficient on the selected interface.",
+      "Whether the lab permits battery-powered moving robots or requires tethered power during testing.",
+      "Required number of traffic signs, road layouts, and traffic light states.",
+      "Whether students may train models before the summer school or only during lab time."
     ]
   },
   "project_ambition": {
     "core_student_version": {
-      "description": "Build a single-board push-to-talk audio interface: button-controlled state machine, microphone level acquisition, simple audio output or tone feedback, LED status indicators, and serial debug logs.",
+      "description": "Build a safe road-following rover using the FRDM-MCXA153, a small chassis, a motor driver, reflectance or line sensors, and simple cue handling through colored markers or predefined stop zones.",
       "expected_difficulty": "intermediate",
       "expected_features": [
-        "Push-to-talk state machine",
-        "Microphone signal level capture using an ADC-capable input or digital audio module interface",
-        "Speaker, buzzer, or headphone output using a safe external driver if needed",
-        "LED status for idle, transmit, and error states",
-        "Serial debug output for sampled levels and state transitions"
+        "Two-wheel differential drive or equivalent low-speed chassis control",
+        "Line or road following using reflectance sensors or simple thresholded sensing",
+        "Start, stop, calibration, and emergency fault states",
+        "Basic speed control using PWM-capable outputs through a motor driver",
+        "Road-lost detection with safe stop behavior",
+        "Serial debug logs for sensor values and control decisions",
+        "Status LED feedback"
       ],
-      "why_it_is_suitable": "It teaches GPIO, timing, ADC or digital sensor input, output control, debugging, and state-machine design without depending on uncertain RF performance."
+      "why_it_is_suitable": "It focuses on core embedded skills: GPIO, timers, PWM, sensor calibration, state machines, control loops, and safe hardware integration without depending on difficult camera performance."
     },
     "recommended_summer_school_version": {
-      "description": "Create a two-device short-range digital push-to-talk prototype using two FRDM-MCXA153 boards and a 3.3 V-compatible external communication module. The audio path may use low-rate sampled audio, encoded voice-like frames, or a simplified voice activity plus tone demonstration depending on available hardware.",
-      "expected_difficulty": "intermediate",
+      "description": "Add constrained computer vision and TinyML classification for a small set of traffic signs or traffic light colors while keeping road following sensor-assisted and the environment highly controlled.",
+      "expected_difficulty": "advanced",
       "expected_features": [
-        "Two matching FRDM-MCXA153 prototypes or one prototype plus a host-side test peer",
-        "Push-to-talk half-duplex protocol",
-        "External 3.3 V-compatible communication module using a generic UART, SPI, or I2C-capable interface",
-        "Audio frame buffering with sequence numbers or timestamps",
-        "Receive status feedback and basic packet-loss indication",
-        "Configurable channel or device ID"
+        "Low-resolution camera module selected for 3.3 V-compatible logic or proper level shifting",
+        "TinyML classifier for a limited set such as stop sign, speed limit marker, left or right arrow, red light, and green light",
+        "Sensor-assisted road following so vision is used for decisions rather than all steering",
+        "Confidence thresholding with unknown or low-confidence fallback behavior",
+        "Behavior mapping from detected cue to stop, slow, turn, or continue",
+        "Dataset capture workflow and repeatable lab lighting assumptions",
+        "Debug output showing detected class, confidence, and selected action"
       ],
-      "why_it_is_interesting": "It turns a familiar consumer device into a concrete embedded systems challenge involving real-time behavior, communication protocols, and human interaction.",
-      "why_it_is_still_feasible": "The RF complexity is delegated to an external module while students focus on firmware structure, buffering, user control, and testable communication behavior."
+      "why_it_is_interesting": "It connects a familiar self-driving car idea to real embedded constraints: tiny images, small models, deterministic control, power limits, and safety fallback states.",
+      "why_it_is_still_feasible": "The scope is constrained to a controlled track, a small number of classes, low speed, and sensor-assisted lane following instead of open-ended autonomous driving."
     },
     "advanced_extension": {
-      "description": "Extend the prototype with better audio handling, packet diagnostics, optional storage, and GenAI-assisted development artifacts such as generated tests, protocol documentation, and debugging checklists.",
+      "description": "Extend the recommended prototype with richer navigation, better TinyML validation, data logging, obstacle handling, and GenAI-assisted development artifacts.",
       "expected_difficulty": "advanced",
       "advanced_features": [
-        "Simple audio compression or voice activity detection",
-        "Ring buffers for transmit and receive audio frames",
-        "Packet loss, latency, and signal-quality logging",
-        "Small display for channel, mode, battery, and link status",
-        "Optional recording of short audio clips or diagnostics to external storage",
-        "Optional encryption or pairing concept for privacy discussion",
-        "PC-side visualization of audio level, packets, and state transitions"
+        "More traffic sign classes with an explicit unknown class",
+        "Traffic light state recognition using color regions or TinyML",
+        "Obstacle stop or slow-down behavior using a distance sensor",
+        "Lap, route, or intersection state machine",
+        "Data logging of sensor readings, inference confidence, motor commands, and failures",
+        "PC-side dataset review and confusion matrix generation",
+        "Optional remote telemetry over a 3.3 V-compatible communication module",
+        "Model comparison between threshold-based detection and TinyML classification"
       ],
       "extra_components": [
-        "External wireless module approved for lab use",
-        "Digital microphone or analog microphone breakout",
-        "Low-power speaker amplifier or headphone driver",
+        "Low-resolution camera module",
+        "Distance or time-of-flight sensor",
+        "External flash, microSD module, or host-side logging path",
         "Small I2C or SPI display",
-        "Optional external flash or microSD module",
-        "Optional battery pack with proper regulation and protection"
+        "3.3 V-compatible wireless or wired telemetry module",
+        "Protected battery pack and regulator for portable operation"
       ],
       "technical_challenges": [
-        "Maintaining audio timing while handling user input and communication",
-        "Choosing a low enough audio rate for the available communication bandwidth",
-        "Avoiding buffer underrun and overflow",
-        "Managing half-duplex transmit and receive behavior",
-        "Keeping external module voltage, current, and logic levels compatible"
+        "Balancing camera capture, inference, and motor control timing",
+        "Keeping model size and tensor buffers within MCU memory limits",
+        "Preventing lighting changes from degrading classification accuracy",
+        "Avoiding motor noise and voltage dips that reset the board or corrupt sensor readings",
+        "Testing moving robot behavior safely and repeatably",
+        "Defining fallback behavior for low-confidence or unknown traffic cues"
       ],
       "risk_controls": [
-        "Use pre-certified or lab-approved communication modules only.",
-        "Start with simulated or diagnostic audio frames before live voice.",
-        "Keep volume and amplifier power low for bench testing.",
-        "Document legal RF assumptions and require instructor approval before over-the-air tests.",
-        "Use generic pin capabilities until exact board configuration is confirmed."
+        "Keep vehicle speed low and use a small controlled track.",
+        "Require a physical or firmware stop mechanism before autonomous testing.",
+        "Use line sensors for baseline steering before adding vision decisions.",
+        "Use low-resolution images and a small number of classes.",
+        "Validate every external module for 3.3 V logic compatibility or level shifting.",
+        "Use a motor driver and separate motor power path rather than powering motors from MCU pins.",
+        "Treat advanced features as optional after the core behavior works."
       ],
       "can_be_optional": true
     }
@@ -148,138 +166,182 @@
     },
     "sensors": [
       {
-        "name": "Microphone module",
-        "purpose": "Capture voice or voice-level input for transmit mode.",
-        "likely_interface": "ADC-capable input for analog microphone breakout, or generic digital audio-capable interface if a digital microphone module is selected",
+        "name": "Reflectance or line sensor array",
+        "purpose": "Detect road line position for robust baseline road following.",
+        "likely_interface": "GPIO-capable pins, ADC-capable pins, or I2C-capable pins depending on selected module",
         "used_in_version": "core",
-        "voltage_or_signal_notes": "Prefer a 3.3 V-compatible module. Analog microphone boards may need biasing, gain, filtering, and careful signal-level verification.",
+        "voltage_or_signal_notes": "Prefer a 3.3 V-compatible module. Verify output levels before connecting to MCU pins.",
         "risks": [
-          "Raw microphone signal may be too small without an amplifier.",
-          "Some modules may expect 5 V or output levels unsuitable for direct MCU input."
+          "Some arrays are designed for 5 V systems.",
+          "Reflectance readings depend on surface material, ambient light, and sensor height."
+        ]
+      },
+      {
+        "name": "Low-resolution camera module",
+        "purpose": "Capture constrained images for traffic sign or traffic light detection.",
+        "likely_interface": "SPI-capable, I2C-capable plus parallel data, or UART-capable interface depending on selected module",
+        "used_in_version": "recommended",
+        "voltage_or_signal_notes": "Select a module with verified 3.3 V logic or provide level shifting. Confirm image size, frame rate, and memory requirements before requirements freeze.",
+        "risks": [
+          "Camera bandwidth and buffering may exceed available MCU resources.",
+          "Image quality may be sensitive to lighting and lens focus.",
+          "Exact SDK support cannot be assumed without checking the selected module."
+        ]
+      },
+      {
+        "name": "Traffic light cue source",
+        "purpose": "Provide red, yellow, or green states for recognition and behavior decisions.",
+        "likely_interface": "Observed optically by camera or color sensor; controlled externally or by a separate fixture",
+        "used_in_version": "recommended",
+        "voltage_or_signal_notes": "If using LED fixtures, keep them electrically separate from the car unless interfaced through verified 3.3 V-safe signals.",
+        "risks": [
+          "Camera color recognition depends on white balance and ambient light.",
+          "LED brightness may saturate the camera."
+        ]
+      },
+      {
+        "name": "Distance or obstacle sensor",
+        "purpose": "Detect obstacles or end-of-track conditions for safe stop behavior.",
+        "likely_interface": "I2C-capable pins, GPIO-capable pins, ADC-capable input, or timed digital signal depending on selected sensor",
+        "used_in_version": "advanced",
+        "voltage_or_signal_notes": "Prefer 3.3 V-compatible sensors. Ultrasonic modules commonly require voltage and timing verification.",
+        "risks": [
+          "Some distance sensors use 5 V echo or trigger signals.",
+          "Timing-sensitive sensors may compete with motor control and inference timing."
         ]
       }
     ],
     "actuators_outputs": [
       {
-        "name": "Speaker, buzzer, or headphone output stage",
-        "purpose": "Provide local tones, received audio playback, or diagnostics.",
-        "likely_interface": "PWM-capable output, DAC-like filtered PWM approach, or external audio amplifier controlled through a generic output interface",
+        "name": "Dual DC motors or geared motor chassis",
+        "purpose": "Move and steer the vehicle using differential speed control.",
+        "likely_interface": "Controlled through a motor driver using PWM-capable and GPIO-capable outputs",
         "used_in_version": "core",
-        "voltage_or_power_notes": "Do not drive a speaker directly from an MCU pin. Use a suitable low-power amplifier or buzzer driver and verify current limits.",
+        "voltage_or_power_notes": "Motors must be powered through an external motor driver and suitable supply. Do not drive motors directly from MCU pins.",
         "risks": [
-          "Speaker current can exceed MCU pin limits.",
-          "Audio amplifier modules may require power or logic levels that need verification."
+          "Motor stall current can exceed board or USB power capacity.",
+          "Electrical noise can affect sensor readings and MCU stability."
+        ]
+      },
+      {
+        "name": "Motor driver module",
+        "purpose": "Interface MCU control signals to the motors safely.",
+        "likely_interface": "PWM-capable outputs and GPIO-capable direction pins",
+        "used_in_version": "core",
+        "voltage_or_power_notes": "Use a driver with 3.3 V-compatible logic input or documented level shifting. Motor supply must match the chassis motor rating.",
+        "risks": [
+          "Some drivers require 5 V logic input or separate logic supply.",
+          "Incorrect wiring can damage the board or driver."
         ]
       },
       {
         "name": "Status LEDs",
-        "purpose": "Show idle, transmit, receive, and error states.",
+        "purpose": "Show idle, calibration, autonomous, stop, and error states.",
         "likely_interface": "GPIO-capable pins",
         "used_in_version": "core",
-        "voltage_or_power_notes": "Use appropriate current-limiting resistors and board-safe drive levels.",
+        "voltage_or_power_notes": "Use board LEDs where available or external LEDs with proper current limiting.",
         "risks": []
       }
     ],
     "user_inputs": [
       {
-        "name": "Push-to-talk button",
-        "purpose": "Select transmit mode while pressed.",
+        "name": "Start or stop button",
+        "purpose": "Enable autonomous mode or force safe idle.",
         "likely_interface": "GPIO-capable pin with pull-up or pull-down configuration",
         "used_in_version": "core",
-        "notes": "Debouncing should be handled in firmware or hardware."
+        "notes": "Firmware should debounce input and prioritize stop over all autonomous behavior."
       },
       {
-        "name": "Channel or mode buttons",
-        "purpose": "Select channel, pairing ID, test mode, or volume mode.",
-        "likely_interface": "GPIO-capable pins",
+        "name": "Calibration or mode button",
+        "purpose": "Capture line sensor thresholds, select test mode, or switch between core and TinyML behavior.",
+        "likely_interface": "GPIO-capable pin",
         "used_in_version": "recommended",
-        "notes": "Optional for the recommended version; can be replaced by serial commands during early testing."
+        "notes": "Can be replaced by USB serial commands during early bring-up."
       }
     ],
     "display_ui": [
       {
         "name": "Small status display",
-        "purpose": "Show channel, mode, link status, and diagnostics.",
+        "purpose": "Show mode, detected traffic cue, confidence, battery or fault state.",
         "likely_interface": "I2C-capable or SPI-capable pins",
         "used_in_version": "advanced",
-        "notes": "Optional; LEDs and serial output are enough for core and recommended prototypes."
+        "notes": "Optional; serial logs and LEDs are enough for the core and recommended versions."
       }
     ],
     "communication_debug": [
       {
         "name": "USB serial debug connection",
-        "purpose": "Log state changes, audio levels, packet counters, and errors.",
+        "purpose": "Log sensor values, calibration data, inference results, motor commands, and fault reasons.",
         "likely_interface": "USB interface or board debug serial interface",
         "used_in_version": "core",
-        "notes": "Useful for bring-up and demonstration even if audio playback is limited."
+        "notes": "Important for tuning and for Agent 1 to define observable requirements."
       },
       {
-        "name": "External short-range communication module",
-        "purpose": "Exchange voice frames or simplified audio packets between two devices.",
-        "likely_interface": "Generic UART-capable, SPI-capable, or I2C-capable pins depending on selected module",
-        "used_in_version": "recommended",
-        "notes": "Choose a 3.3 V-compatible, legal, lab-approved module. Do not design a custom RF transmitter for this course project."
+        "name": "Optional telemetry module",
+        "purpose": "Stream navigation and inference data to a PC or companion logger.",
+        "likely_interface": "UART-capable, SPI-capable, or I2C-capable pins depending on selected module",
+        "used_in_version": "advanced",
+        "notes": "Use only if 3.3 V logic and power requirements are confirmed."
       }
     ],
     "power_source": {
-      "recommended_power": "Use the board's normal development power path for bench testing. Add external regulated power only if audio amplifier, radio module, or battery operation requires it.",
-      "notes": "Battery operation is optional and should use a protected battery pack or regulated supply approved by instructors.",
+      "recommended_power": "Use USB or normal board development power for FRDM-MCXA153 logic during bring-up and a separate regulated motor supply for the chassis. Battery operation should be added only after bench testing.",
+      "notes": "All grounds and power domains must be reviewed before connection. Motor power, camera power, and board power should be sized for peak current and protected where appropriate.",
       "risks": [
-        "Audio amplifiers and wireless modules may draw more current than the board can safely provide.",
-        "Incorrect battery wiring or unregulated supplies can damage the board."
+        "Motor startup current may reset the board.",
+        "Battery packs can be unsafe without protection, regulation, and instructor review.",
+        "Shared noisy supplies can degrade camera and sensor performance."
       ]
     },
     "optional_advanced_components": [
       {
-        "name": "Pre-certified wireless module",
-        "purpose": "Provide the actual radio link without custom RF design.",
-        "reason_to_include": "Makes the walkie talkie concept demonstrable while keeping RF hardware realistic.",
-        "reason_to_exclude": "Availability, bandwidth, legal limitations, or driver complexity may exceed the course schedule.",
-        "risks": [
-          "Module may not support enough bandwidth for raw audio.",
-          "Module may require level shifting, external antenna rules, or specific regulatory limits."
-        ]
-      },
-      {
         "name": "External flash or microSD module",
-        "purpose": "Store audio clips, logs, or packet traces.",
-        "reason_to_include": "Supports advanced debugging and demonstrations.",
-        "reason_to_exclude": "Adds file-system and timing complexity.",
+        "purpose": "Store image samples, inference logs, sensor traces, and run summaries.",
+        "reason_to_include": "Supports model evaluation and debugging across multiple test runs.",
+        "reason_to_exclude": "Adds storage, file-system, and timing complexity.",
         "risks": [
-          "Storage writes may interfere with real-time audio timing.",
-          "Some modules may be 5 V-oriented and require verification."
+          "Storage writes can interrupt real-time control if not scheduled carefully.",
+          "Some storage modules are intended for 5 V systems and require verification."
         ]
       },
       {
-        "name": "Battery pack with regulator and protection",
-        "purpose": "Make the prototype portable.",
-        "reason_to_include": "Improves walkie talkie realism.",
-        "reason_to_exclude": "Power safety and charging circuitry can distract from the embedded communication objective.",
+        "name": "Distance or time-of-flight sensor",
+        "purpose": "Add obstacle detection and stop behavior.",
+        "reason_to_include": "Improves safety and makes autonomy more convincing.",
+        "reason_to_exclude": "Adds sensor integration and timing work beyond the core road-following scope.",
         "risks": [
-          "Battery safety risk if unprotected cells or incorrect charging are used.",
-          "Voltage drops can reset the board during audio or radio peaks."
+          "Voltage compatibility varies by module.",
+          "Readings may be unreliable on dark, angled, or reflective surfaces."
+        ]
+      },
+      {
+        "name": "Wireless telemetry module",
+        "purpose": "Send logs or live state to a PC during autonomous runs.",
+        "reason_to_include": "Makes debugging moving behavior easier.",
+        "reason_to_exclude": "Communication setup may distract from core autonomy and TinyML goals.",
+        "risks": [
+          "Wireless modules may require extra current, level shifting, or lab approval.",
+          "Telemetry timing can interfere with control loop timing if implemented synchronously."
         ]
       }
     ]
   },
   "software_context": {
-    "recommended_development_environment": "NXP-supported FRDM-MCXA153 development workflow selected by the course staff, using board examples for GPIO, timers, serial debug, and the selected audio or communication interfaces.",
+    "recommended_development_environment": "NXP-supported embedded C development workflow for FRDM-MCXA153, with board configuration reviewed before implementation",
     "recommended_sdk_or_libraries": [
-      "Board support package and examples for FRDM-MCXA153",
-      "GPIO and timer examples",
-      "ADC or selected audio-interface examples",
-      "UART, SPI, or I2C examples matching the selected communication module",
-      "Optional lightweight ring-buffer or packet protocol helper code written by students"
+      "NXP MCUXpresso SDK or other NXP-supported SDK package for FRDM-MCXA153, subject to local project setup",
+      "CMSIS-NN or a lightweight TinyML inference runtime if compatible with the chosen model and build environment",
+      "A host-side Python or notebook workflow for dataset preparation and model evaluation, if permitted by the course",
+      "A simple serial logging tool for calibration and test runs"
     ],
     "programming_language": "C",
-    "existing_codebase": "new_project",
-    "suggested_starting_point": "Start from a minimal FRDM-MCXA153 project that blinks LEDs and prints serial debug logs, then add push-to-talk input, microphone sampling or audio-level reading, local output, and finally the selected communication module.",
+    "existing_codebase": "existing_project",
+    "suggested_starting_point": "Begin from a minimal FRDM-MCXA153 firmware project that proves GPIO, timer or PWM output, serial logging, and one sensor input before integrating motors and TinyML.",
     "debugging_interfaces": [
-      "USB serial logs",
-      "On-board debugger",
+      "USB serial logging",
+      "On-board debugger if available in the local setup",
       "LED state indicators",
-      "Optional logic analyzer for timing and communication signals",
-      "Optional host-side script for packet inspection"
+      "Optional host-side log parser for sensor and inference traces"
     ],
     "possible_gen_ai_usage": [
       "requirements drafting",
@@ -292,133 +354,148 @@
   "constraints": {
     "target_board": "NXP FRDM-MCXA153 is mandatory",
     "voltage": "Assume 3.3 V logic unless verified otherwise",
-    "power": "External audio and radio components must have verified current requirements and should not be powered from MCU pins.",
-    "timing": "Audio capture, playback, and packet transfer require bounded timing, buffering, and clear half-duplex state transitions.",
-    "memory": "Raw audio buffers can consume memory quickly, so low sample rates, short frames, and bounded ring buffers are recommended.",
-    "safety": "Avoid high volume, unsafe batteries, direct speaker drive from MCU pins, and unapproved RF transmission.",
-    "privacy_security": "Voice communication may capture personal speech; demonstrations should avoid sensitive content and should document whether transmissions are open or paired.",
+    "power": "Motors, camera, and optional modules may require separate regulated supplies; do not power motors directly from MCU pins.",
+    "timing": "Road following needs a predictable control loop; camera capture and TinyML inference must not block safety checks or motor updates for too long.",
+    "memory": "TinyML must use small models, low-resolution inputs, and carefully sized buffers suitable for the MCXA153 memory budget.",
+    "safety": "Prototype must operate only at low speed in a controlled lab area with stop behavior and supervised testing.",
+    "privacy_security": "Avoid capturing identifiable people; datasets should contain track, signs, and lighting conditions only unless explicit approval is given.",
     "student_level": "third-year university Computer Science students"
   },
   "complexity": {
     "core_level": "intermediate",
-    "recommended_level": "intermediate",
+    "recommended_level": "advanced",
     "advanced_level": "advanced",
     "student_suitability": "suitable_with_simplification",
-    "reason": "The idea is attractive and teachable, but real-time voice communication and RF constraints can become difficult. A staged design keeps the core achievable while leaving full digital voice exchange as a recommended or advanced goal."
+    "reason": "A full self-driving car with general computer vision is too broad for a microcontroller summer school project, but a controlled-track rover with sensor-assisted road following and limited TinyML traffic cue recognition is achievable."
   },
   "facts_provided_by_user": [
-    "Project idea: walkie talkie",
-    "Project must use the NXP FRDM-MCXA153 board",
-    "A core student version, recommended version, and advanced extension are required",
-    "Exact pins and SDK APIs must not be invented"
+    "Project concept is an autonomous self-driving vehicle.",
+    "Vehicle should use computer vision and TinyML on a microcontroller.",
+    "Vehicle should follow a road.",
+    "Vehicle should recognize traffic signs and traffic lights.",
+    "Vehicle should navigate autonomously in a controlled environment.",
+    "Project must use the NXP FRDM-MCXA153 board."
   ],
   "assumptions": [
     {
       "id": "A-001",
-      "assumption": "The project is intended as an educational prototype, not a certified consumer radio product.",
-      "reason": "The input is a broad concept and the summer school context favors learning outcomes over product certification.",
+      "assumption": "The vehicle will be a small tabletop or floor robot, not a road-capable vehicle.",
+      "reason": "Safe operation and achievable student scope require a controlled lab-scale platform.",
       "requires_human_approval": true
     },
     {
       "id": "A-002",
-      "assumption": "A pre-certified or lab-approved external communication module will be used for any over-the-air wireless link.",
-      "reason": "Custom RF transmitter design is not appropriate for a short student embedded project and may raise legal constraints.",
+      "assumption": "Road following can be implemented with line or reflectance sensors in the core version.",
+      "reason": "This keeps the baseline reliable while leaving camera and TinyML work for the recommended version.",
       "requires_human_approval": true
     },
     {
       "id": "A-003",
-      "assumption": "The recommended version may use reduced audio quality, simplified voice frames, or a host-side peer if two complete boards are not available.",
-      "reason": "This keeps the demonstration feasible despite unknown module bandwidth and hardware availability.",
+      "assumption": "TinyML classification will be limited to a small number of traffic signs or traffic light states.",
+      "reason": "Microcontroller memory, compute, dataset size, and summer school time make broad object recognition unrealistic.",
       "requires_human_approval": true
     },
     {
       "id": "A-004",
-      "assumption": "All external modules will be checked for 3.3 V logic compatibility before connection to the FRDM-MCXA153.",
-      "reason": "The brief must not assume 5 V compatibility or safe direct connection.",
+      "assumption": "The camera module and motor driver will be selected later based on 3.3 V logic compatibility and local availability.",
+      "reason": "The user did not provide exact modules, and the prompt forbids inventing exact pins or SDK APIs.",
+      "requires_human_approval": true
+    },
+    {
+      "id": "A-005",
+      "assumption": "The controlled environment will have consistent lighting and printed or taped road features.",
+      "reason": "Vision and reflectance sensing both depend strongly on repeatable visual conditions.",
       "requires_human_approval": true
     }
   ],
   "open_questions": [
     {
       "id": "Q-001",
-      "question": "Should the demonstration require real voice audio between two devices, or is a staged prototype with audio levels, tones, and packet diagnostics acceptable?",
-      "why_it_matters": "This determines audio bandwidth, buffer size, module choice, and schedule risk."
+      "question": "Which chassis, motors, motor driver, and power source are available?",
+      "why_it_matters": "These choices determine speed control method, power safety requirements, and hardware integration effort."
     },
     {
       "id": "Q-002",
-      "question": "Which microphone, speaker amplifier, and wireless modules are available to students?",
-      "why_it_matters": "Hardware availability drives interface choice, power design, and achievable audio quality."
+      "question": "Which camera module, if any, is available and compatible with the FRDM-MCXA153 setup?",
+      "why_it_matters": "Camera interface, frame size, buffering, and SDK support determine whether TinyML vision is feasible."
     },
     {
       "id": "Q-003",
-      "question": "Are two FRDM-MCXA153 boards available per project team?",
-      "why_it_matters": "A two-device walkie talkie is the most natural demonstration, but a host-side peer can reduce hardware needs."
+      "question": "How many traffic signs and traffic light states must be recognized for the demonstration?",
+      "why_it_matters": "Class count affects dataset size, model complexity, memory use, and testing effort."
     },
     {
       "id": "Q-004",
-      "question": "What wireless bands, transmit powers, and lab policies are approved for student use?",
-      "why_it_matters": "Over-the-air communication must remain legal and safe."
+      "question": "Will students be allowed to train a model before the lab, or must all training support happen during the course?",
+      "why_it_matters": "TinyML model preparation can dominate schedule if dataset capture and training are not planned early."
     },
     {
       "id": "Q-005",
-      "question": "Is portable battery operation required or only optional?",
-      "why_it_matters": "Battery operation adds power, safety, enclosure, and testing complexity."
+      "question": "What safety rules apply to moving robots in the lab?",
+      "why_it_matters": "Speed limits, test area rules, and emergency stop expectations should be requirements from the start."
+    },
+    {
+      "id": "Q-006",
+      "question": "Should traffic light recognition use camera color detection, a separate color sensor, or encoded lab fixtures?",
+      "why_it_matters": "The answer changes sensor selection, difficulty, and robustness."
     }
   ],
   "risks": {
     "technical": [
-      "Audio capture and playback may require more timing precision than expected.",
-      "Communication module bandwidth may be insufficient for raw audio.",
-      "Two-way behavior must be half-duplex to avoid complex mixing and collision handling.",
-      "Debugging audio quality can be difficult without instrumentation."
+      "Full camera-based steering and sign recognition may exceed the time and compute budget.",
+      "Sensor calibration can be unstable under changing lighting.",
+      "Camera module integration may be harder than line sensor and motor control integration.",
+      "Model accuracy may look good offline but fail on the moving car due to blur, angle, or lighting."
     ],
     "safety": [
-      "Speaker or headphone output should be kept at safe volume levels.",
-      "Battery-powered operation requires protected cells and correct regulation.",
-      "No safety-critical or emergency communication claims should be made."
+      "Moving chassis can collide with hands, cables, or other prototypes if speed is too high.",
+      "Uncontrolled firmware faults could leave motors running.",
+      "Battery operation requires careful supervision and protected hardware."
     ],
     "voltage_power": [
-      "External audio amplifiers and wireless modules may require more current than available from board headers.",
-      "Some common breakout boards are designed for 5 V operation or have unclear logic levels.",
-      "Directly driving a speaker from an MCU pin can damage the board."
+      "Motor drivers, camera modules, and distance sensors may not be 3.3 V logic compatible.",
+      "Motor current can exceed USB or board power limits.",
+      "Voltage dips and motor noise can reset the MCU or corrupt sensor readings."
     ],
     "timing": [
-      "Audio sampling, packet transmission, and playback can conflict without buffering.",
-      "Button debounce and mode switching must not disrupt audio frames.",
-      "Storage or display updates in the advanced version can introduce latency."
+      "TinyML inference may block the control loop if scheduled poorly.",
+      "Camera capture may consume too much time or memory bandwidth.",
+      "Distance sensors with timing-based protocols may interfere with motor updates if handled synchronously."
     ],
     "memory": [
-      "Unbounded audio buffers can exceed MCU RAM.",
-      "Diagnostics and optional logging must use fixed-size buffers or controlled sampling."
+      "Image buffers, model weights, tensor arenas, and logs can exceed MCU memory if image sizes are too large.",
+      "Adding display, storage, and telemetry features may reduce memory available for inference."
     ],
     "privacy_security": [
-      "Voice transmission can expose personal speech.",
-      "Unencrypted wireless links may be observable by nearby receivers depending on module and protocol.",
-      "Pairing, channel selection, or device IDs should be documented to avoid accidental cross-talk."
+      "Camera datasets should avoid identifiable people and private spaces.",
+      "Telemetry logs should avoid storing personal data unless approved.",
+      "Wireless telemetry, if used, should not be treated as secure without explicit design work."
     ],
     "advanced_feature_risks": [
-      "Audio compression and voice activity detection may consume significant CPU time.",
-      "Battery portability and enclosure work can distract from firmware learning goals.",
-      "Adding display, storage, and wireless simultaneously can exceed the summer school schedule."
+      "Adding too many sign classes can make the model unreliable and the schedule risky.",
+      "Advanced navigation at intersections requires careful state-machine design and test coverage.",
+      "Data logging can disrupt real-time behavior if writes are not buffered or scheduled."
     ]
   },
   "human_approval_required": [
-    "Approve the selected scope: core, recommended, or advanced.",
-    "Approve the wireless module and confirm it is legal and lab-approved.",
-    "Approve external microphone and speaker amplifier modules after voltage and current checks.",
-    "Approve whether real voice exchange is required for the final demonstration.",
-    "Approve any battery-powered operation plan."
+    "Confirm that a small controlled-track robot is the intended interpretation of autonomous car.",
+    "Approve the core version using line or reflectance sensors for reliable road following.",
+    "Select or approve camera module, motor driver, chassis, and power source.",
+    "Approve the traffic sign and traffic light classes for the recommended version.",
+    "Confirm lab safety rules, maximum speed, and required emergency stop behavior.",
+    "Confirm whether external motor power and battery operation are allowed."
   ],
   "handoff_to_requirements_agent": {
     "ready_for_requirements_engineering": true,
     "recommended_scope_for_requirements": "recommended",
     "readiness_status": "ready_with_assumptions",
-    "readiness_notes": "The project is ready for requirements engineering if the requirements agent treats the recommended scope as a staged push-to-talk digital audio prototype and keeps exact pins, SDK calls, wireless module choice, and audio quality as decisions to confirm.",
+    "readiness_notes": "Agent 1 should write requirements around the recommended scope: sensor-assisted road following plus limited TinyML traffic cue recognition on FRDM-MCXA153. Requirements should keep the core line-following version independently demonstrable and make advanced features optional.",
     "critical_missing_information": [
-      "Available audio and wireless modules",
-      "Number of FRDM-MCXA153 boards per team",
-      "Approved wireless policy for the lab",
-      "Required audio fidelity and final demonstration expectations"
+      "Exact chassis and motor driver",
+      "Exact camera or vision sensor module",
+      "Available memory budget after chosen runtime and SDK setup",
+      "Approved traffic cue classes",
+      "Power source and safety constraints"
     ],
     "recommended_next_agent": "Requirements Engineering Assistant Agent"
   }

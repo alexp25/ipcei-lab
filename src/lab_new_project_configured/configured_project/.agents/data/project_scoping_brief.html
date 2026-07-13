@@ -3,201 +3,197 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Project Scoping Brief - FRDM-MCXA153 Walkie Talkie</title>
+  <title>Agent 0 Scoping Report - FRDM-MCXA153 Autonomous Road-Following Car</title>
   <style>
     :root {
       color-scheme: light;
-      --ink: #18202a;
-      --muted: #5b6573;
-      --line: #d8dee8;
-      --soft: #f4f7fb;
-      --panel: #ffffff;
-      --accent: #006d77;
-      --accent-2: #9b5de5;
-      --warn: #9a5b00;
-      --risk: #a61b1b;
-      --ok: #18794e;
+      --ink: #172026;
+      --muted: #5b6975;
+      --line: #d9e1e7;
+      --paper: #ffffff;
+      --soft: #f4f7f8;
+      --accent: #0f766e;
+      --accent-2: #1d4ed8;
+      --warn: #b45309;
+      --risk: #b91c1c;
+      --ok: #047857;
     }
+
     * {
       box-sizing: border-box;
     }
+
     body {
       margin: 0;
+      background: #eef3f5;
+      color: var(--ink);
       font-family: Arial, Helvetica, sans-serif;
       line-height: 1.5;
-      color: var(--ink);
-      background: var(--soft);
     }
+
     main {
-      width: min(1120px, calc(100% - 32px));
+      max-width: 1120px;
       margin: 0 auto;
-      padding: 32px 0 48px;
-    }
-    header {
       padding: 28px;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 8px;
+      background: var(--paper);
+      min-height: 100vh;
     }
+
+    header {
+      border-bottom: 3px solid var(--accent);
+      padding-bottom: 18px;
+      margin-bottom: 24px;
+    }
+
     h1, h2, h3 {
-      margin: 0;
+      margin: 0 0 10px;
       line-height: 1.2;
+    }
+
+    h1 {
+      font-size: 30px;
       letter-spacing: 0;
     }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 10px;
-    }
+
     h2 {
-      font-size: 1.35rem;
-      margin-bottom: 14px;
+      font-size: 22px;
+      margin-top: 28px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--line);
     }
+
     h3 {
-      font-size: 1.05rem;
-      margin-bottom: 8px;
-    }
-    p {
-      margin: 0 0 10px;
-    }
-    section {
+      font-size: 17px;
       margin-top: 18px;
-      padding: 24px;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 8px;
     }
+
+    p {
+      margin: 0 0 12px;
+    }
+
     ul, ol {
-      margin: 8px 0 0 22px;
-      padding: 0;
+      margin-top: 8px;
+      padding-left: 22px;
     }
+
     li {
-      margin: 4px 0;
+      margin-bottom: 6px;
     }
+
     table {
-      width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 0.95rem;
+      width: 100%;
+      margin: 12px 0 18px;
+      font-size: 14px;
     }
+
     th, td {
       border: 1px solid var(--line);
-      padding: 10px;
+      padding: 9px 10px;
       text-align: left;
       vertical-align: top;
     }
+
     th {
-      background: #eef3f8;
+      background: var(--soft);
+      font-weight: 700;
     }
-    .subtitle {
-      color: var(--muted);
-      max-width: 850px;
-    }
+
     .meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
       margin-top: 16px;
     }
-    .badge {
-      display: inline-block;
-      padding: 4px 9px;
-      border-radius: 999px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      border: 1px solid transparent;
-      white-space: nowrap;
-    }
-    .badge.mandatory {
-      color: #064f57;
-      background: #d9f2f3;
-      border-color: #a6dadd;
-    }
-    .badge.ready {
-      color: #15583d;
-      background: #ddf3e9;
-      border-color: #a9dec5;
-    }
-    .badge.assumption {
-      color: #6b3f00;
-      background: #fff0d1;
-      border-color: #f0c36b;
-    }
-    .badge.advanced {
-      color: #57338a;
-      background: #efe4ff;
-      border-color: #d3b8fb;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-    }
+
+    .meta div,
     .panel {
       border: 1px solid var(--line);
+      background: var(--soft);
+      padding: 12px;
       border-radius: 8px;
-      padding: 16px;
-      background: #fbfcfe;
     }
-    .kv {
-      display: grid;
-      grid-template-columns: 220px 1fr;
-      gap: 8px 14px;
-      margin-top: 8px;
-    }
-    .key {
-      font-weight: 700;
-    }
-    .muted {
+
+    .label {
+      display: block;
       color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 3px;
     }
-    .callout {
+
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #ffffff;
+      background: var(--accent-2);
+      white-space: nowrap;
+    }
+
+    .badge.mandatory {
+      background: var(--risk);
+    }
+
+    .badge.ready {
+      background: var(--ok);
+    }
+
+    .badge.warn {
+      background: var(--warn);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .ambition {
       border-left: 4px solid var(--accent);
-      padding: 12px 14px;
-      background: #eefafa;
-      margin-top: 10px;
+      padding: 12px;
+      background: #f8fbfb;
     }
-    .warning {
+
+    .ambition.recommended {
+      border-left-color: var(--accent-2);
+    }
+
+    .ambition.advanced {
       border-left-color: var(--warn);
-      background: #fff7e8;
     }
-    .risk {
-      color: var(--risk);
-      font-weight: 700;
+
+    .callout {
+      border-left: 4px solid var(--risk);
+      background: #fff7f7;
+      padding: 12px;
+      margin: 12px 0;
     }
-    .ok {
-      color: var(--ok);
-      font-weight: 700;
+
+    .small {
+      color: var(--muted);
+      font-size: 13px;
     }
-    @media (max-width: 820px) {
-      main {
-        width: min(100% - 20px, 1120px);
-        padding-top: 16px;
-      }
-      header, section {
-        padding: 18px;
-      }
-      .grid, .kv {
-        grid-template-columns: 1fr;
-      }
-      h1 {
-        font-size: 1.55rem;
-      }
-    }
+
     @media print {
       body {
         background: #ffffff;
       }
+
       main {
-        width: 100%;
-        padding: 0;
+        max-width: none;
+        padding: 14mm;
       }
-      header, section {
+
+      h2 {
+        break-after: avoid;
+      }
+
+      table, .panel, .ambition {
         break-inside: avoid;
-        border-color: #999;
-        border-radius: 0;
-      }
-      .badge {
-        border-color: #888;
       }
     }
   </style>
@@ -205,78 +201,108 @@
 <body>
   <main>
     <header>
-      <h1>FRDM-MCXA153 Push-to-Talk Walkie Talkie Prototype</h1>
-      <p class="subtitle">Scoping brief for an Embedded Engineering and Gen AI Summer School project. The original idea was: <strong>walkie talkie</strong>.</p>
+      <h1>FRDM-MCXA153 Autonomous Road-Following Car</h1>
+      <p>A scoped embedded project brief for Agent 1, based on a controlled self-driving vehicle concept using computer vision and TinyML where feasible.</p>
       <div class="meta">
-        <span class="badge mandatory">NXP FRDM-MCXA153 mandatory</span>
-        <span class="badge assumption">Input quality: vague</span>
-        <span class="badge ready">Ready with assumptions</span>
+        <div>
+          <span class="label">Agent</span>
+          Embedded Project Idea Scoping Agent v2.2
+        </div>
+        <div>
+          <span class="label">Fixed Platform</span>
+          <span class="badge mandatory">NXP FRDM-MCXA153 mandatory</span>
+        </div>
+        <div>
+          <span class="label">Readiness</span>
+          <span class="badge ready">Ready with assumptions</span>
+        </div>
+        <div>
+          <span class="label">Recommended Scope</span>
+          Sensor-assisted road following plus limited TinyML traffic cue recognition
+        </div>
       </div>
     </header>
 
     <section>
       <h2>Project Summary</h2>
-      <p>A student prototype that uses the NXP FRDM-MCXA153 as the controller for a push-to-talk audio communication device. The core version focuses on audio input, output, state control, and diagnostics. The recommended version adds short-range digital communication through an external 3.3 V-compatible module.</p>
-      <div class="kv">
-        <div class="key">Main objective</div>
-        <div>Demonstrate push-to-talk control, microphone input, speaker or headphone output, status feedback, and optional short-range audio packet transfer.</div>
-        <div class="key">Operating environment</div>
-        <div>Indoor lab or classroom prototype testing between two identical devices or between one device and a host-side simulator.</div>
-        <div class="key">Out of scope</div>
-        <div>Custom RF transmitter design, commercial walkie talkie compatibility, emergency communication use, and exact MCU pin assignment before hardware review.</div>
-      </div>
-    </section>
-
-    <section>
-      <h2>Fixed Platform</h2>
+      <p>The project is a small autonomous vehicle controlled by the NXP FRDM-MCXA153. It follows a controlled road track, reacts to simple traffic cues, and can scale from reliable sensor-based line following to constrained TinyML vision classification.</p>
       <table>
-        <tr><th>Item</th><th>Decision</th></tr>
-        <tr><td>Board</td><td>NXP FRDM-MCXA153</td></tr>
-        <tr><td>MCU</td><td>NXP MCXA153</td></tr>
-        <tr><td>Status</td><td>Mandatory user constraint</td></tr>
-        <tr><td>Pin policy</td><td>Use generic capabilities unless exact pins are provided.</td></tr>
-        <tr><td>Logic level policy</td><td>Assume 3.3 V logic unless verified otherwise.</td></tr>
+        <tr>
+          <th>Main objective</th>
+          <td>Demonstrate embedded autonomy through motor control, road tracking, traffic cue recognition, and safe navigation in a controlled indoor environment.</td>
+        </tr>
+        <tr>
+          <th>Intended user</th>
+          <td>Third-year university Computer Science student</td>
+        </tr>
+        <tr>
+          <th>Operating environment</th>
+          <td>Indoor lab track with printed or taped road lines, controlled lighting, low speed operation, and instructor-approved test zones.</td>
+        </tr>
+        <tr>
+          <th>Main behavior</th>
+          <td>The car starts safely, follows a marked road, slows or stops for recognized cues, responds to traffic signs or lights, and reports status through LEDs, serial logs, or an optional display.</td>
+        </tr>
       </table>
     </section>
 
     <section>
-      <h2>Scope Options</h2>
+      <h2>Fixed Platform</h2>
+      <div class="panel">
+        <p><strong>Board:</strong> NXP FRDM-MCXA153</p>
+        <p><strong>MCU:</strong> NXP MCXA153</p>
+        <p><strong>Status:</strong> Mandatory user constraint. This board must remain the main controller.</p>
+        <p><strong>Pin policy:</strong> Use generic capabilities such as GPIO-capable, ADC-capable, PWM-capable, I2C-capable, UART-capable, SPI-capable pins, and USB interface until exact routing is reviewed.</p>
+        <p><strong>Logic level policy:</strong> Assume 3.3 V logic unless verified otherwise.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Ambition Levels</h2>
       <div class="grid">
-        <article class="panel">
+        <article class="ambition">
           <h3>Core Student Version</h3>
-          <p><strong>Difficulty:</strong> Intermediate</p>
-          <p>Build a single-board push-to-talk audio interface with a button-controlled state machine, microphone level acquisition, simple output, LED feedback, and serial logs.</p>
+          <p><span class="badge">Intermediate</span></p>
+          <p>Build a safe road-following rover using the FRDM-MCXA153, a small chassis, a motor driver, reflectance or line sensors, and simple cue handling through colored markers or predefined stop zones.</p>
           <ul>
-            <li>Push-to-talk state machine</li>
-            <li>Microphone signal level capture</li>
-            <li>Speaker, buzzer, or headphone output</li>
-            <li>Idle, transmit, and error LEDs</li>
-            <li>Serial diagnostics</li>
+            <li>Two-wheel differential drive or equivalent low-speed chassis control</li>
+            <li>Line or road following using reflectance sensors or simple thresholded sensing</li>
+            <li>Start, stop, calibration, and emergency fault states</li>
+            <li>Basic speed control using PWM-capable outputs through a motor driver</li>
+            <li>Road-lost detection with safe stop behavior</li>
+            <li>Serial debug logs and status LED feedback</li>
           </ul>
+          <p class="small">Suitable because it teaches GPIO, timers, PWM, calibration, state machines, control loops, and safe hardware integration without depending on difficult camera performance.</p>
         </article>
-        <article class="panel">
-          <h3>Recommended Version</h3>
-          <p><strong>Difficulty:</strong> Intermediate</p>
-          <p>Create a two-device short-range digital prototype using two FRDM-MCXA153 boards and a 3.3 V-compatible external communication module.</p>
+
+        <article class="ambition recommended">
+          <h3>Recommended Summer School Version</h3>
+          <p><span class="badge warn">Advanced but feasible</span></p>
+          <p>Add constrained computer vision and TinyML classification for a small set of traffic signs or traffic light colors while keeping road following sensor-assisted and the environment highly controlled.</p>
           <ul>
-            <li>Half-duplex push-to-talk protocol</li>
-            <li>Audio frame buffering</li>
-            <li>External UART, SPI, or I2C communication module</li>
-            <li>Packet counters and receive status</li>
-            <li>Configurable channel or device ID</li>
+            <li>Low-resolution camera module with verified 3.3 V logic or proper level shifting</li>
+            <li>TinyML classifier for limited classes such as stop, speed marker, arrow, red light, and green light</li>
+            <li>Sensor-assisted road following so vision is used for decisions rather than all steering</li>
+            <li>Confidence thresholding with unknown or low-confidence fallback behavior</li>
+            <li>Behavior mapping from detected cue to stop, slow, turn, or continue</li>
+            <li>Dataset capture workflow and repeatable lab lighting assumptions</li>
           </ul>
+          <p class="small">Interesting because it makes the self-driving idea real while exposing microcontroller limits: tiny images, small models, deterministic control, power limits, and safety fallback states.</p>
         </article>
-        <article class="panel">
+
+        <article class="ambition advanced">
           <h3>Advanced Extension</h3>
-          <p><strong>Difficulty:</strong> Advanced</p>
-          <p>Improve audio handling and diagnostics with optional compression, logging, display status, pairing concepts, and PC-side visualization.</p>
+          <p><span class="badge warn">Optional advanced</span></p>
+          <p>Extend the recommended prototype with richer navigation, better TinyML validation, data logging, obstacle handling, and GenAI-assisted development artifacts.</p>
           <ul>
-            <li>Voice activity detection or simple compression</li>
-            <li>Ring buffers for audio frames</li>
-            <li>Latency and packet-loss logging</li>
-            <li>Optional display and external storage</li>
-            <li>Optional privacy or pairing concept</li>
+            <li>More traffic sign classes with an explicit unknown class</li>
+            <li>Traffic light recognition using color regions or TinyML</li>
+            <li>Obstacle stop or slow-down behavior using a distance sensor</li>
+            <li>Lap, route, or intersection state machine</li>
+            <li>Inference, sensor, motor, and failure data logging</li>
+            <li>PC-side dataset review and confusion matrix generation</li>
           </ul>
+          <p class="small">Risk controls include low vehicle speed, physical or firmware stop behavior, 3.3 V verification, separate motor power, and treating advanced work as optional.</p>
         </article>
       </div>
     </section>
@@ -284,86 +310,155 @@
     <section>
       <h2>Likely Hardware</h2>
       <table>
-        <tr><th>Component</th><th>Purpose</th><th>Likely Interface</th><th>Scope</th><th>Notes and Risks</th></tr>
-        <tr>
-          <td>Microphone module</td>
-          <td>Capture voice or voice-level input.</td>
-          <td>ADC-capable input or selected digital audio-capable interface</td>
-          <td>Core</td>
-          <td>Prefer 3.3 V-compatible modules. Raw microphone signals may need gain and filtering.</td>
-        </tr>
-        <tr>
-          <td>Speaker, buzzer, or headphone output</td>
-          <td>Provide tones or received audio playback.</td>
-          <td>PWM-capable output or external audio amplifier</td>
-          <td>Core</td>
-          <td>Do not drive a speaker directly from an MCU pin. Verify current and power limits.</td>
-        </tr>
-        <tr>
-          <td>Push-to-talk button</td>
-          <td>Enter transmit mode while pressed.</td>
-          <td>GPIO-capable pin</td>
-          <td>Core</td>
-          <td>Needs debounce handling.</td>
-        </tr>
-        <tr>
-          <td>Status LEDs</td>
-          <td>Show idle, transmit, receive, and error states.</td>
-          <td>GPIO-capable pins</td>
-          <td>Core</td>
-          <td>Use suitable current-limiting resistors and board-safe levels.</td>
-        </tr>
-        <tr>
-          <td>External short-range communication module</td>
-          <td>Exchange voice frames or simplified audio packets.</td>
-          <td>UART-capable, SPI-capable, or I2C-capable pins</td>
-          <td>Recommended</td>
-          <td>Must be legal, lab-approved, and voltage-compatible.</td>
-        </tr>
-        <tr>
-          <td>Small status display</td>
-          <td>Show channel, mode, link, and diagnostic data.</td>
-          <td>I2C-capable or SPI-capable pins</td>
-          <td>Advanced</td>
-          <td>Optional; LEDs and serial output are enough for earlier versions.</td>
-        </tr>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Purpose</th>
+            <th>Likely interface</th>
+            <th>Version</th>
+            <th>Notes and risks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Reflectance or line sensor array</td>
+            <td>Detect road line position</td>
+            <td>GPIO-capable, ADC-capable, or I2C-capable pins</td>
+            <td>Core</td>
+            <td>Prefer 3.3 V-compatible modules. Readings depend on surface, ambient light, and sensor height.</td>
+          </tr>
+          <tr>
+            <td>Low-resolution camera module</td>
+            <td>Capture constrained images for traffic cue detection</td>
+            <td>SPI-capable, I2C-capable plus parallel data, or UART-capable interface depending on module</td>
+            <td>Recommended</td>
+            <td>Verify logic level, frame size, frame rate, memory requirements, and SDK support before requirements freeze.</td>
+          </tr>
+          <tr>
+            <td>Dual DC motors or geared chassis</td>
+            <td>Move and steer the vehicle</td>
+            <td>Motor driver controlled by PWM-capable and GPIO-capable outputs</td>
+            <td>Core</td>
+            <td>Do not drive motors from MCU pins. Motor current and electrical noise are major risks.</td>
+          </tr>
+          <tr>
+            <td>Motor driver module</td>
+            <td>Interface MCU control signals to motors safely</td>
+            <td>PWM-capable outputs and GPIO-capable direction pins</td>
+            <td>Core</td>
+            <td>Must have 3.3 V-compatible logic input or documented level shifting.</td>
+          </tr>
+          <tr>
+            <td>Distance or obstacle sensor</td>
+            <td>Detect obstacles or end-of-track conditions</td>
+            <td>I2C-capable, GPIO-capable, ADC-capable, or timed digital signal</td>
+            <td>Advanced</td>
+            <td>Some sensors use 5 V echo or trigger signals and need careful timing.</td>
+          </tr>
+          <tr>
+            <td>USB serial debug connection</td>
+            <td>Log calibration, inference, motor commands, and faults</td>
+            <td>USB interface or board debug serial interface</td>
+            <td>Core</td>
+            <td>Important for tuning and observable requirements.</td>
+          </tr>
+        </tbody>
       </table>
-      <div class="callout warning">
-        <strong>Power note:</strong> Use the board's normal development power path for bench testing. Add external regulated power only after checking the current needs of audio amplifiers, radio modules, and any battery setup.
+    </section>
+
+    <section>
+      <h2>Power and Safety</h2>
+      <div class="callout">
+        <p><strong>Important:</strong> Motors, camera modules, and optional sensors may require power beyond what the board or USB path can safely provide. Motors must use an external driver and suitable supply. Do not assume 5 V compatibility with MCU signals.</p>
       </div>
+      <ul>
+        <li>Use USB or normal board development power for FRDM-MCXA153 logic during bring-up.</li>
+        <li>Use a separate regulated motor supply for the chassis if required by the motors and driver.</li>
+        <li>Review common ground, current limits, polarity, and protection before connecting power domains.</li>
+        <li>Keep vehicle speed low and test in an instructor-approved area.</li>
+        <li>Implement stop behavior before autonomous driving tests.</li>
+      </ul>
     </section>
 
     <section>
       <h2>Software Context</h2>
-      <p>Recommended development should follow the NXP-supported FRDM-MCXA153 workflow selected by course staff. Start from a minimal project that blinks LEDs and prints serial logs, then add push-to-talk input, microphone sampling or level reading, local output, and finally the communication module.</p>
-      <ul>
-        <li>Programming language: C</li>
-        <li>Starting point: new FRDM-MCXA153 project</li>
-        <li>Useful examples: GPIO, timers, serial debug, ADC or audio interface, UART, SPI, or I2C</li>
-        <li>Debugging: USB serial logs, on-board debugger, LED states, optional logic analyzer, optional host-side packet inspector</li>
-        <li>GenAI usage: requirements drafting, test generation, code review, debugging support, documentation generation</li>
-      </ul>
+      <table>
+        <tr>
+          <th>Development environment</th>
+          <td>NXP-supported embedded C workflow for FRDM-MCXA153, with board configuration reviewed before implementation.</td>
+        </tr>
+        <tr>
+          <th>Likely libraries</th>
+          <td>NXP MCUXpresso SDK or other NXP-supported SDK package; CMSIS-NN or a lightweight TinyML runtime if compatible; host-side dataset tools if permitted.</td>
+        </tr>
+        <tr>
+          <th>Language</th>
+          <td>C</td>
+        </tr>
+        <tr>
+          <th>Starting point</th>
+          <td>Prove GPIO, timer or PWM output, serial logging, and one sensor input before integrating motors and TinyML.</td>
+        </tr>
+        <tr>
+          <th>Debugging</th>
+          <td>USB serial logs, LED state indicators, on-board debugger if available, and optional host-side log parser.</td>
+        </tr>
+      </table>
     </section>
 
     <section>
       <h2>Assumptions</h2>
       <ol>
-        <li>The project is an educational prototype, not a certified consumer radio product.</li>
-        <li>Any over-the-air wireless link uses a pre-certified or lab-approved external communication module.</li>
-        <li>The recommended version may use reduced audio quality, simplified frames, or a host-side peer if two boards are unavailable.</li>
-        <li>All external modules are checked for 3.3 V logic compatibility before connection.</li>
+        <li>The vehicle will be a small tabletop or floor robot, not a road-capable vehicle.</li>
+        <li>Road following can be implemented with line or reflectance sensors in the core version.</li>
+        <li>TinyML classification will be limited to a small number of traffic signs or traffic light states.</li>
+        <li>The camera module and motor driver will be selected later based on 3.3 V logic compatibility and local availability.</li>
+        <li>The controlled environment will have consistent lighting and printed or taped road features.</li>
       </ol>
     </section>
 
     <section>
       <h2>Open Questions</h2>
       <table>
-        <tr><th>ID</th><th>Question</th><th>Why it matters</th></tr>
-        <tr><td>Q-001</td><td>Should the demo require real voice audio between two devices, or is staged audio-level and packet behavior acceptable?</td><td>Determines bandwidth, buffer size, module choice, and schedule risk.</td></tr>
-        <tr><td>Q-002</td><td>Which microphone, speaker amplifier, and wireless modules are available?</td><td>Drives interface choice, power design, and audio quality.</td></tr>
-        <tr><td>Q-003</td><td>Are two FRDM-MCXA153 boards available per team?</td><td>A two-device demo is natural, but a host-side peer can reduce hardware needs.</td></tr>
-        <tr><td>Q-004</td><td>What wireless bands, transmit powers, and lab policies are approved?</td><td>Over-the-air communication must remain legal and safe.</td></tr>
-        <tr><td>Q-005</td><td>Is portable battery operation required or optional?</td><td>Battery operation adds power, safety, enclosure, and testing complexity.</td></tr>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Question</th>
+            <th>Why it matters</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Q-001</td>
+            <td>Which chassis, motors, motor driver, and power source are available?</td>
+            <td>Determines speed control method, power safety requirements, and hardware integration effort.</td>
+          </tr>
+          <tr>
+            <td>Q-002</td>
+            <td>Which camera module is available and compatible with the FRDM-MCXA153 setup?</td>
+            <td>Camera interface, frame size, buffering, and SDK support determine whether TinyML vision is feasible.</td>
+          </tr>
+          <tr>
+            <td>Q-003</td>
+            <td>How many traffic signs and traffic light states must be recognized?</td>
+            <td>Class count affects dataset size, model complexity, memory use, and testing effort.</td>
+          </tr>
+          <tr>
+            <td>Q-004</td>
+            <td>Will students train a model before the lab or during the course?</td>
+            <td>TinyML preparation can dominate schedule if dataset capture and training are not planned early.</td>
+          </tr>
+          <tr>
+            <td>Q-005</td>
+            <td>What safety rules apply to moving robots in the lab?</td>
+            <td>Speed limits, test area rules, and emergency stop expectations should become requirements.</td>
+          </tr>
+          <tr>
+            <td>Q-006</td>
+            <td>Should traffic light recognition use camera color detection, a separate color sensor, or encoded lab fixtures?</td>
+            <td>The answer changes sensor selection, difficulty, and robustness.</td>
+          </tr>
+        </tbody>
       </table>
     </section>
 
@@ -373,46 +468,59 @@
         <div class="panel">
           <h3>Technical</h3>
           <ul>
-            <li>Audio capture and playback require bounded timing.</li>
-            <li>Communication bandwidth may be insufficient for raw audio.</li>
-            <li>Half-duplex behavior must be clearly defined.</li>
+            <li>Full camera-based steering and sign recognition may exceed schedule and compute budget.</li>
+            <li>Camera integration may be harder than line sensor and motor control integration.</li>
+            <li>Offline model accuracy may fail on the moving car due to blur, angle, or lighting.</li>
           </ul>
         </div>
         <div class="panel">
           <h3>Voltage and Power</h3>
           <ul>
-            <li>External modules may draw too much current from board headers.</li>
-            <li>Some breakouts may use 5 V logic.</li>
-            <li>Direct speaker drive from an MCU pin can damage hardware.</li>
+            <li>Modules may not be 3.3 V logic compatible.</li>
+            <li>Motor current can exceed USB or board power limits.</li>
+            <li>Voltage dips and motor noise can reset the MCU.</li>
           </ul>
         </div>
         <div class="panel">
-          <h3>Privacy and Safety</h3>
+          <h3>Timing and Memory</h3>
           <ul>
-            <li>Voice transmission may expose personal speech.</li>
-            <li>Unencrypted links may be observable nearby.</li>
-            <li>Battery and audio volume must be handled conservatively.</li>
+            <li>TinyML inference may block the control loop if scheduled poorly.</li>
+            <li>Image buffers, model weights, tensor arenas, and logs can exceed memory if image sizes are too large.</li>
+            <li>Storage, display, and telemetry features reduce resources available for inference.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>Safety and Privacy</h3>
+          <ul>
+            <li>Low speed, supervised testing, and stop behavior are required.</li>
+            <li>Datasets should avoid identifiable people and private spaces.</li>
+            <li>Wireless telemetry should not be treated as secure without explicit design work.</li>
           </ul>
         </div>
       </div>
     </section>
 
     <section>
-      <h2>Human Approval Required</h2>
-      <ul>
-        <li>Approve the selected scope: core, recommended, or advanced.</li>
-        <li>Approve the wireless module and confirm it is legal and lab-approved.</li>
-        <li>Approve external microphone and speaker amplifier modules after voltage and current checks.</li>
-        <li>Approve whether real voice exchange is required for the final demonstration.</li>
-        <li>Approve any battery-powered operation plan.</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>Agent 1 Readiness</h2>
-      <p><span class="badge ready">Ready for requirements engineering</span> <span class="badge assumption">Recommended scope: recommended version</span></p>
-      <p>The project is ready for requirements engineering if Agent 1 treats the target as a staged push-to-talk digital audio prototype and keeps exact pins, SDK calls, wireless module choice, and audio quality as decisions to confirm.</p>
-      <p><strong>Critical missing information:</strong> available audio and wireless modules, number of FRDM-MCXA153 boards per team, approved wireless policy, and required final audio fidelity.</p>
+      <h2>Agent 1 Handoff</h2>
+      <table>
+        <tr>
+          <th>Ready for requirements engineering</th>
+          <td>Yes</td>
+        </tr>
+        <tr>
+          <th>Recommended scope</th>
+          <td>Recommended version: sensor-assisted road following plus limited TinyML traffic cue recognition.</td>
+        </tr>
+        <tr>
+          <th>Readiness status</th>
+          <td>Ready with assumptions</td>
+        </tr>
+        <tr>
+          <th>Critical missing information</th>
+          <td>Exact chassis and motor driver; exact camera or vision sensor module; available memory budget; approved traffic cue classes; power source and safety constraints.</td>
+        </tr>
+      </table>
+      <p>Agent 1 should keep the core line-following version independently demonstrable and make advanced features optional.</p>
     </section>
   </main>
 </body>

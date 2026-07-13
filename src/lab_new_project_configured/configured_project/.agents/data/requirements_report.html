@@ -3,57 +3,145 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Requirements Report - FRDM-MCXA153 Walkie Talkie Prototype</title>
+  <title>Requirements Report - FRDM-MCXA153 Autonomous Road-Following Car</title>
   <style>
-    :root { --ink:#17202a; --muted:#5d6d7e; --line:#d7dbdd; --bg:#f7f9fb; --panel:#ffffff; --core:#1f7a4d; --rec:#1f5f99; --adv:#8a5a00; --risk:#a93226; }
+    :root {
+      --ink: #172026;
+      --muted: #5b6975;
+      --paper: #ffffff;
+      --bg: #eef3f5;
+      --soft: #f6f8fa;
+      --line: #d8e0e6;
+      --core: #047857;
+      --rec: #1d4ed8;
+      --adv: #b45309;
+      --risk: #b91c1c;
+    }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.45; }
-    main { max-width: 1180px; margin: 0 auto; padding: 28px; }
-    header, section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 22px; margin: 0 0 18px; }
-    h1 { margin: 0 0 8px; font-size: 30px; }
-    h2 { margin: 0 0 14px; font-size: 22px; border-bottom: 2px solid var(--line); padding-bottom: 8px; }
-    h3 { margin: 18px 0 8px; font-size: 17px; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.45;
+    }
+    main {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 28px;
+      background: var(--paper);
+      min-height: 100vh;
+    }
+    header {
+      border-bottom: 4px solid var(--rec);
+      padding-bottom: 18px;
+      margin-bottom: 22px;
+    }
+    h1, h2, h3 { margin: 0 0 10px; line-height: 1.2; }
+    h1 { font-size: 30px; letter-spacing: 0; }
+    h2 {
+      font-size: 21px;
+      margin-top: 28px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--line);
+    }
+    h3 { font-size: 16px; margin-top: 16px; }
     p { margin: 0 0 10px; }
-    ul, ol { margin-top: 6px; padding-left: 22px; }
-    table { width: 100%; border-collapse: collapse; margin: 10px 0 16px; font-size: 14px; }
-    th, td { border: 1px solid var(--line); padding: 8px; vertical-align: top; }
-    th { background: #edf2f7; text-align: left; }
-    code { background: #eef1f5; padding: 1px 4px; border-radius: 4px; }
-    .badge { display: inline-block; padding: 4px 9px; border-radius: 999px; color: white; font-weight: 700; font-size: 12px; }
-    .ready { background: var(--rec); }
+    ul, ol { margin: 8px 0 14px; padding-left: 22px; }
+    li { margin-bottom: 5px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 18px;
+      font-size: 13px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 8px 9px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: var(--soft); font-weight: 700; }
+    code { font-family: Consolas, "Courier New", monospace; font-size: 0.95em; }
+    .meta, .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+    }
+    .box, .card {
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 3px;
+    }
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 3px 9px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      background: var(--rec);
+    }
     .core { background: var(--core); }
     .recommended { background: var(--rec); }
     .advanced { background: var(--adv); }
     .risk { background: var(--risk); }
-    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-    .note { color: var(--muted); }
-    .checklist label { display: block; margin: 6px 0; }
-    .small { font-size: 13px; }
-    @media print {
-      body { background: white; }
-      main { max-width: none; padding: 0; }
-      header, section { break-inside: avoid; border-radius: 0; }
-      a { color: inherit; text-decoration: none; }
+    .toc a { color: var(--rec); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .note {
+      border-left: 4px solid var(--adv);
+      background: #fff8ed;
+      padding: 10px 12px;
+      margin: 12px 0;
     }
-    @media (max-width: 760px) {
-      main { padding: 12px; }
-      .grid { grid-template-columns: 1fr; }
-      table { font-size: 12px; }
-      th, td { padding: 6px; }
+    .danger {
+      border-left: 4px solid var(--risk);
+      background: #fff5f5;
+      padding: 10px 12px;
+      margin: 12px 0;
+    }
+    .checklist {
+      columns: 2;
+      list-style: none;
+      padding-left: 0;
+    }
+    .checklist li { break-inside: avoid; }
+    .small { color: var(--muted); font-size: 12px; }
+    @media print {
+      body { background: #fff; }
+      main { max-width: none; padding: 12mm; }
+      a { color: inherit; text-decoration: none; }
+      table, .box, .card { break-inside: avoid; }
+      h2, h3 { break-after: avoid; }
+      .checklist { columns: 1; }
     }
   </style>
 </head>
 <body>
 <main>
   <header>
-    <span class="badge ready">READY WITH ASSUMPTIONS</span>
     <h1>Requirements and Specification Package</h1>
-    <p><strong>Project:</strong> FRDM-MCXA153 Walkie Talkie Prototype</p>
-    <p><strong>Generated for:</strong> Embedded Engineering and Gen AI Summer School, third-year Computer Science students</p>
-    <p><strong>Generation note:</strong> Human-review draft generated from Agent 0 scoping JSON. AI assists; humans decide.</p>
+    <p><strong>Project:</strong> FRDM-MCXA153 Autonomous Road-Following Car</p>
+    <p class="small">Generated from <code>.agents/data/project_scoping_brief.json</code> for human review. Requirements are drafts until approved by humans.</p>
+    <div class="meta">
+      <div class="box"><span class="label">Target Board</span><span class="badge risk">NXP FRDM-MCXA153 mandatory</span></div>
+      <div class="box"><span class="label">MCU</span>NXP MCXA153</div>
+      <div class="box"><span class="label">Selected Scope</span><span class="badge recommended">Recommended</span></div>
+      <div class="box"><span class="label">Final Status</span><span class="badge recommended">READY FOR HUMAN REVIEW</span></div>
+    </div>
   </header>
 
-  <section>
+  <section id="toc" class="toc">
     <h2>Table of Contents</h2>
     <ol>
       <li><a href="#interpretation">Input Interpretation and Selected Scope</a></li>
@@ -74,91 +162,111 @@
 
   <section id="interpretation">
     <h2>1. Input Interpretation and Selected Scope</h2>
-    <div class="grid">
-      <div>
-        <p><strong>Purpose:</strong> Build a push-to-talk embedded audio communication prototype that starts with local audio capture/playback and can extend toward short-range wireless voice transfer.</p>
-        <p><strong>Mandatory target board:</strong> NXP FRDM-MCXA153 with NXP MCXA153 MCU.</p>
-        <p><strong>Intended user:</strong> Third-year Computer Science student.</p>
-        <p><strong>Operating environment:</strong> Indoor laboratory or classroom prototype environment with controlled power and supervised hardware integration.</p>
-      </div>
-      <div>
-        <p><strong>Available ambition levels:</strong> <span class="badge core">core</span> <span class="badge recommended">recommended</span> <span class="badge advanced">advanced</span></p>
-        <p><strong>Selected scope for requirements:</strong> Recommended summer school version, with a core one-board milestone and optional advanced extensions.</p>
-        <p><strong>Readiness status:</strong> Ready with assumptions.</p>
-        <p><strong>Critical missing information:</strong> number of boards, available audio modules, wireless module, continuous speech versus short clips, allowed wireless technology and range.</p>
-      </div>
-    </div>
-    <h3>Facts from User and Agent 0</h3>
+    <table>
+      <tr><th>Project name</th><td>FRDM-MCXA153 Autonomous Road-Following Car</td></tr>
+      <tr><th>Purpose</th><td>Teach embedded sensing, motor control, state machines, TinyML tradeoffs, and safe prototype autonomy using a constrained microcontroller platform.</td></tr>
+      <tr><th>Target board</th><td>NXP FRDM-MCXA153 with NXP MCXA153 MCU. This is mandatory, not an assumption.</td></tr>
+      <tr><th>Intended user</th><td>Third-year university Computer Science student.</td></tr>
+      <tr><th>Operating environment</th><td>Indoor lab track with printed or taped road lines, controlled lighting, low speed operation, and instructor-approved test zones.</td></tr>
+      <tr><th>Available ambition levels</th><td>Core student prototype, recommended summer school version, and optional advanced extension.</td></tr>
+      <tr><th>Selected scope</th><td>Recommended: sensor-assisted road following plus limited TinyML traffic cue recognition. Core line following must remain independently demonstrable.</td></tr>
+      <tr><th>Readiness status from Agent 0</th><td>Ready with assumptions.</td></tr>
+      <tr><th>Critical missing information</th><td>Exact chassis and motor driver; exact camera or vision sensor module; available memory budget after chosen runtime and SDK setup; approved traffic cue classes; power source and safety constraints.</td></tr>
+    </table>
+    <h3>Facts From User</h3>
     <ul>
-      <li>The project idea is “walkie talkie”.</li>
-      <li>The project must use the NXP FRDM-MCXA153 board.</li>
-      <li>Exact pins and SDK APIs must not be invented.</li>
-      <li>The output report must separate core, recommended, and advanced requirements and include tests, traceability, risks, and human review.</li>
+      <li>Project concept is an autonomous self-driving vehicle.</li>
+      <li>Vehicle should use computer vision and TinyML on a microcontroller.</li>
+      <li>Vehicle should follow a road.</li>
+      <li>Vehicle should recognize traffic signs and traffic lights.</li>
+      <li>Vehicle should navigate autonomously in a controlled environment.</li>
+      <li>Project must use the NXP FRDM-MCXA153 board.</li>
     </ul>
     <h3>Agent 0 Assumptions</h3>
     <ul>
-      <li>The project is an educational lab prototype, not a certified consumer radio product.</li>
-      <li>Two boards may be available for the recommended version, but the core version must work with one board.</li>
-      <li>Short-range classroom communication is sufficient.</li>
-      <li>Low-fidelity voice or short audio clips are acceptable for the recommended version.</li>
+      <li>A-001: The vehicle will be a small tabletop or floor robot, not a road-capable vehicle.</li>
+      <li>A-002: Road following can be implemented with line or reflectance sensors in the core version.</li>
+      <li>A-003: TinyML classification will be limited to a small number of traffic signs or traffic light states.</li>
+      <li>A-004: The camera module and motor driver will be selected later based on 3.3 V logic compatibility and local availability.</li>
+      <li>A-005: The controlled environment will have consistent lighting and printed or taped road features.</li>
     </ul>
     <h3>Additional Agent 1 Assumptions</h3>
     <ul>
-      <li>USB-powered operation is acceptable for first implementation and verification.</li>
-      <li>Core acceptance can be demonstrated by state changes, serial logs, and observable audio-level or playback behavior.</li>
-      <li>Wireless voice transfer may use short buffered clips if continuous streaming is not feasible.</li>
-      <li>All numeric thresholds in this report are AI assumptions pending human approval.</li>
+      <li>AI-A1-001: The first approved build target is the recommended tier, with core features verified before TinyML integration.</li>
+      <li>AI-A1-002: Initial track speed shall be limited by an instructor-approved setting; any numeric speed value remains unresolved until hardware is selected.</li>
+      <li>AI-A1-003: The TinyML cue set shall start with at least stop and go/green behavior; the exact class list requires human approval.</li>
+      <li>AI-A1-004: Camera data shall not intentionally include identifiable people.</li>
     </ul>
     <h3>Human Approvals Needed</h3>
     <ul>
-      <li>Approve selected tier and whether the recommended scope requires two FRDM-MCXA153 boards.</li>
-      <li>Approve microphone, audio output, display, and wireless modules after voltage and current review.</li>
-      <li>Approve short voice clips as an acceptable fallback to continuous speech streaming.</li>
-      <li>Approve radio use according to lab policy and local regulations.</li>
-      <li>Approve whether battery operation is in or out of scope.</li>
+      <li>Approve small controlled-track robot interpretation and selected recommended tier.</li>
+      <li>Approve core line or reflectance sensing for baseline road following.</li>
+      <li>Select or approve chassis, motor driver, camera module, power source, and optional sensors.</li>
+      <li>Approve traffic sign and traffic light classes.</li>
+      <li>Confirm lab safety rules, maximum speed policy, emergency stop behavior, and battery permission.</li>
     </ul>
   </section>
 
   <section id="tiers">
     <h2>2. Feature Tiers</h2>
     <table>
-      <thead><tr><th>Tier</th><th>Features</th><th>Extra Components</th><th>Main Risks</th><th>Student Suitability</th></tr></thead>
+      <thead><tr><th>Tier</th><th>Features</th><th>Extra components</th><th>Main risks</th><th>Student suitability</th></tr></thead>
       <tbody>
-        <tr><td><span class="badge core">Core</span></td><td>Push-to-talk button, microphone activity capture, LED states, serial debug, local audio level or playback demo.</td><td>3.3 V-compatible microphone module, safe speaker or audio output path, LEDs/buttons.</td><td>Audio quality, microphone gain, debouncing, safe speaker drive.</td><td>Suitable with instructor-provided starter project.</td></tr>
-        <tr><td><span class="badge recommended">Recommended</span></td><td>Two-device half-duplex behavior, packetized low-rate audio or short clips, link state, packet counters, error reporting.</td><td>Second FRDM-MCXA153, 3.3 V-compatible wireless modules, optional mode/channel buttons.</td><td>Bandwidth, latency, packet loss, module driver effort.</td><td>Achievable if audio fidelity expectations are conservative.</td></tr>
-        <tr><td><span class="badge advanced">Advanced</span></td><td>Voice activity detection, companding or compression, channel selection, diagnostics display, logging, optional edge AI concept.</td><td>Display, codec or digital audio path, optional storage or host dashboard, optional battery system.</td><td>Memory pressure, timing jitter, battery safety, AI/model complexity.</td><td>Optional extension for stronger teams.</td></tr>
+        <tr>
+          <td><span class="badge core">Core</span></td>
+          <td>Low-speed chassis, line or reflectance road following, start/stop/calibration states, PWM motor control through driver, road-lost stop, LED and serial debug.</td>
+          <td>Chassis, dual motors, motor driver, line or reflectance sensor array, start/stop input.</td>
+          <td>Motor power, sensor calibration, vehicle runaway if faults are not handled.</td>
+          <td>Suitable and realistic for third-year CS students with instructor hardware review.</td>
+        </tr>
+        <tr>
+          <td><span class="badge recommended">Recommended</span></td>
+          <td>Low-resolution camera, limited TinyML cue classifier, confidence thresholding, behavior mapping for stop/slow/turn/continue, dataset workflow, debug output.</td>
+          <td>Camera module and traffic cue fixtures or printed signs.</td>
+          <td>Memory limits, camera integration, lighting sensitivity, inference timing.</td>
+          <td>Ambitious but feasible if the cue set and environment are tightly constrained.</td>
+        </tr>
+        <tr>
+          <td><span class="badge advanced">Advanced</span></td>
+          <td>More classes, obstacle handling, lap or intersection state machine, data logging, PC-side model evaluation, optional telemetry, optional display.</td>
+          <td>Distance sensor, storage or host logging path, display, telemetry module, protected battery pack.</td>
+          <td>Integration complexity, timing interference, power draw, privacy and telemetry assumptions.</td>
+          <td>Optional extension for teams that complete core and recommended behavior early.</td>
+        </tr>
       </tbody>
     </table>
   </section>
 
   <section id="scenarios">
     <h2>3. Scenarios and User Stories</h2>
+    <h3>Scenarios</h3>
     <table>
-      <thead><tr><th>ID</th><th>Scenario</th><th>Description</th></tr></thead>
+      <thead><tr><th>ID</th><th>Name</th><th>Description</th></tr></thead>
       <tbody>
-        <tr><td>SC-001</td><td>Startup/setup</td><td>System powers on, initializes configured modules, and reports idle or fault state.</td></tr>
-        <tr><td>SC-002</td><td>Normal operation</td><td>User presses push-to-talk, speaks, releases the button, and the device returns to receive or idle mode.</td></tr>
-        <tr><td>SC-003</td><td>User interaction</td><td>User observes LEDs or display to identify idle, transmit, receive, link, and error states.</td></tr>
-        <tr><td>SC-004</td><td>Sensor/input processing</td><td>System reads a button and microphone or audio input path without using exact unverified pins.</td></tr>
-        <tr><td>SC-005</td><td>Actuator/output behavior</td><td>System drives LEDs and safe audio output through suitable interface circuitry.</td></tr>
-        <tr><td>SC-006</td><td>Communication/logging</td><td>Recommended version exchanges audio packets or short clips and logs packet statistics.</td></tr>
-        <tr><td>SC-007</td><td>Advanced behavior</td><td>Optional features process audio activity, show richer diagnostics, or log quality metrics.</td></tr>
-        <tr><td>SC-008</td><td>Error/fault handling</td><td>System reports missing peer, audio input fault, buffer overflow, or module initialization failure.</td></tr>
-        <tr><td>SC-009</td><td>Debugging/maintenance</td><td>Developer uses serial logs, LEDs, oscilloscope, or logic analyzer evidence to verify behavior.</td></tr>
-        <tr><td>SC-010</td><td>Safety/reliability</td><td>System avoids unsafe current draw, unverified 5 V logic, direct speaker drive, and uncontrolled battery behavior.</td></tr>
+        <tr><td>SC-001</td><td>Startup and setup</td><td>Student powers the board, keeps motors disabled or lifted for checks, verifies status LED, and confirms serial debug is active.</td></tr>
+        <tr><td>SC-002</td><td>Calibration</td><td>Student calibrates line sensors or camera thresholds under current lighting before autonomous operation.</td></tr>
+        <tr><td>SC-003</td><td>Normal road following</td><td>Vehicle follows a marked road using sensor feedback and low-speed motor commands.</td></tr>
+        <tr><td>SC-004</td><td>User interaction</td><td>Student uses start, stop, and mode or calibration controls to manage autonomous behavior.</td></tr>
+        <tr><td>SC-005</td><td>Sensor and input processing</td><td>Firmware samples road sensors, optional camera frames, and button states without assuming exact pins.</td></tr>
+        <tr><td>SC-006</td><td>Actuator behavior</td><td>Firmware commands left and right motors through a motor driver and reports state through LEDs.</td></tr>
+        <tr><td>SC-007</td><td>TinyML traffic cue handling</td><td>Recommended tier classifies a limited cue set and maps accepted detections to vehicle behavior.</td></tr>
+        <tr><td>SC-008</td><td>Data logging and debugging</td><td>System emits serial logs for calibration values, motor commands, detections, confidence, and faults.</td></tr>
+        <tr><td>SC-009</td><td>Advanced behavior</td><td>Optional features add obstacle detection, route state, telemetry, display, or data logging.</td></tr>
+        <tr><td>SC-010</td><td>Error and safety handling</td><td>Vehicle enters a safe stopped state on road loss, stop input, low confidence, sensor fault, or power concern.</td></tr>
       </tbody>
     </table>
+    <h3>User Stories</h3>
     <table>
-      <thead><tr><th>ID</th><th>User Story</th></tr></thead>
+      <thead><tr><th>ID</th><th>Story</th></tr></thead>
       <tbody>
-        <tr><td>US-001</td><td>As a student developer, I need the FRDM-MCXA153 to be the main controller, so that the project satisfies the fixed platform requirement.</td></tr>
-        <tr><td>US-002</td><td>As a walkie-talkie user, I need a push-to-talk control, so that I can intentionally enter transmit mode.</td></tr>
-        <tr><td>US-003</td><td>As a walkie-talkie user, I need microphone activity to be captured, so that my speech can be processed or sent.</td></tr>
-        <tr><td>US-004</td><td>As a walkie-talkie user, I need audible or visual feedback, so that I know the device is responding.</td></tr>
-        <tr><td>US-005</td><td>As a demonstrator, I need a peer communication mode, so that the project behaves like a walkie talkie.</td></tr>
-        <tr><td>US-006</td><td>As a developer, I need debug logs and status indicators, so that I can diagnose timing, packet, and hardware issues.</td></tr>
-        <tr><td>US-007</td><td>As an instructor, I need safe electrical integration, so that students do not damage the board or modules.</td></tr>
-        <tr><td>US-008</td><td>As an advanced student, I need optional audio processing and diagnostics, so that I can explore richer embedded behavior.</td></tr>
+        <tr><td>US-001</td><td>As a student, I need the car to initialize predictably, so that I can test hardware without unexpected motor movement.</td></tr>
+        <tr><td>US-002</td><td>As a student, I need to calibrate sensors, so that the vehicle can adapt to the current track and lighting.</td></tr>
+        <tr><td>US-003</td><td>As a student, I need the car to follow a marked road, so that the core autonomous behavior is demonstrable.</td></tr>
+        <tr><td>US-004</td><td>As a reviewer, I need visible and serial status output, so that I can understand the system state during a demonstration.</td></tr>
+        <tr><td>US-005</td><td>As a student, I need the car to stop on fault or stop input, so that testing remains controlled.</td></tr>
+        <tr><td>US-006</td><td>As a student, I need traffic cue recognition, so that the recommended version demonstrates TinyML-assisted decisions.</td></tr>
+        <tr><td>US-007</td><td>As an instructor, I need evidence from tests, so that I can approve progress toward implementation.</td></tr>
+        <tr><td>US-008</td><td>As an advanced team, I need optional logging or telemetry, so that model and navigation behavior can be reviewed after a run.</td></tr>
       </tbody>
     </table>
   </section>
@@ -166,22 +274,28 @@
   <section id="functional">
     <h2>4. Functional Requirements</h2>
     <table>
-      <thead><tr><th>ID</th><th>Tier</th><th>Requirement</th><th>Source</th><th>Story</th><th>Component</th><th>Priority</th><th>Verification</th><th>Acceptance Criterion</th><th>Quality</th></tr></thead>
+      <thead>
+        <tr><th>ID</th><th>Tier</th><th>Statement</th><th>Source</th><th>Story</th><th>Component/module</th><th>Priority</th><th>Verification</th><th>Acceptance criterion</th><th>Quality check</th></tr>
+      </thead>
       <tbody>
-        <tr><td>FR-001</td><td>core</td><td>The system shall use the NXP FRDM-MCXA153 board as the main controller platform.</td><td>user fact</td><td>US-001</td><td>Main board</td><td>Must</td><td>inspection</td><td>Hardware review confirms FRDM-MCXA153 is the only main controller.</td><td>atomic, clear, verifiable, traceable</td></tr>
-        <tr><td>FR-002</td><td>core</td><td>When powered from the approved source, the system shall initialize configured inputs, outputs, audio path, and debug reporting.</td><td>derived</td><td>US-006</td><td>Firmware startup</td><td>Must</td><td>test</td><td>Serial log or LED sequence shows startup complete or a named fault.</td><td>atomic, clear, verifiable, traceable</td></tr>
-        <tr><td>FR-003</td><td>core</td><td>When the push-to-talk button state changes, the system shall debounce the input before changing operating state.</td><td>derived</td><td>US-002</td><td>Button input</td><td>Must</td><td>test</td><td>At least 20 deliberate presses produce no unintended multiple state changes; threshold is an AI assumption.</td><td>atomic, clear, verifiable, traceable</td></tr>
-        <tr><td>FR-004</td><td>core</td><td>While push-to-talk is active, the system shall enter transmit or record state and indicate that state to the user.</td><td>derived</td><td>US-002</td><td>State machine, LEDs</td><td>Must</td><td>demonstration</td><td>Transmit indicator is active for the duration of the pressed button.</td><td>atomic, clear, verifiable, traceable</td></tr>
-        <tr><td>FR-005</td><td>core</td><td>While in transmit or record state, the system shall capture microphone or audio input samples or audio activity measurements.</td><td>derived</td><td>US-003</td><td>Audio input</td><td>Must</td><td>test</td><td>Serial output, meter, or captured buffer changes when speech or a test tone is applied.</td><td>atomic, clear, verifiable, traceable</td></tr>
-        <tr><td>FR-006</td><td>core</td><td>The system shall provide an observable local audio-level or local playback demonstration.</td><td>Agent 0 assumption</td><td>US-004</td><td>Audio output/UI</td><td>Must</td><td>demonstration</td><td>Reviewer observes level indication or playback from a captured short buffer.</td><td>atomic, clear, verifiable, traceable</td></tr>
-        <tr><td>FR-007</td><td>core</td><td>If a configured core audio input or output path cannot be initialized, the system shall enter an error state and report the failed module through LED or serial debug output.</td><td>derived</td><td>US-006</td><td>Error handling</td><td>Must</td><td>test</td><td>Fault injection produces a named error state without misleading transmit indication.</td><td>atomic, clear, verifiable, traceable</td></tr>
-        <tr><td>FR-008</td><td>recommended</td><td>The system should support a paired-device half-duplex mode using two FRDM-MCXA153-based prototypes and approved communication modules.</td><td>Agent 0 assumption</td><td>US-005</td><td>Wireless link</td><td>Should</td><td>demonstration</td><td>One device transmits while the peer receives in a controlled lab setup.</td><td>atomic, clear, verifiable, traceable</td></tr>
-        <tr><td>FR-009</td><td>recommended</td><td>When operating in paired mode, the transmitting device should package audio samples or short voice clips into framed messages for the peer device.</td><td>derived</td><td>US-005</td><td>Packetizer</td><td>Should</td><td>test</td><td>Receiver log shows valid frame count increasing during transmit.</td><td>atomic, clear, verifiable, traceable</td></tr>
-        <tr><td>FR-010</td><td>recommended</td><td>When valid audio frames are received, the receiving device should play or otherwise present the received audio content.</td><td>derived</td><td>US-005</td><td>Receiver/audio output</td><td>Should</td><td>demonstration</td><td>Reviewer hears playback or observes a decoded audio-level trace tied to received frames.</td><td>atomic, clear, verifiable, traceable</td></tr>
-        <tr><td>FR-011</td><td>recommended</td><td>The system should report link, transmit, receive, and packet-error status through serial debug output and at least one visible indicator.</td><td>derived</td><td>US-006</td><td>Debug/UI</td><td>Should</td><td>test</td><td>Status output changes correctly during idle, transmit, receive, and link-fault conditions.</td><td>atomic, clear, verifiable, traceable</td></tr>
-        <tr><td>FR-012</td><td>advanced</td><td>The system could estimate voice activity from captured audio to suppress silent packets or annotate logs.</td><td>Agent 0 assumption</td><td>US-008</td><td>Audio processing</td><td>Could</td><td>analysis/test</td><td>Voice activity flag changes between quiet room and speech samples in a repeatable demo; threshold is an AI assumption.</td><td>atomic, clear, verifiable, traceable</td></tr>
-        <tr><td>FR-013</td><td>advanced</td><td>The system could apply simple companding or compression to audio data before transmission.</td><td>Agent 0 assumption</td><td>US-008</td><td>Audio processing</td><td>Could</td><td>test</td><td>Encoded and decoded test samples remain recognizable and frame size is reduced or normalized.</td><td>atomic, clear, verifiable, traceable</td></tr>
-        <tr><td>FR-014</td><td>advanced</td><td>The system could show channel, state, packet count, or battery estimate on an approved display module.</td><td>Agent 0 assumption</td><td>US-008</td><td>Display</td><td>Could</td><td>demonstration</td><td>Display updates match serial state during a transmit/receive demo.</td><td>atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-001</td><td>Core</td><td>The system shall use the NXP FRDM-MCXA153 board as the main controller platform.</td><td>User fact</td><td>US-001</td><td>Main controller</td><td>Must</td><td>Inspection</td><td>Hardware review identifies FRDM-MCXA153 as the only main controller.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-002</td><td>Core</td><td>When powered, the system shall initialize into a stopped state before enabling motor commands.</td><td>Derived</td><td>US-001</td><td>Startup/state machine</td><td>Must</td><td>Test</td><td>No motor command is observed before explicit start command.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-003</td><td>Core</td><td>The system shall provide a calibration mode for road sensing before autonomous road following.</td><td>Agent 0 assumption</td><td>US-002</td><td>Calibration</td><td>Must</td><td>Demonstration</td><td>Serial log or LED confirms calibration entered and completed.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-004</td><td>Core</td><td>While in autonomous mode, the system shall read road-following sensor input and estimate road position relative to the vehicle.</td><td>Derived</td><td>US-003</td><td>Road sensing</td><td>Must</td><td>Test</td><td>Sensor values and estimated position change when the vehicle is moved across the marked road.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-005</td><td>Core</td><td>While road position is available, the system shall command left and right motor outputs through a motor driver to follow the marked road.</td><td>Derived</td><td>US-003</td><td>Motor control</td><td>Must</td><td>Demonstration</td><td>Vehicle completes an approved track segment without leaving the marked path.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-006</td><td>Core</td><td>If the road-following input is lost, the system shall command a stopped state and report a road-lost fault.</td><td>Derived</td><td>US-005</td><td>Fault handling</td><td>Must</td><td>Test</td><td>Motors stop and debug output identifies road-lost condition.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-007</td><td>Core</td><td>When the stop control is activated, the system shall command motors to stop and remain stopped until a new start sequence is accepted.</td><td>Derived</td><td>US-005</td><td>User input/safety</td><td>Must</td><td>Test</td><td>Stop input overrides autonomous behavior in every tested operating state.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-008</td><td>Core</td><td>The system shall indicate idle, calibration, autonomous, stop, and fault states using LEDs or equivalent visible output.</td><td>Derived</td><td>US-004</td><td>Status UI</td><td>Must</td><td>Demonstration</td><td>Reviewer can identify each state from the documented visible indication.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-009</td><td>Core</td><td>The system shall output serial debug messages for startup, calibration, road position, motor command state, and fault events.</td><td>Derived</td><td>US-004</td><td>Debug logging</td><td>Must</td><td>Test</td><td>Captured serial log contains each required event type during test run.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-010</td><td>Recommended</td><td>The system shall capture low-resolution camera input for traffic cue processing when the approved camera module is present.</td><td>Derived</td><td>US-006</td><td>Vision input</td><td>Should</td><td>Test</td><td>Debug output confirms at least one captured frame or image summary from the approved module.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-011</td><td>Recommended</td><td>The system shall classify an approved limited set of traffic signs or traffic light states using a TinyML model or approved constrained vision method.</td><td>User fact</td><td>US-006</td><td>TinyML inference</td><td>Should</td><td>Test</td><td>Each approved class can be detected during a controlled static or moving test.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-012</td><td>Recommended</td><td>If traffic cue confidence is below the approved threshold, the system shall treat the cue as unknown and use fallback behavior.</td><td>Agent 1 assumption</td><td>US-006</td><td>Decision logic</td><td>Should</td><td>Test</td><td>Low-confidence sample produces unknown classification and fallback action in the log.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-013</td><td>Recommended</td><td>When an approved stop cue is recognized, the system shall command the vehicle to stop before continuing autonomous behavior.</td><td>User fact</td><td>US-006</td><td>Behavior mapping</td><td>Should</td><td>Demonstration</td><td>Vehicle stops after the approved stop cue is presented on the controlled track.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-014</td><td>Recommended</td><td>When an approved continue or green-light cue is recognized, the system shall allow road-following behavior to continue if no fault is active.</td><td>User fact</td><td>US-006</td><td>Behavior mapping</td><td>Should</td><td>Demonstration</td><td>Vehicle continues road following after recognized continue cue and no active fault.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-015</td><td>Recommended</td><td>The system shall report detected traffic cue class, confidence category, and selected action through serial debug output.</td><td>Derived</td><td>US-004</td><td>Vision debug</td><td>Should</td><td>Test</td><td>Log includes class, confidence category, and action for each processed cue event.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-016</td><td>Advanced</td><td>The system could stop or slow when an approved obstacle sensor reports an obstacle condition.</td><td>Agent 0 assumption</td><td>US-008</td><td>Obstacle sensing</td><td>Could</td><td>Demonstration</td><td>Vehicle changes to approved obstacle behavior when test target is presented.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-017</td><td>Advanced</td><td>The system could store or stream run data including sensor readings, inference results, motor commands, and fault events.</td><td>Agent 0 assumption</td><td>US-008</td><td>Logging/telemetry</td><td>Could</td><td>Test</td><td>Saved or streamed run record contains all approved fields.</td><td>Atomic, clear, verifiable, traceable</td></tr>
+        <tr><td>FR-018</td><td>Advanced</td><td>The system could show mode, detected cue, confidence category, and fault state on an optional display.</td><td>Agent 0 assumption</td><td>US-008</td><td>Display UI</td><td>Could</td><td>Demonstration</td><td>Display updates match serial debug state for tested events.</td><td>Atomic, clear, verifiable, traceable</td></tr>
       </tbody>
     </table>
   </section>
@@ -189,91 +303,96 @@
   <section id="nonfunctional">
     <h2>5. Non-Functional Requirements</h2>
     <table>
-      <thead><tr><th>ID</th><th>Tier</th><th>Category</th><th>Statement</th><th>Threshold or Metric</th><th>Source</th><th>Verification</th><th>Risk if Not Satisfied</th></tr></thead>
+      <thead><tr><th>ID</th><th>Tier</th><th>Category</th><th>Statement</th><th>Threshold or metric</th><th>Threshold source</th><th>Verification</th><th>Risk if not satisfied</th></tr></thead>
       <tbody>
-        <tr><td>NFR-001</td><td>core</td><td>safety</td><td>All external components connected to the FRDM-MCXA153 shall be electrically compatible with the board logic level and current limits, or shall use appropriate interface circuitry.</td><td>3.3 V logic compatibility or documented level shifting; current within board limits.</td><td>user fact</td><td>inspection/measurement</td><td>Board or module damage.</td></tr>
-        <tr><td>NFR-002</td><td>core</td><td>power</td><td>The core prototype shall use an approved USB or regulated power source.</td><td>Power source approved during hardware review.</td><td>AI assumption</td><td>inspection</td><td>Unexpected resets or unsafe supply wiring.</td></tr>
-        <tr><td>NFR-003</td><td>core</td><td>timing</td><td>The core audio capture path shall use a consistent sampling schedule suitable for the selected low-fidelity demo.</td><td>Sample period variation reviewed with serial timing or instrument evidence; exact threshold unresolved.</td><td>unresolved</td><td>analysis/test</td><td>Unusable audio-level or playback behavior.</td></tr>
-        <tr><td>NFR-004</td><td>core</td><td>usability</td><td>Transmit, idle, and error states shall be distinguishable to a reviewer.</td><td>Reviewer can identify each state during checklist demo.</td><td>AI assumption</td><td>demonstration</td><td>Demo is confusing and hard to assess.</td></tr>
-        <tr><td>NFR-005</td><td>recommended</td><td>reliability</td><td>The paired-device mode should expose packet counts and dropped-frame indicators.</td><td>Serial log includes sent, received, and rejected frame counts.</td><td>AI assumption</td><td>test</td><td>Wireless failures cannot be diagnosed.</td></tr>
-        <tr><td>NFR-006</td><td>recommended</td><td>privacy-security</td><td>The prototype should avoid storing or transmitting sensitive speech outside the controlled lab demo.</td><td>Demo script and review checklist confirm no sensitive recording is used.</td><td>derived</td><td>inspection</td><td>Privacy concern for participants.</td></tr>
-        <tr><td>NFR-007</td><td>recommended</td><td>memory</td><td>Audio buffers should be sized conservatively and documented.</td><td>Memory map or build report reviewed; exact limit unresolved until toolchain and modules are selected.</td><td>unresolved</td><td>analysis</td><td>Stack/heap collision or unstable behavior.</td></tr>
-        <tr><td>NFR-008</td><td>advanced</td><td>maintainability</td><td>Advanced audio processing, display, and logging features should be separable from the core state machine.</td><td>Module review shows optional features can be disabled at build or configuration time.</td><td>AI assumption</td><td>inspection</td><td>Advanced work destabilizes the core demo.</td></tr>
+        <tr><td>NFR-001</td><td>Core</td><td>Power</td><td>All external components connected to the FRDM-MCXA153 shall be electrically compatible with the board logic level and current limits, or shall use appropriate interface circuitry.</td><td>3.3 V logic compatibility or documented interface circuitry; current within approved limits.</td><td>User fact and unresolved datasheet checks</td><td>Inspection and measurement</td><td>Board damage or unreliable behavior.</td></tr>
+        <tr><td>NFR-002</td><td>Core</td><td>Safety</td><td>The vehicle shall operate only in an instructor-approved low-speed controlled test area.</td><td>Exact speed limit unresolved; must be approved before moving tests.</td><td>AI assumption</td><td>Inspection and demonstration</td><td>Collision with hands, cables, or equipment.</td></tr>
+        <tr><td>NFR-003</td><td>Core</td><td>Reliability</td><td>The system shall enter a stopped state for stop input, road loss, initialization, and active fault conditions.</td><td>Stopped response observed in all listed conditions.</td><td>Derived</td><td>Test</td><td>Vehicle may keep moving during a fault.</td></tr>
+        <tr><td>NFR-004</td><td>Core</td><td>Maintainability</td><td>The firmware shall expose calibration, state, and fault information through serial logs.</td><td>Logs include startup, calibration, state, and fault event classes.</td><td>Derived</td><td>Test</td><td>Students cannot diagnose track or hardware problems.</td></tr>
+        <tr><td>NFR-005</td><td>Recommended</td><td>Memory</td><td>TinyML model, image buffers, tensor buffers, and application code shall fit in the approved MCXA153 memory budget.</td><td>Exact memory budget unresolved until build configuration and selected runtime are known.</td><td>Unresolved</td><td>Analysis</td><td>Build failure or runtime instability.</td></tr>
+        <tr><td>NFR-006</td><td>Recommended</td><td>Timing</td><td>Camera capture and TinyML inference shall not prevent periodic safety checks and motor updates.</td><td>Exact loop period unresolved; timing budget must be approved after hardware selection.</td><td>AI assumption</td><td>Analysis and timing test</td><td>Late stop response or unstable steering.</td></tr>
+        <tr><td>NFR-007</td><td>Recommended</td><td>Usability</td><td>The system shall provide documented visible and serial indicators for calibration, running, stopped, and fault states.</td><td>Reviewer can map each indicator to documented state.</td><td>Derived</td><td>Demonstration</td><td>Human reviewer cannot judge system state.</td></tr>
+        <tr><td>NFR-008</td><td>Recommended</td><td>Privacy-security</td><td>Camera datasets and logs shall avoid intentionally collecting identifiable people or private spaces.</td><td>Dataset review finds only track, signs, light cues, and non-identifying lab context.</td><td>AI assumption</td><td>Inspection</td><td>Privacy concerns and unapproved data collection.</td></tr>
+        <tr><td>NFR-009</td><td>Advanced</td><td>Power</td><td>Battery operation, telemetry, storage, display, and obstacle sensors shall be added only after a reviewed power budget.</td><td>Power budget approved by human reviewer before connection.</td><td>Derived</td><td>Inspection</td><td>Brownouts, heat, or damaged components.</td></tr>
+        <tr><td>NFR-010</td><td>Advanced</td><td>Reliability</td><td>Advanced logging or telemetry shall not block safety-state handling.</td><td>No missed stop or fault handling during logging test.</td><td>AI assumption</td><td>Test</td><td>Optional features degrade core safety behavior.</td></tr>
       </tbody>
     </table>
   </section>
 
   <section id="hardware">
     <h2>6. Hardware Block Diagram Description</h2>
-    <p><strong>Main controller:</strong> The NXP FRDM-MCXA153 board hosts the system state machine, button reading, audio input handling, optional packetization, audio output control, and debug reporting.</p>
-    <p><strong>Core components:</strong> push-to-talk button on a GPIO-capable input, microphone or audio input module on an ADC-capable or verified digital-audio-capable interface, safe audio output path through an amplifier or approved audio module, and visible LEDs on GPIO-capable outputs.</p>
-    <p><strong>Recommended components:</strong> second FRDM-MCXA153 prototype, approved 3.3 V-compatible wireless module connected through generic SPI-capable or UART-capable pins, optional channel/mode buttons, and serial debug.</p>
-    <p><strong>Advanced optional components:</strong> display on generic I2C-capable or SPI-capable pins, codec or digital microphone/amplifier pair, optional storage or host logging, and optional regulated battery subsystem.</p>
-    <p><strong>Power flow:</strong> USB or approved regulated power feeds the FRDM-MCXA153. External modules may draw from approved board rails only after current review; higher-current audio amplifier or radio modules may need separate regulated power with a safe common ground.</p>
-    <p><strong>Data/control flow:</strong> Button state controls the firmware state machine. Microphone data flows to audio analysis, local playback, or packet framing. Wireless frames flow to the peer device, which decodes and presents audio. Logs flow to USB serial debug.</p>
-    <p><strong>Electrical concerns:</strong> Verify 3.3 V logic, current limits, pull-up/pull-down requirements, audio biasing, decoupling, common ground, and protection before wiring. Datasheets are required for every module before implementation.</p>
+    <p>The FRDM-MCXA153 is the main controller. Core inputs include a start/stop button, calibration or mode input, and a reflectance or line sensor array. Core outputs include a dual motor driver, left and right motors, status LEDs, and USB serial debug. Recommended inputs add a low-resolution camera and traffic cue fixtures observed optically. Advanced optional modules include a distance sensor, storage or host logging path, display, telemetry module, and protected battery pack.</p>
+    <div class="cards">
+      <div class="card"><h3>Power Flow</h3><p>Board logic is powered through the normal development power path during bring-up. Motors use a suitable external regulated motor supply through a motor driver. Optional camera, display, storage, sensors, and telemetry need approved voltage and current budgets before connection.</p></div>
+      <div class="card"><h3>Data and Control Flow</h3><p>Road sensor and camera data flow into the FRDM-MCXA153. Firmware estimates road position, classifies approved cues, applies state-machine rules, and sends control signals to the motor driver. Debug data flows to USB serial and optionally to storage, display, or telemetry.</p></div>
+      <div class="card"><h3>Compatibility Concerns</h3><p>Every external signal must be verified for 3.3 V logic compatibility or level shifted. Motor driver logic inputs, camera interface signals, distance sensor echo lines, storage modules, and telemetry modules require datasheet review.</p></div>
+      <div class="card"><h3>Protection Needs</h3><p>Motor supply decoupling, common-ground review, current limiting for LEDs, pull-up or pull-down definitions for buttons, ESD-aware handling, and reverse-polarity or battery protection are required where applicable.</p></div>
+    </div>
+    <div class="danger">
+      <p>No schematic is implied by this report. Exact pins, protection parts, pull resistors, decoupling capacitors, and power wiring require board pinout, datasheet, and instructor review.</p>
+    </div>
   </section>
 
   <section id="pins">
     <h2>7. Pin Allocation Draft</h2>
     <table>
-      <thead><tr><th>Component</th><th>Tier</th><th>Signal</th><th>Required MCU Capability</th><th>Suggested Pin</th><th>Voltage</th><th>Direction</th><th>Interface</th><th>Verification Needed</th></tr></thead>
+      <thead><tr><th>Component</th><th>Tier</th><th>Signal</th><th>Required MCU capability</th><th>Suggested pin or capability</th><th>Voltage level</th><th>Direction</th><th>Interface</th><th>Verification needed</th></tr></thead>
       <tbody>
-        <tr><td>Push-to-talk button</td><td>core</td><td>Button state</td><td>GPIO-capable pin with pull-up or pull-down support</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V logic</td><td>Input</td><td>GPIO</td><td>Pinout, debounce approach, pull resistor configuration.</td></tr>
-        <tr><td>Microphone/audio input</td><td>core</td><td>Audio sample or data</td><td>ADC-capable pin or verified digital audio-capable interface</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V or conditioned analog range</td><td>Input</td><td>ADC or selected digital interface</td><td>Signal range, bias, filtering, timing support.</td></tr>
-        <tr><td>Status LEDs</td><td>core</td><td>Idle/transmit/error indicators</td><td>GPIO-capable pins</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V logic with current limiting</td><td>Output</td><td>GPIO</td><td>LED polarity, resistor value, current limit.</td></tr>
-        <tr><td>Audio output/amplifier</td><td>core</td><td>Playback signal</td><td>PWM-capable output, selected audio interface, or external codec interface</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V logic or module-specific conditioned signal</td><td>Output</td><td>PWM/audio interface</td><td>Amplifier input requirements, output filtering, current supply.</td></tr>
-        <tr><td>Wireless module</td><td>recommended</td><td>Audio frames/control</td><td>SPI-capable or UART-capable pins depending on module</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V logic unless level shifted</td><td>Bidirectional</td><td>SPI or UART</td><td>Voltage, current peaks, module interface mode, radio approval.</td></tr>
-        <tr><td>Optional display</td><td>advanced</td><td>Status/diagnostics</td><td>I2C-capable or SPI-capable pins</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V logic unless level shifted</td><td>Output/bidirectional</td><td>I2C or SPI</td><td>Bus pull-ups, address conflicts, update timing.</td></tr>
-        <tr><td>Optional battery monitor</td><td>advanced</td><td>Scaled voltage</td><td>ADC-capable pin</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>ADC-safe divided voltage</td><td>Input</td><td>ADC</td><td>Divider values, maximum input voltage, battery safety.</td></tr>
+        <tr><td>Start/stop button</td><td>Core</td><td>Button state</td><td>GPIO-capable pin with pull-up or pull-down option</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V logic assumed</td><td>Input</td><td>GPIO</td><td>Debounce, pull configuration, active level.</td></tr>
+        <tr><td>Calibration/mode button</td><td>Core/Recommended</td><td>Button state</td><td>GPIO-capable pin</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V logic assumed</td><td>Input</td><td>GPIO</td><td>Debounce, pull configuration, active level.</td></tr>
+        <tr><td>Line sensor array</td><td>Core</td><td>Road reflectance channels</td><td>ADC-capable, GPIO-capable, or I2C-capable pins depending on module</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V compatible or level shifted</td><td>Input</td><td>ADC/GPIO/I2C</td><td>Signal range, sample timing, sensor supply.</td></tr>
+        <tr><td>Motor driver</td><td>Core</td><td>Left/right enable or speed</td><td>PWM-capable outputs</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V logic to driver</td><td>Output</td><td>PWM</td><td>Driver input threshold, frequency tolerance, current path.</td></tr>
+        <tr><td>Motor driver</td><td>Core</td><td>Direction or control lines</td><td>GPIO-capable pins</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V logic to driver</td><td>Output</td><td>GPIO</td><td>Driver truth table, default stopped state.</td></tr>
+        <tr><td>Status LEDs</td><td>Core</td><td>State indicators</td><td>GPIO-capable pins</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V logic assumed</td><td>Output</td><td>GPIO</td><td>Current limiting and board LED availability.</td></tr>
+        <tr><td>USB serial debug</td><td>Core</td><td>Debug log stream</td><td>USB interface or debug serial path</td><td>Generic FRDM-MCXA153 capability only - exact interface requires board documentation.</td><td>Board-defined</td><td>Bidirectional</td><td>USB/UART debug</td><td>Host connection, baud or USB configuration.</td></tr>
+        <tr><td>Low-resolution camera</td><td>Recommended</td><td>Image/configuration data</td><td>SPI-capable, I2C-capable plus data, or UART-capable pins depending on module</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V compatible or level shifted</td><td>Input/config bidirectional</td><td>Camera-specific digital interface</td><td>SDK support, frame size, timing, memory, voltage.</td></tr>
+        <tr><td>Distance sensor</td><td>Advanced</td><td>Range reading</td><td>I2C-capable, GPIO-capable, ADC-capable, or timed digital input depending on sensor</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V compatible or level shifted</td><td>Input or bidirectional</td><td>I2C/GPIO/ADC</td><td>Echo voltage, timing, update rate.</td></tr>
+        <tr><td>Display</td><td>Advanced</td><td>Status display data</td><td>I2C-capable or SPI-capable pins</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V compatible or level shifted</td><td>Output or bidirectional</td><td>I2C/SPI</td><td>Voltage, address/chip select, update timing.</td></tr>
+        <tr><td>Telemetry/storage</td><td>Advanced</td><td>Run data</td><td>UART-capable, SPI-capable, or I2C-capable pins depending on module</td><td>Generic FRDM-MCXA153 capability only - exact pin requires board pinout and datasheet verification.</td><td>3.3 V compatible or level shifted</td><td>Bidirectional</td><td>UART/SPI/I2C</td><td>Power, blocking behavior, data integrity.</td></tr>
       </tbody>
     </table>
   </section>
 
   <section id="firmware">
     <h2>8. Firmware Architecture</h2>
-    <p><strong>Architecture style:</strong> Bare-metal superloop with interrupt-driven timing or event flags is recommended for core and recommended tiers. RTOS use is unknown and should be approved only if it matches course templates.</p>
-    <p><strong>Reason:</strong> The project needs clear state transitions and predictable audio timing without adding unnecessary scheduling complexity for the core student version.</p>
     <table>
-      <thead><tr><th>Module</th><th>Responsibilities</th></tr></thead>
-      <tbody>
-        <tr><td>Board/platform module</td><td>Initialize clocks, board support, debug console, and approved peripherals without naming unverified SDK APIs.</td></tr>
-        <tr><td>Input module</td><td>Read and debounce push-to-talk and optional mode/channel controls.</td></tr>
-        <tr><td>State machine</td><td>Manage idle, transmit/record, receive/playback, error, and optional pairing states.</td></tr>
-        <tr><td>Audio input module</td><td>Acquire audio samples or activity measurements and store them in bounded buffers.</td></tr>
-        <tr><td>Audio output module</td><td>Drive approved playback path or visual audio-level output.</td></tr>
-        <tr><td>Communication module</td><td>Recommended tier: frame audio data, exchange packets, count errors, and expose link state.</td></tr>
-        <tr><td>Diagnostics module</td><td>Emit serial logs and drive status LEDs or optional display.</td></tr>
-        <tr><td>Advanced processing module</td><td>Optional voice activity, companding, compression, display, and logging features.</td></tr>
-      </tbody>
+      <tr><th>Architecture style</th><td>Bare-metal superloop with interrupt-driven timing or peripheral events. RTOS use is unknown and should be approved only if it fits the course setup.</td></tr>
+      <tr><th>Reason for choice</th><td>The project needs predictable state-machine behavior, simple scheduling, and clarity for third-year students. A superloop is enough for core behavior; interrupts can handle timing or capture events without inventing SDK APIs.</td></tr>
+      <tr><th>Main modules</th><td>Platform initialization, state machine, safety manager, road sensor module, calibration module, motor control module, user input module, status LED module, serial logger, recommended camera acquisition module, recommended TinyML inference module, advanced obstacle/logging/display/telemetry modules.</td></tr>
+      <tr><th>Startup sequence</th><td>Initialize board services, keep motor output disabled, initialize debug logging, verify configured inputs/outputs, enter idle/stopped state, wait for calibration or start command.</td></tr>
+      <tr><th>Main loop/task flow</th><td>Read user inputs, update safety conditions, sample road sensors, update calibration or road estimate, process camera/inference when enabled, update state machine, command motors, update status indicators, emit logs.</td></tr>
+      <tr><th>Interrupt/event handling</th><td>Use interrupts only for approved timing, button events, communication, or sensor events where needed. Interrupt handlers should set flags or buffers; main logic should remain in state-machine modules.</td></tr>
+      <tr><th>Communication/data logging flow</th><td>Core logs are serial and nonblocking where possible. Advanced storage or telemetry must buffer data and avoid delaying safety checks.</td></tr>
+      <tr><th>Advanced feature flow</th><td>Obstacle sensing, display updates, storage, telemetry, and extra route states are optional and must not override core stop behavior.</td></tr>
+      <tr><th>Error handling</th><td>Faults include road lost, sensor unavailable, camera unavailable, low-confidence cue, motor driver disabled, and power review failure. Faults should be visible and logged.</td></tr>
+      <tr><th>Safe-state strategy</th><td>Stopped motor command is the default on startup, stop input, road loss, active fault, unresolved cue behavior, or failed initialization.</td></tr>
+      <tr><th>Configuration constants</th><td>Sensor thresholds, confidence threshold, class list, speed settings, timing budget, log level, and enabled feature tier. Numeric values require human approval or measured calibration.</td></tr>
     </table>
-    <p><strong>Startup sequence:</strong> initialize board support, configure approved pins and peripherals, verify optional modules, clear buffers, report version/configuration, enter idle or named fault state.</p>
-    <p><strong>Main loop/task flow:</strong> process input events, update state machine, service audio buffers, service communication frames if enabled, update indicators, emit bounded logs.</p>
-    <p><strong>Interrupt/event handling:</strong> timers or peripheral events may set flags for audio sampling, communication receive, and button changes; heavy processing should run outside interrupt context.</p>
-    <p><strong>Error and safe-state strategy:</strong> on module fault, buffer overflow, invalid frame, or unsafe configuration, stop transmit/playback where needed, report the fault, and remain inspectable through LED or serial output.</p>
-    <p><strong>Configuration constants:</strong> sample rate, buffer size, debounce time, frame size, log level, and optional display refresh period must be declared as reviewable constants; exact values require human approval.</p>
   </section>
 
   <section id="tests">
     <h2>9. Test Cases and Acceptance Criteria</h2>
     <table>
-      <thead><tr><th>ID</th><th>Requirement</th><th>Tier</th><th>Type</th><th>Preconditions</th><th>Steps</th><th>Expected Result</th><th>Evidence</th><th>Pass/Fail Rule</th></tr></thead>
+      <thead><tr><th>ID</th><th>Requirement</th><th>Tier</th><th>Type</th><th>Preconditions</th><th>Steps</th><th>Expected result</th><th>Acceptance criterion</th><th>Evidence</th><th>Pass/fail rule</th></tr></thead>
       <tbody>
-        <tr><td>TC-001</td><td>FR-001</td><td>core</td><td>inspection</td><td>Prototype assembled.</td><td>Inspect main controller and bill of materials.</td><td>FRDM-MCXA153 is the main controller.</td><td>Photo and checklist result.</td><td>Pass if no alternate main controller is used.</td></tr>
-        <tr><td>TC-002</td><td>FR-002</td><td>core</td><td>test</td><td>Approved power connected.</td><td>Power cycle system and observe startup logs/LEDs.</td><td>Startup complete or named fault is reported.</td><td>Serial log and video.</td><td>Pass if startup state is unambiguous.</td></tr>
-        <tr><td>TC-003</td><td>FR-003</td><td>core</td><td>test</td><td>Button connected to approved GPIO-capable input.</td><td>Press and release button 20 times at normal pace.</td><td>One state transition per deliberate press or release.</td><td>Serial log.</td><td>Pass if no unintended duplicate transitions are observed.</td></tr>
-        <tr><td>TC-004</td><td>FR-004</td><td>core</td><td>demonstration</td><td>Startup complete.</td><td>Hold push-to-talk, then release it.</td><td>Transmit indicator appears while held and clears after release.</td><td>Video or checklist result.</td><td>Pass if indicator follows button state after debouncing.</td></tr>
-        <tr><td>TC-005</td><td>FR-005</td><td>core</td><td>test</td><td>Microphone path approved and connected.</td><td>Apply speech or test tone and inspect reported audio values.</td><td>Measured level or buffer data changes with sound.</td><td>Serial log, oscilloscope capture, or saved data log.</td><td>Pass if quiet and sound conditions are distinguishable.</td></tr>
-        <tr><td>TC-006</td><td>FR-006</td><td>core</td><td>demonstration</td><td>Audio input/output or level indicator configured.</td><td>Capture a short sound and present local level or playback.</td><td>Reviewer observes audio response.</td><td>Video or reviewer checklist.</td><td>Pass if response corresponds to captured input.</td></tr>
-        <tr><td>TC-007</td><td>FR-007</td><td>core</td><td>test</td><td>Fault injection method approved.</td><td>Disconnect or disable one configured module, then restart.</td><td>System enters named error state.</td><td>Serial log and LED observation.</td><td>Pass if fault is reported without false ready state.</td></tr>
-        <tr><td>TC-008</td><td>FR-008</td><td>recommended</td><td>demonstration</td><td>Two approved prototypes powered and paired.</td><td>Transmit from device A while observing device B.</td><td>Device B enters receive behavior.</td><td>Video and serial logs from both devices.</td><td>Pass if half-duplex state is observable on both devices.</td></tr>
-        <tr><td>TC-009</td><td>FR-009</td><td>recommended</td><td>test</td><td>Wireless link configured.</td><td>Transmit sample audio or clip and inspect frame logs.</td><td>Valid frame count increases and invalid frames are counted separately.</td><td>Serial log or logic analyzer capture.</td><td>Pass if frames are formed and counted consistently.</td></tr>
-        <tr><td>TC-010</td><td>FR-010</td><td>recommended</td><td>demonstration</td><td>Receiver audio output approved.</td><td>Send a short audio clip from peer device.</td><td>Receiver presents playback or corresponding audio-level trace.</td><td>Video/audio recording or saved data log.</td><td>Pass if received content is visibly or audibly tied to transmit event.</td></tr>
-        <tr><td>TC-011</td><td>FR-011</td><td>recommended</td><td>test</td><td>Debug output enabled.</td><td>Exercise idle, transmit, receive, and link fault states.</td><td>Logs and visible indicators match each state.</td><td>Serial log and video.</td><td>Pass if every tested state has a distinct report.</td></tr>
-        <tr><td>TC-012</td><td>FR-012</td><td>advanced</td><td>test</td><td>Voice activity feature enabled.</td><td>Compare quiet input and speech input.</td><td>Voice activity flag changes predictably.</td><td>Saved data log.</td><td>Pass if reviewer accepts threshold and observed behavior.</td></tr>
-        <tr><td>TC-013</td><td>FR-013</td><td>advanced</td><td>test</td><td>Compression feature enabled.</td><td>Encode and decode known sample data.</td><td>Decoded output remains recognizable and frame handling remains stable.</td><td>Unit test result or data log.</td><td>Pass if no buffer overflow and result is accepted by reviewer.</td></tr>
-        <tr><td>TC-014</td><td>FR-014</td><td>advanced</td><td>demonstration</td><td>Display approved and connected.</td><td>Run transmit/receive demo while observing display and serial log.</td><td>Displayed state matches serial state.</td><td>Photo/video and serial log.</td><td>Pass if display does not conflict with core operation.</td></tr>
-        <tr><td>TC-015</td><td>NFR-001</td><td>core</td><td>inspection/measurement</td><td>Modules selected.</td><td>Review datasheets and measure supply/logic levels before final connection.</td><td>Compatibility or interface circuitry is documented.</td><td>Datasheet checklist and measured voltages.</td><td>Pass if every external connection is approved.</td></tr>
+        <tr><td>TC-001</td><td>FR-001</td><td>Core</td><td>Inspection</td><td>Prototype hardware available.</td><td>Inspect main controller and compare to board label/documentation.</td><td>Main controller is FRDM-MCXA153.</td><td>No alternate main controller is used.</td><td>Checklist result, photo.</td><td>Pass if FRDM-MCXA153 is main controller.</td></tr>
+        <tr><td>TC-002</td><td>FR-002</td><td>Core</td><td>Test</td><td>Vehicle wheels lifted or motor outputs monitored.</td><td>Power system without pressing start.</td><td>System enters stopped state.</td><td>No motor command before start.</td><td>Serial log, oscilloscope or logic analyzer capture.</td><td>Pass if outputs remain stopped.</td></tr>
+        <tr><td>TC-003</td><td>FR-003</td><td>Core</td><td>Demonstration</td><td>Track and sensors installed.</td><td>Enter calibration mode and complete calibration action.</td><td>Calibration state is visible and logged.</td><td>Log or LED confirms calibration entered and completed.</td><td>Serial log, video.</td><td>Pass if reviewer observes calibration state and completion.</td></tr>
+        <tr><td>TC-004</td><td>FR-004</td><td>Core</td><td>Test</td><td>Road sensor connected and debug enabled.</td><td>Move car laterally across road marking.</td><td>Sensor readings and estimated road position change.</td><td>Log shows distinct position values for left/center/right conditions.</td><td>Serial log.</td><td>Pass if road position responds to movement.</td></tr>
+        <tr><td>TC-005</td><td>FR-005</td><td>Core</td><td>Demonstration</td><td>Approved low-speed track and safety observer present.</td><td>Start autonomous mode on core track segment.</td><td>Vehicle follows marked road segment.</td><td>Vehicle completes approved segment without leaving path.</td><td>Video, serial log.</td><td>Pass if path completion and no fault are observed.</td></tr>
+        <tr><td>TC-006</td><td>FR-006</td><td>Core</td><td>Test</td><td>Vehicle in autonomous mode at approved low speed.</td><td>Remove or obscure road marking in controlled way.</td><td>Vehicle stops and reports road-lost fault.</td><td>Motors stop and fault is logged.</td><td>Video, serial log.</td><td>Pass if stopped state occurs after road loss.</td></tr>
+        <tr><td>TC-007</td><td>FR-007</td><td>Core</td><td>Test</td><td>Vehicle in idle, calibration, autonomous, and fault-recovery states.</td><td>Activate stop control in each state.</td><td>Stop command overrides current behavior.</td><td>Motors stop and remain stopped until new start sequence.</td><td>Video, serial log, logic capture.</td><td>Pass if every tested state stops.</td></tr>
+        <tr><td>TC-008</td><td>FR-008</td><td>Core</td><td>Demonstration</td><td>State indicator mapping documented.</td><td>Exercise idle, calibration, autonomous, stop, and fault states.</td><td>Visible output identifies each state.</td><td>Reviewer maps each state correctly.</td><td>Checklist result, video.</td><td>Pass if all states are identifiable.</td></tr>
+        <tr><td>TC-009</td><td>FR-009</td><td>Core</td><td>Test</td><td>Serial logging connected.</td><td>Run startup, calibration, road following, motor command, and fault tests.</td><td>Log includes all required event classes.</td><td>Captured log contains startup, calibration, road position, motor command, and fault events.</td><td>Serial log.</td><td>Pass if all event classes are present.</td></tr>
+        <tr><td>TC-010</td><td>FR-010</td><td>Recommended</td><td>Test</td><td>Approved camera connected and powered safely.</td><td>Capture image data or frame summary.</td><td>System reports captured frame or summary.</td><td>Debug output confirms frame capture.</td><td>Serial log, optional image dump.</td><td>Pass if capture evidence exists without fault.</td></tr>
+        <tr><td>TC-011</td><td>FR-011</td><td>Recommended</td><td>Test</td><td>Approved model and cue set loaded.</td><td>Present each approved traffic cue under controlled lighting.</td><td>System classifies each approved cue.</td><td>Each class is detected in controlled static or moving test.</td><td>Serial log, photo/video evidence.</td><td>Pass if all approved classes are detected according to reviewed criterion.</td></tr>
+        <tr><td>TC-012</td><td>FR-012</td><td>Recommended</td><td>Test</td><td>Confidence threshold approved.</td><td>Present ambiguous or out-of-set cue.</td><td>System reports unknown and uses fallback.</td><td>Low-confidence sample produces unknown classification and fallback action.</td><td>Serial log, photo of cue.</td><td>Pass if unknown path is used.</td></tr>
+        <tr><td>TC-013</td><td>FR-013</td><td>Recommended</td><td>Demonstration</td><td>Stop cue approved and model configured.</td><td>Present stop cue during controlled run.</td><td>Vehicle stops.</td><td>Vehicle stops after recognized stop cue.</td><td>Video, serial log.</td><td>Pass if stop behavior occurs and is logged.</td></tr>
+        <tr><td>TC-014</td><td>FR-014</td><td>Recommended</td><td>Demonstration</td><td>Continue cue approved and no fault active.</td><td>Present continue or green-light cue during controlled run.</td><td>Vehicle continues road following.</td><td>Vehicle continues after recognized continue cue.</td><td>Video, serial log.</td><td>Pass if no unintended stop occurs.</td></tr>
+        <tr><td>TC-015</td><td>FR-015</td><td>Recommended</td><td>Test</td><td>Traffic cue processing enabled.</td><td>Present approved and unknown cues.</td><td>Log includes class, confidence category, and action.</td><td>Each processed cue event has required fields.</td><td>Serial log.</td><td>Pass if required fields are present.</td></tr>
+        <tr><td>TC-016</td><td>FR-016</td><td>Advanced</td><td>Demonstration</td><td>Approved obstacle sensor connected.</td><td>Present test obstacle at approved condition.</td><td>Vehicle slows or stops according to approved behavior.</td><td>Obstacle behavior occurs and is logged.</td><td>Video, serial log.</td><td>Pass if approved response occurs.</td></tr>
+        <tr><td>TC-017</td><td>FR-017</td><td>Advanced</td><td>Test</td><td>Logging or telemetry module approved.</td><td>Run vehicle and collect stored or streamed data.</td><td>Run record includes required fields.</td><td>Record contains sensor, inference, motor, and fault fields.</td><td>Saved data log, dashboard screenshot.</td><td>Pass if record is complete and readable.</td></tr>
+        <tr><td>TC-018</td><td>FR-018</td><td>Advanced</td><td>Demonstration</td><td>Display connected and approved.</td><td>Exercise mode, cue, confidence, and fault states.</td><td>Display matches debug state.</td><td>Display updates match serial log for tested events.</td><td>Video, serial log.</td><td>Pass if display and log agree.</td></tr>
       </tbody>
     </table>
   </section>
@@ -281,76 +400,73 @@
   <section id="traceability">
     <h2>10. Traceability Matrix</h2>
     <table>
-      <thead><tr><th>User Story</th><th>Requirement</th><th>Test Case</th><th>Acceptance Criterion</th><th>Evidence</th><th>Gap</th></tr></thead>
+      <thead><tr><th>User story</th><th>Requirement</th><th>Test case</th><th>Acceptance criterion</th><th>Evidence</th><th>Gap</th></tr></thead>
       <tbody>
-        <tr><td>US-001</td><td>FR-001</td><td>TC-001</td><td>FRDM-MCXA153 is main controller.</td><td>Photo, checklist</td><td>None</td></tr>
-        <tr><td>US-006</td><td>FR-002</td><td>TC-002</td><td>Startup complete or named fault.</td><td>Serial log, video</td><td>None</td></tr>
-        <tr><td>US-002</td><td>FR-003, FR-004</td><td>TC-003, TC-004</td><td>Debounced transition and transmit indicator.</td><td>Serial log, video</td><td>None</td></tr>
-        <tr><td>US-003</td><td>FR-005</td><td>TC-005</td><td>Audio input changes with sound.</td><td>Log or instrument capture</td><td>None</td></tr>
-        <tr><td>US-004</td><td>FR-006</td><td>TC-006</td><td>Local audio response observed.</td><td>Video/checklist</td><td>None</td></tr>
-        <tr><td>US-006</td><td>FR-007</td><td>TC-007</td><td>Fault is reported without false ready state.</td><td>Serial log, LED observation</td><td>None</td></tr>
-        <tr><td>US-005</td><td>FR-008, FR-009, FR-010, FR-011</td><td>TC-008, TC-009, TC-010, TC-011</td><td>Peer mode, frame transfer, received output, and state reporting work.</td><td>Logs, video, capture</td><td>Wireless module unresolved</td></tr>
-        <tr><td>US-008</td><td>FR-012, FR-013, FR-014</td><td>TC-012, TC-013, TC-014</td><td>Optional advanced behavior accepted by reviewer.</td><td>Logs, unit results, photos</td><td>Advanced components unresolved</td></tr>
-        <tr><td>US-007</td><td>NFR-001</td><td>TC-015</td><td>Every external connection approved.</td><td>Datasheets, measurements</td><td>None</td></tr>
+        <tr><td>US-001</td><td>FR-001, FR-002</td><td>TC-001, TC-002</td><td>FRDM-MCXA153 is main controller; motors remain stopped before start.</td><td>Checklist, photo, serial/log capture.</td><td>None</td></tr>
+        <tr><td>US-002</td><td>FR-003</td><td>TC-003</td><td>Calibration entered and completed with visible or serial evidence.</td><td>Serial log, video.</td><td>None</td></tr>
+        <tr><td>US-003</td><td>FR-004, FR-005</td><td>TC-004, TC-005</td><td>Road position changes with track position; approved segment completed.</td><td>Serial log, video.</td><td>None</td></tr>
+        <tr><td>US-004</td><td>FR-008, FR-009, FR-015</td><td>TC-008, TC-009, TC-015</td><td>State and cue information are visible and logged.</td><td>Checklist, serial log.</td><td>None</td></tr>
+        <tr><td>US-005</td><td>FR-006, FR-007</td><td>TC-006, TC-007</td><td>Road-lost and stop input force stopped behavior.</td><td>Video, serial log.</td><td>None</td></tr>
+        <tr><td>US-006</td><td>FR-010, FR-011, FR-012, FR-013, FR-014</td><td>TC-010, TC-011, TC-012, TC-013, TC-014</td><td>Approved cues are captured, classified, and mapped to actions.</td><td>Serial log, photo/video evidence.</td><td>Exact cue classes unresolved until human approval.</td></tr>
+        <tr><td>US-007</td><td>All Must FRs</td><td>TC-001 through TC-009</td><td>Every Must functional requirement has at least one test.</td><td>Test report and collected evidence.</td><td>None</td></tr>
+        <tr><td>US-008</td><td>FR-016, FR-017, FR-018</td><td>TC-016, TC-017, TC-018</td><td>Optional advanced behavior works only after component approval.</td><td>Video, logs, screenshots.</td><td>Advanced components unresolved.</td></tr>
       </tbody>
     </table>
-    <p class="note">Every Must functional requirement has at least one test case. Remaining gaps are component-selection gaps, not missing test coverage.</p>
   </section>
 
   <section id="risks">
     <h2>11. Assumptions and Risk Register</h2>
-    <h3>Facts from User</h3>
-    <ul><li>Walkie talkie project idea.</li><li>NXP FRDM-MCXA153 board is mandatory.</li><li>No exact pins or SDK APIs may be invented.</li></ul>
-    <h3>Open Questions</h3>
-    <ul><li>Will teams have one or two boards?</li><li>Which audio and wireless modules are available?</li><li>Are short voice clips acceptable?</li><li>What wireless technology and range are allowed?</li><li>Is battery operation required?</li></ul>
+    <h3>Facts, Assumptions, and Open Questions</h3>
+    <p>Facts from user and Agent 0 assumptions are listed in Section 1. Open questions remain around chassis, motor driver, camera module, cue classes, training workflow, safety rules, and traffic light recognition approach.</p>
     <table>
-      <thead><tr><th>ID</th><th>Risk Area</th><th>Tier</th><th>Severity</th><th>Impact</th><th>Mitigation</th><th>Human Approval</th></tr></thead>
+      <thead><tr><th>ID</th><th>Category</th><th>Tier affected</th><th>Severity</th><th>Impact</th><th>Mitigation</th><th>Human approval</th></tr></thead>
       <tbody>
-        <tr><td>R-001</td><td>technical</td><td>core</td><td>Medium</td><td>Audio input/output integration takes longer than expected.</td><td>Start with audio level reporting before playback.</td><td>no</td></tr>
-        <tr><td>R-002</td><td>safety</td><td>core</td><td>High</td><td>Speaker or amplifier wiring exceeds MCU or board current limits.</td><td>Use approved amplifier module and inspect wiring before power.</td><td>yes</td></tr>
-        <tr><td>R-003</td><td>voltage/power</td><td>core/recommended</td><td>High</td><td>5 V module damages 3.3 V board I/O.</td><td>Verify datasheets and add level shifting or reject module.</td><td>yes</td></tr>
-        <tr><td>R-004</td><td>timing</td><td>recommended</td><td>Medium</td><td>Packet delays produce choppy or unusable audio.</td><td>Permit short clips or lower sample rate fallback.</td><td>yes</td></tr>
-        <tr><td>R-005</td><td>memory</td><td>recommended/advanced</td><td>Medium</td><td>Audio buffers consume too much memory.</td><td>Review build memory report and use bounded buffers.</td><td>no</td></tr>
-        <tr><td>R-006</td><td>privacy/security</td><td>recommended</td><td>Medium</td><td>Voice data is recorded or transmitted without consent.</td><td>Use controlled demo phrases and avoid persistent storage unless approved.</td><td>yes</td></tr>
-        <tr><td>R-007</td><td>reliability</td><td>recommended</td><td>Medium</td><td>Wireless packet loss is hard to diagnose.</td><td>Log sent, received, rejected, and dropped frame counts.</td><td>no</td></tr>
-        <tr><td>R-008</td><td>advanced feature</td><td>advanced</td><td>Medium</td><td>Compression, display, or AI work destabilizes core demo.</td><td>Keep advanced modules optional and disable-able.</td><td>yes</td></tr>
-        <tr><td>R-009</td><td>safety</td><td>advanced</td><td>High</td><td>Battery operation introduces charging or protection hazards.</td><td>Keep USB power unless battery subsystem is reviewed.</td><td>yes</td></tr>
+        <tr><td>R-001</td><td>Technical</td><td>Recommended</td><td>High</td><td>Camera or TinyML integration may exceed schedule.</td><td>Keep line following independent; start with static cue classification; limit class count.</td><td>Yes</td></tr>
+        <tr><td>R-002</td><td>Technical</td><td>Core</td><td>Medium</td><td>Sensor calibration may fail under changed lighting or surfaces.</td><td>Add calibration mode, serial raw-value logging, and controlled track materials.</td><td>No</td></tr>
+        <tr><td>R-003</td><td>Safety</td><td>Core</td><td>High</td><td>Vehicle may collide with equipment or people during tests.</td><td>Use low speed, lifted-wheel startup tests, stop input, road-lost stop, and supervised test area.</td><td>Yes</td></tr>
+        <tr><td>R-004</td><td>Voltage/power</td><td>Core</td><td>High</td><td>Motor driver or sensors could damage the board if logic levels or current paths are wrong.</td><td>Review datasheets, measure voltages, use level shifting and separate motor power.</td><td>Yes</td></tr>
+        <tr><td>R-005</td><td>Timing</td><td>Recommended</td><td>Medium</td><td>Inference or camera capture may delay control and stop handling.</td><td>Budget timing, process vision at lower rate than safety checks, avoid blocking logs.</td><td>Yes</td></tr>
+        <tr><td>R-006</td><td>Memory</td><td>Recommended</td><td>High</td><td>Model, image buffers, tensor arena, and firmware may exceed memory.</td><td>Use low-resolution images, small model, compile-time memory report, and model size review.</td><td>Yes</td></tr>
+        <tr><td>R-007</td><td>Privacy/security</td><td>Recommended</td><td>Medium</td><td>Camera data could capture people or private spaces.</td><td>Use track-only datasets and review saved images/logs.</td><td>Yes</td></tr>
+        <tr><td>R-008</td><td>Reliability</td><td>Advanced</td><td>Medium</td><td>Telemetry, display, or storage may block safety logic.</td><td>Make advanced modules optional, buffered, and disabled until core tests pass.</td><td>No</td></tr>
+        <tr><td>R-009</td><td>Advanced feature</td><td>Advanced</td><td>Medium</td><td>Too many sign classes may reduce classifier quality.</td><td>Approve a small cue set first and add unknown class before expanding.</td><td>Yes</td></tr>
+        <tr><td>R-010</td><td>Voltage/power</td><td>Advanced</td><td>High</td><td>Battery operation may introduce safety and brownout issues.</td><td>Require protected battery pack, regulator review, current measurement, and instructor approval.</td><td>Yes</td></tr>
       </tbody>
     </table>
   </section>
 
   <section id="review">
     <h2>12. Human Review Checklist</h2>
-    <div class="checklist">
-      <label><input type="checkbox"> Scope approved</label>
-      <label><input type="checkbox"> Selected feature tier approved</label>
-      <label><input type="checkbox"> FRDM-MCXA153 confirmed as mandatory board</label>
-      <label><input type="checkbox"> FRDM-MCXA153 pinout checked</label>
-      <label><input type="checkbox"> Voltage compatibility checked</label>
-      <label><input type="checkbox"> Current limits checked</label>
-      <label><input type="checkbox"> Power budget checked</label>
-      <label><input type="checkbox"> External modules checked</label>
-      <label><input type="checkbox"> Advanced components approved or removed</label>
-      <label><input type="checkbox"> Sensor/actuator interfaces confirmed</label>
-      <label><input type="checkbox"> Firmware architecture approved</label>
-      <label><input type="checkbox"> Timing and memory constraints reviewed</label>
-      <label><input type="checkbox"> Test plan reviewed</label>
-      <label><input type="checkbox"> Traceability reviewed</label>
-      <label><input type="checkbox"> Safety/privacy/security risks reviewed</label>
-      <label><input type="checkbox"> AI assumptions accepted or rejected</label>
-      <label><input type="checkbox"> Implementation allowed to start: yes/no</label>
-    </div>
+    <ul class="checklist">
+      <li><input type="checkbox"> Scope approved</li>
+      <li><input type="checkbox"> Selected feature tier approved</li>
+      <li><input type="checkbox"> FRDM-MCXA153 confirmed as mandatory board</li>
+      <li><input type="checkbox"> FRDM-MCXA153 pinout checked</li>
+      <li><input type="checkbox"> Voltage compatibility checked</li>
+      <li><input type="checkbox"> Current limits checked</li>
+      <li><input type="checkbox"> Power budget checked</li>
+      <li><input type="checkbox"> External modules checked</li>
+      <li><input type="checkbox"> Advanced components approved or removed</li>
+      <li><input type="checkbox"> Sensor/actuator interfaces confirmed</li>
+      <li><input type="checkbox"> Firmware architecture approved</li>
+      <li><input type="checkbox"> Timing and memory constraints reviewed</li>
+      <li><input type="checkbox"> Test plan reviewed</li>
+      <li><input type="checkbox"> Traceability reviewed</li>
+      <li><input type="checkbox"> Safety/privacy/security risks reviewed</li>
+      <li><input type="checkbox"> AI assumptions accepted or rejected</li>
+      <li><input type="checkbox"> Implementation allowed to start: yes/no</li>
+    </ul>
   </section>
 
   <section id="status">
     <h2>13. Final Status</h2>
-    <p><span class="badge ready">READY FOR HUMAN REVIEW</span></p>
+    <p><span class="badge recommended">READY FOR HUMAN REVIEW</span></p>
     <ul>
-      <li>The report defines core, recommended, and advanced requirements while keeping the FRDM-MCXA153 as the mandatory main controller.</li>
-      <li>All exact pins and SDK APIs are intentionally left unresolved until board pinout, module datasheets, and course templates are reviewed.</li>
+      <li>The selected recommended scope is defined and keeps the core line-following prototype independently demonstrable.</li>
+      <li>The mandatory NXP FRDM-MCXA153 platform is preserved as a formal requirement.</li>
       <li>Every Must functional requirement has at least one linked test case.</li>
-      <li>The recommended two-device wireless scope is feasible only after module, power, radio, and audio-quality assumptions are approved.</li>
-      <li>Implementation should begin with the core one-board audio and push-to-talk milestone.</li>
+      <li>Exact pins, SDK APIs, numeric timing thresholds, and module choices remain unresolved until human hardware review.</li>
+      <li>Implementation should begin only after the review checklist approves safety, power, pinout, and selected components.</li>
     </ul>
   </section>
 </main>
